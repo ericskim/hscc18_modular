@@ -1,0 +1,314 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      9554,        305]
+NotebookOptionsPosition[      8138,        249]
+NotebookOutlinePosition[      8480,        264]
+CellTagsIndexPosition[      8437,        261]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Loading MathTIDES", "Section",
+ CellChangeTimes->{{3.504611527097014*^9, 3.504611535701703*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"<<", "MathTIDES`"}]], "Input",
+ CellChangeTimes->{{3.504611544095785*^9, 3.504611548061817*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  FrameBox[
+   RowBox[{
+    StyleBox[
+     RowBox[{"    ", 
+      RowBox[{
+       RowBox[{"MathTIDES", " ", "2.00"}], "\n", "    ", 
+       RowBox[{
+        RowBox[{
+        "MathTIDES", "    ", "is", "   ", "part", "   ", "of", "   ", "the", "   ",
+          "TIDES", "   ", 
+         RowBox[{"project", ".", "\n", "    ", "Copyright"}], 
+         RowBox[{"(", "C", ")"}], "  ", "2010", "  ", "Abad"}], ",", " ", 
+        RowBox[{"A", "."}], ",", "  ", "Barrio", ",", " ", 
+        RowBox[{"R", "."}], ",", "  ", "Blesa", ",", " ", 
+        RowBox[{
+         RowBox[{"F", ".", "  ", "and"}], "  ", "Rodriguez"}], ",", " ", 
+        RowBox[{"M", ".", "\n"}]}]}]}],
+     FontFamily->"Geneva"], 
+    TagBox[
+     ButtonBox[
+      PaneSelectorBox[{False->"\<\"http://gme.unizar.es/software/tides\"\>", 
+       True->
+       StyleBox["\<\"http://gme.unizar.es/software/tides\"\>", 
+        "HyperlinkActive"]}, Dynamic[
+        CurrentValue["MouseOver"]],
+       BaseStyle->{"Hyperlink"},
+       BaselinePosition->Baseline,
+       FrameMargins->0,
+       ImageSize->Automatic],
+      BaseStyle->"Hyperlink",
+      ButtonData->{
+        URL["http://gme.unizar.es/software/tides"], None},
+      ButtonNote->"http://gme.unizar.es/software/tides"],
+     Annotation[#, "http://gme.unizar.es/software/tides", "Hyperlink"]& ]}],
+   Background->RGBColor[1, 1, 0.85]],
+  DisplayForm]], "Output",
+ CellChangeTimes->{3.504611624578113*^9, 3.504612596138023*^9, 
+  3.5046163489964447`*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Setting the work directory", "Section",
+ CellChangeTimes->{{3.5046115899786386`*^9, 3.504611612743342*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"SetDirectory", "[", 
+  RowBox[{"NotebookDirectory", "[", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.504611504172099*^9, 3.5046115237780867`*^9}}],
+
+Cell[BoxData["\<\"/Users/abad/Desktop/TIDESExamples/chapter08\"\>"], "Output",
+ CellChangeTimes->{3.5046116262400103`*^9, 3.504612596230681*^9, 
+  3.504616350807206*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Writing code to compute events", "Section",
+ CellChangeTimes->{{3.504616862650247*^9, 3.504616878744357*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Declaring the sincos differential equation", "Subsection",
+ CellChangeTimes->{{3.504611649805194*^9, 3.504611659312459*^9}, {
+  3.504612548740176*^9, 3.504612549593028*^9}, {3.504616317526087*^9, 
+  3.504616320164647*^9}, {3.504616791343506*^9, 3.5046167925256557`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"sincosODE", "=", 
+   RowBox[{"FirstOrderODE", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"y", ",", 
+       RowBox[{"-", "x"}]}], "}"}], ",", "t", ",", 
+     RowBox[{"{", 
+      RowBox[{"x", ",", "y"}], "}"}]}], "]"}]}], ";"}]], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Zeros of Sin[x] + Cos[x] in [0, 10 \[Pi]]\
+\>", "Subsection",
+ CellChangeTimes->{{3.504616897410726*^9, 3.504616920577626*^9}}],
+
+Cell[BoxData[
+ RowBox[{"TSMCodeFiles", "[", 
+  RowBox[{
+  "sincosODE", ",", " ", "\"\<sincosMinZ\>\"", ",", "\[IndentingNewLine]", 
+   RowBox[{"InitialConditions", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "1"}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"IntegrationPoints", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", 
+      RowBox[{"10", " ", "Pi"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"Output", "\[Rule]", "Screen"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"FindZeros", "\[Rule]", 
+    RowBox[{"x", "+", "y"}]}]}], "]"}]], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Two local extrema of Sin[x] in [0, 10 \[Pi]]\
+\>", "Subsection",
+ CellChangeTimes->{{3.504617004699554*^9, 3.504617018011463*^9}}],
+
+Cell[BoxData[
+ RowBox[{"TSMCodeFiles", "[", 
+  RowBox[{
+  "sincosODE", ",", "\[IndentingNewLine]", "\"\<sincosMinE\>\"", ",", 
+   "\[IndentingNewLine]", 
+   RowBox[{"InitialConditions", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "1"}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"IntegrationPoints", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", 
+      RowBox[{"10", " ", "Pi"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"Output", "\[Rule]", "Screen"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"FindExtrema", "\[Rule]", "x"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"EventsNumber", "\[Rule]", "2"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.5046169518411283`*^9, 3.504617002009562*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Ten local maxima of Sin[x] + 2 Cos[x] in[0, 10 \[Pi]]\
+\>", "Subsection",
+ CellChangeTimes->{{3.504617036300871*^9, 3.5046170558670397`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"TSMCodeFiles", "[", 
+  RowBox[{
+  "sincosODE", ",", " ", "\"\<sincosMinM\>\"", ",", "\[IndentingNewLine]", 
+   RowBox[{"InitialConditions", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "1"}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"IntegrationPoints", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", 
+      RowBox[{"10", " ", "Pi"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"Output", "\[Rule]", "Screen"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"FindMaxima", "\[Rule]", 
+    RowBox[{"x", " ", "+", " ", 
+     RowBox[{"2", " ", "y"}]}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"EventsNumber", "\[Rule]", "10"}]}], "]"}]], "Input"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Writing code to compute periodic orbits", "Section",
+ CellChangeTimes->{{3.504617248635536*^9, 3.504617265552269*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Declaring the Kepler differential equation", "Subsection",
+ CellChangeTimes->{{3.50461731933582*^9, 3.504617330873559*^9}}],
+
+Cell[BoxData[
+ RowBox[{"keplerODE", "=", 
+  RowBox[{"PotentialToODE", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"-", "mu"}], "/", 
+     RowBox[{"Sqrt", "[", 
+      RowBox[{
+       RowBox[{"x", "^", "2"}], "+", 
+       RowBox[{"y", "^", "2"}], "+", 
+       RowBox[{"z", "^", "2"}]}], "]"}]}], ",", "t", ",", 
+    RowBox[{"{", 
+     RowBox[{"x", ",", "y", ",", "z"}], "}"}], ",", "mu"}], "]"}]}]], "Input"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Find the period of one orbit", "Subsection",
+ CellChangeTimes->{{3.5046173475892353`*^9, 3.5046173616019783`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"TSMCodeFiles", "[", 
+  RowBox[{
+  "keplerODE", ",", "\[IndentingNewLine]", "\"\<keplerP\>\"", ",", 
+   "\[IndentingNewLine]", 
+   RowBox[{"InitialConditions", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+     "0.8", ",", "0", ",", "0", ",", "0", ",", "1.2247448713915892", ",", 
+      "0"}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"ParametersValue", "\[Rule]", 
+    RowBox[{"{", "1", "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"IntegrationPoints", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", " ", 
+      RowBox[{"10", " ", "Pi"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"EventsNumber", "\[Rule]", "2"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"FindZeros", "\[Rule]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"x", "-", "0.8"}], ")"}], "^", "2"}], " ", "+", " ", 
+     RowBox[{"y", "^", "2"}], " ", "+", " ", 
+     RowBox[{"z", "^", "2"}]}]}], ",", "\[IndentingNewLine]", 
+   RowBox[{"Output", "\[Rule]", "Screen"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.5046173701497927`*^9, 3.504617375006215*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1003, 856},
+WindowMargins->{{338, Automatic}, {Automatic, 93}},
+FrontEndVersion->"7.0 for Mac OS X x86 (32-bit) (February 18, 2009)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[567, 22, 102, 1, 100, "Section"],
+Cell[CellGroupData[{
+Cell[694, 27, 120, 2, 40, "Input"],
+Cell[817, 31, 1496, 39, 131, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2362, 76, 113, 1, 100, "Section"],
+Cell[CellGroupData[{
+Cell[2500, 81, 172, 3, 40, "Input"],
+Cell[2675, 86, 169, 2, 40, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2893, 94, 115, 1, 100, "Section"],
+Cell[CellGroupData[{
+Cell[3033, 99, 276, 3, 51, "Subsection"],
+Cell[3312, 104, 280, 9, 40, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3629, 118, 137, 3, 51, "Subsection"],
+Cell[3769, 123, 579, 13, 133, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4385, 141, 140, 3, 51, "Subsection"],
+Cell[4528, 146, 720, 15, 179, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5285, 166, 151, 3, 51, "Subsection"],
+Cell[5439, 171, 691, 15, 156, "Input"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6179, 192, 124, 1, 100, "Section"],
+Cell[CellGroupData[{
+Cell[6328, 197, 129, 1, 51, "Subsection"],
+Cell[6460, 200, 406, 12, 40, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6903, 217, 120, 1, 51, "Subsection"],
+Cell[7026, 220, 1084, 25, 202, "Input"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

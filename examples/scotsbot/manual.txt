@@ -1,0 +1,25 @@
+Scotsbot - The Implementations of SCOTS on Khepera-IV 
+
+
+Directions for files:
+
+
+I. bot_scots.cc - Code for implementing the recurrence specification with two targets sets on the platform
+
+Requires reach.scs and reach2.scs as the look-up tables for the respective target sets
+
+
+II. bot_scots_reach.cc - Code for implementing the reachability specification with two targets sets on the platform
+
+Requires reach.scs as the look-up table for the target set.
+
+
+All .hh files are the headers included in the I and II
+
+
+Note: I and II requires libraries and cross-compiler for the bot.
+
+Manual for installation of the libraries and cross-compiler: 
+
+http://ftp.k-team.com/KheperaIV/UserManual/Khepera%20IV%20User%20Manual.pdf
+
