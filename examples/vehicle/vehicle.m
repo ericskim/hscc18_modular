@@ -27,7 +27,7 @@ lb=[9 0];
 ub=lb+0.5;
 v=[9 0; 9.5  0; 9 0.5; 9.5 .5];
 % initial state
-x0=[0.4 0.4 0];
+x0=[0.6 0.6 0];
 
 
 % load controller from file
@@ -46,15 +46,9 @@ while(loop>0)
   end 
 
   u=controller.input(y(end,:));
-  temp1=controller.input(y(end,:),'projection',[1]);
-  temp2=controller.input(y(end,:),'projection',[2]);
-  temp=[temp1,temp2];
-  %-------------here choose your controller input-------------%
-  in=temp(1,:);
-  %-----------------------------------------------------------%
-  v=[v; in];
-  [t x]=ode45(@unicycle_ode,[0 .3], y(end,:), odeset('abstol',1e-4,'reltol',1e-4),in');
+  v=[v; u];
 
+  [t x]=ode45(@unicycle_ode,[0 .2], y(end,:), odeset('abstol',1e-10,'reltol',1e-10),u);
   y=[y; x(end,:)];
 end
 

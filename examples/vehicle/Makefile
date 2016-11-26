@@ -3,20 +3,15 @@
 #
 #CC        = g++
 CC       	  = clang++
-CXXFLAGS 		= -g -Wall -Wextra -std=c++11
-CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG
+CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3  
+CXXDEBUG		= -g -Wall -Wextra -std=c++14
 
 
 #
 # scots 
 #
 SCOTSROOT		= ../..
-SCOTSINC		= -I$(SCOTSROOT)/src -I$(SCOTSROOT)/src/sparse
-
-
-#
-# cudd 
-#
+SCOTSINC		= -I$(SCOTSROOT)/sparse -I$(SCOTSROOT)/utils
 
 
 .PHONY: vehicle
@@ -27,6 +22,9 @@ all: $(TARGET)
 
 vehicle: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) vehicle.cc -o vehicle
+
+debug: 
+	$(CC) $(CXXDEBUG) $(SCOTSINC) vehicle.cc -o vehicle
 
 
 clean:

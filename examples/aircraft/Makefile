@@ -4,14 +4,14 @@
 #CC        = g++
 CC       	  = clang++
 CXXFLAGS 		= -g -Wall -Wextra -std=c++11
-CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG
+CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3 -DNDEBUG
 
 
 #
 # scots 
 #
 SCOTSROOT		= ../..
-SCOTSINC		= -I$(SCOTSROOT)/src
+SCOTSINC		= -I$(SCOTSROOT)/sparse -I$(SCOTSROOT)/utils
 
 
 #
@@ -30,4 +30,4 @@ aircraft:
 
 
 clean:
-	rm aircraft  *.o
+	rm aircraft

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <limits>
 #include "UniformGrid.hh"
-#include "Game.hh"
+#include "StaticController.hh"
 #include "TransitionSystem.hh"
 namespace scots {
 /*
@@ -28,7 +28,7 @@ IO(){
 
 /* function: createUniformGridParameterString */
 template<class U>
-static std::string createUniformGridParameterString(const UniformGrid<U>* gs, const char* key="scots") {
+static std::string createUniformGridParameterString(const UniformGrid<U> &gs, const char* key="scots") {
         /* produce string with parameters to be written into file */
         std::stringstream dim;
         std::stringstream z;
@@ -65,7 +65,7 @@ static std::string createUniformGridParameterString(const UniformGrid<U>* gs, co
 /* function:  readDimensionFromFile
  * a function to read the dimension of the uniform grid from file */
 template<class T>
-static void readDimensionFromFile(UniformGrid<T> *ss, const char *filename, const char* key="scots") {
+static void readDimensionFromFile(UniformGrid<T> &ss, const char& filename, const char* key="scots") {
         ss->dim_=0;
         /* open file */
         std::ifstream file(filename);
@@ -101,7 +101,7 @@ static void readDimensionFromFile(UniformGrid<T> *ss, const char *filename, cons
 /* function:  readMembersFromFile
  * a function to read the uniform grid data from file */
 template<class T>
-static void readMembersFromFile(UniformGrid<T> *ss, const char *filename, const char* key="scots") {
+static void readMembersFromFile(UniformGrid<T> &ss, const char &filename, const char* key="scots") {
 
         std::ifstream file(filename);
         if(!file.good()) {
@@ -132,7 +132,7 @@ static void readMembersFromFile(UniformGrid<T> *ss, const char *filename, const 
                                 check++;
                                 std::istringstream sline(line.substr(line.find(":")+1));
                                 for(size_t i=0; i<ss->dim_; i++)
-                                        sline >> ss->z_[i];
+                                       sline >> ss->z_[i];
                         }
                         /* read first grid point*/
                         if(line.find("first")!=std::string::npos) {
@@ -208,7 +208,7 @@ static void writeToFile(const UniformGrid<U>* gs, const char* filename, const ch
 /* function: writeToFile()
  * ts: TransitionSystem
  * filename: name of file */
-static void writeToFile(const TransitionSystem* ts, const char* filename) {
+static void writeToFile(const TransitionSystem& ts, const char* filename) {
         /* open file */
         std::ofstream file(filename);
         if(!file.good()) {
@@ -265,39 +265,42 @@ static void writeToFile(const TransitionSystem* ts, const char* filename) {
         std::cout << "Transition System saved to file: "<< filename << std::endl;
 }
 
-/* function: writeControllerToFile()  (only save the graph)
- * gg: Game
- * filename: name of file */
-static void writeControllerToFile(const Game *gg, const char* filename) {
-        /* open file */
-        std::ofstream file(filename);
-        if(!file.good()) {
-                std::ostringstream os;
-                os << "IO: Game: Error: Unable to open file:" << filename << "'.";
-                throw std::runtime_error(os.str().c_str());
-        }
-        /* write to file */
-        file << "################################################################################" << std::endl;
-        file << "#############            SCOTS: controller information              ############" << std::endl;
-        file << "################################################################################" << std::endl;
-        file << std::endl;
-        file << "#Controller" << std::endl;
-        file << "#no of states in the transition system: " << gg->N_ << std::endl;
-        file << "#no of labels in the transition system: " << gg->M_ << std::endl;
-        file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
+/* function: writeControllerToFile()
+ * only save the state-input pairs */
+static void writeControllerToFile(const StaticController &con, const char* filename) {
+  /* open file */
+  std::ofstream file(filename);
+  if(!file.good()) {
+    std::ostringstream os;
+    os << "IO: Game: Error: Unable to open file:" << filename << "'.";
+    throw std::runtime_error(os.str().c_str());
+  }
+  /* write to file */
+  file << "################################################################################" << std::endl;
+  file << "#############            SCOTS: controller information              ############" << std::endl;
+  file << "################################################################################" << std::endl;
+  file << std::endl;
+  file << "#Controller" << std::endl;
+  file << "#no of states in the transition system: " << con.N_ << std::endl;
+  file << "#no of labels in the transition system: " << con.M_ << std::endl;
+  file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
 
-        for(size_t i=0; i<gg->N_; i++) {
-                if(gg->domain_[i] && gg->val_[i] < std::numeric_limits<double>::infinity()) {
-                        file << i << " " << gg->val_[i] <<" ";
-                        for(size_t j=0; j<gg->M_; j++)
-                                if(gg->domain_[i][j])
-                                        file << j << " ";
-                        file << std::endl;
-                }
+  bool m=false;
+  for(size_t i=0; i<con.N_; i++) {
+    for(size_t j=0; j<con.M_; j++) {
+      if(con.domain_[i*con.M_ + j]) {
+        if(!m) {
+          file << i << " " << con.val_[i] <<" ";
+          m=true;
         }
+        file << j << " ";
+    }
+    m=false;
+    file << std::endl;
+  }
 
-        file.close();
-        std::cout << "controller saved to file: "<< filename << std::endl;
+  file.close();
+  std::cout << "controller saved to file: "<< filename << std::endl;
 }
 
 /* function: writeControllerToFile()  (save the graph and grid points)
@@ -306,7 +309,7 @@ static void writeControllerToFile(const Game *gg, const char* filename) {
  * filename: name of file */
 //  template<class T=std::array<double,1>, class U=std::array<double,1>>
 template<class T, class U>
-static void writeControllerToFile(const Game *gg, const char* filename, const UniformGrid<T> *ss, const UniformGrid<U> *is) {
+static void writeControllerToFile(const StaticController &con, const UniformGrid<T> &ss, const UniformGrid<U> &is, const char* filename) {
         /* open file */
         std::ofstream file(filename);
         if(!file.good()) {
@@ -347,7 +350,7 @@ static void writeControllerToFile(const Game *gg, const char* filename, const Un
 /* function: readFromFile()
 * ts: TransitionSystem
 * filename: name of file */
-static void readFromFile(TransitionSystem* ts, const char* filename) {
+static void readFromFile(TransitionSystem& ts, const char* filename) {
         /* open file */
         std::ifstream file(filename);
         if(!file.good()) {
@@ -515,7 +518,7 @@ static void readFromFile(TransitionSystem* ts, const char* filename) {
 }   /* close function readFromFile */
 
 template<class T>
-static void readFromFile(UniformGrid<T> *ss, const char* filename, const char *key="scots") {
+static void readFromFile(UniformGrid<T> &ss, const char* filename, const char *key="scots") {
         /* read the dimension  from file */
         readDimensionFromFile(ss,filename,key);
         ss->nofGridPoints_.resize(ss->dim_);
@@ -552,7 +555,7 @@ static void readFromFile(UniformGrid<std::vector<double> > *ss, const char* file
         }
 }
 
-static void readControllerFromFile(Game* gg, const char* filename) {
+static void readControllerFromFile(StaticController con, const char* filename) {
         gg->ts_=NULL;
         /* open file */
         std::ifstream file(filename);

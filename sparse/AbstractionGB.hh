@@ -2,15 +2,12 @@
 #define ABSTRACTIONGB_HH_
 
 #include <iostream>
-#include "UniformGrid.hh"
-#include <limits>
 #include <cstring>
+#include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "TicToc.hh"
 
-////////////////// all short changed to unsigned short by Meysam ////////////
 namespace scots {
-TicToc tt;
 /*
  * class: AbstractionGB
  *
@@ -18,432 +15,275 @@ TicToc tt;
  * the theory in http://arxiv.org/abs/1503.03715
  *
  */
-template<class stateType, class inputType>
+template<class state_type, class input_type>
 class AbstractionGB {
 private:
 /* var: stateSpace_
  */
-UniformGrid<stateType>* stateSpace_;
+const UniformGrid<state_type>* stateSpace_;
 /* var: inputSpace_
  */
-UniformGrid<inputType>* inputSpace_;
+const UniformGrid<input_type>* inputSpace_;
 /* var: transitionsSystem_
  */
 TransitionSystem* transitionSystem_;
-
-
 
 public:
 /* constructor:  AbstractionGB
  *
  * initialize with the state space <UniformGrid>  and input space  <UniformGrid>
- *
- *
  */
-AbstractionGB(UniformGrid<stateType> *stateSpace,
-              UniformGrid<inputType> *inputSpace,
-              TransitionSystem *transitionSystem)
-        : stateSpace_(stateSpace),
-        inputSpace_(inputSpace),
-        transitionSystem_(transitionSystem) {
+AbstractionGB(const UniformGrid<state_type> &stateSpace,
+              const UniformGrid<input_type> &inputSpace,
+              TransitionSystem &transitionSystem)
+        : stateSpace_(&stateSpace),
+        inputSpace_(&inputSpace),
+        transitionSystem_(&transitionSystem) {
 
 }
-~AbstractionGB(){
-}
-
 
 /* function:  computeTransitionRelation
  *
  * provide:
  * system_post(x,u)   -   computes the center of the hyper rectangle that
  *                        containes the attainable set
- * radius_post(x,u,z) -   computes the radius of the hyper rectangle contianing
+ * radius_post(r,x,u) -   computes the radius of the hyper rectangle contianing
  *                        the attainabel set
- * overflow(x,r,z)    -   check if the hyper rectangel with center x, and radius r+z
- *                        intersects with an overflow symbol
+ * OPTIONAL:
+ *
+ * overflow(x,r)    -     check if the hyper rectangle with center x, and radius r
+ *                        is an overflow symbol?
  *
  */
-
-template<class F1, class F2, class F3>
-void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &overflow, char* cmd="default") {
-
-        /* set number of states and labels for the transistion system */
-        size_t N=stateSpace_->getN();
-        size_t M=inputSpace_->getN();
-        transitionSystem_->N_=N;
-        transitionSystem_->M_=M;
-        size_t dim=stateSpace_->getDimension();
-        size_t T=0;
-        size_t mode=0;
-        std::cout << "mode=0, default, BOTH (preOnly & postOnly) \n " << std::endl;
-
-        if(strcmp(cmd,"preOnly")==0) {
-                mode=1;
-                std::cout << "mode changed to 1 , just preOnly \n" << std::endl;
-        }
-        else if(strcmp(cmd,"postOnly")==0) {
-                mode=2;
-                std::cout << "mode changed to 2 , just postOnly\n " << std::endl;
-        }
-        /* for out of bounds check */
-        std::vector<size_t> npoints(dim);
-        npoints = stateSpace_->getNofGridPoints();
-        std::vector<size_t> NN(dim);
-        NN=stateSpace_->getNN();
-        /* variables for managing the post */
-        int* lb = (int*) malloc(dim*sizeof(int));
-        int* ub = (int*) malloc(dim*sizeof(int));
-        int* nn = (int*) malloc(dim*sizeof(int));
-        stateType first=stateSpace_->getFirstGridPoint();
-
-        /* cell radius */
-        stateType eta=stateSpace_->getEta();
-        stateType z=stateSpace_->getZ();
-        stateType r;
-
-        /* state and input variables */
-        stateType x;
-        inputType u;
-
-        /////  whole program ///  state_size_t for pointer changed to size_t:
-
-        // state_size_t*** boundPointer=(state_size_t***)malloc(N*sizeof(state_size_t**));
-        size_t*** boundPointer=(size_t***)malloc(N*sizeof(size_t**));
-
-        // state_size_t** prePointer=(state_size_t**)malloc(N*sizeof(state_size_t*));
-        size_t** prePointer=(size_t**)malloc(N*sizeof(size_t*));
-
-        // state_size_t** postPointer=(state_size_t**)malloc(N*sizeof(state_size_t*));
-        size_t** postPointer=(size_t**)malloc(N*sizeof(size_t*));
-
-        // short changed to unsigned short
-        unsigned short** noPre=(unsigned short**)malloc(N*sizeof(unsigned short*));
-        unsigned short** noPost=(unsigned short**)malloc(N*sizeof(unsigned short*));
-        unsigned short** tempPointer=(unsigned short**)malloc(N*sizeof(unsigned short*));
-        for(size_t i=0; i<N; i++) {
-                prePointer[i]=NULL;
-                tempPointer[i]=NULL;
-                noPre[i]=NULL;
-                noPost[i]=NULL;
-                boundPointer[i]=NULL;
-                postPointer[i]=NULL;
-        }
-
-        /* first loop */
-
-        tt.tic();
-        // By meysam
-        std::ostringstream os;
-        std::cout << "\t \t first loop started "<< std::endl;
-        // By meysam
-
-        for(size_t i=0; i<N; i++) {
-
-                /* is x an element of the overflow symbols ? */
-                stateSpace_->itox(i,x);
-                if(overflow(x))
-                        continue;
-                /* loop over all inputs */
-                for(size_t j=0; j<M; j++) {
-
-                        /* current state */
-                        stateSpace_->itox(i,x);
-                        /* current input */
-                        inputSpace_->itox(j,u);
-                        /* cell radius (including measurement errors) */
-                        for(size_t k=0; k<dim; k++)
-                                r[k]=eta[k]/2.0+z[k];
-                        /* integrate system and radius growth bound */
-                        /* the result is stored in x and r */
-                        system_post(x,u);
-                        radius_post(r,u);
-
-                        /* determine the cells which intersect with the attainable set*/
-                        int out_of_bounds=0;
-                        size_t npost=1;
-                        for(size_t k=0; k<dim; k++) {
-                                lb[k] = std::lround(((x[k]-r[k]-z[k]-first[k])/eta[k]));
-                                ub[k] = std::lround(((x[k]+r[k]+z[k]-first[k])/eta[k]));
-                                if(lb[k]<0 || ub[k]>=(int)npoints[k]) {
-                                        out_of_bounds=1;
-                                        break;
-                                }
-                                /* how many post are there */
-                                nn[k]=npost;
-                                npost*=(ub[k]-lb[k]+1);
-
-
-
-                        }
-                        if(out_of_bounds) {
-                                if(!boundPointer[i])
-                                        // boundPointer[i]=(state_size_t**)malloc(M*sizeof(state_size_t*));
-                                        boundPointer[i]=(size_t**)malloc(M*sizeof(size_t*));
-                                boundPointer[i][j]=NULL;
-                                continue;
-                        }
-                        if(!boundPointer[i])
-
-                                //boundPointer[i]=(state_size_t**)malloc(M*sizeof(state_size_t*));
-                                //boundPointer[i][j]=(state_size_t*)malloc(2*sizeof(state_size_t));
-
-                                boundPointer[i]=(size_t**)malloc(M*sizeof(size_t*));
-                        boundPointer[i][j]=(size_t*)malloc(2*sizeof(size_t));
-
-
-                        /* calculate k and add the lower-left and upper-right indices to the array */
-                        for(size_t k=0; k<npost; k++) {
-                                int t=(int) k;
-                                int s;
-                                size_t idx=0;
-                                for(int l=(dim-1); l>=0; l--) {
-                                        s=t/nn[l];
-                                        t=t%nn[l];
-                                        idx+=(lb[l]+s)*NN[l];
-                                }
-                                if(!noPre[idx]) {
-                                        noPre[idx]=(unsigned short*)calloc(M,sizeof(unsigned short));
-                                        //  prePointer[idx]=(state_size_t*)calloc(M,sizeof(state_size_t));
-                                        prePointer[idx]=(size_t*)calloc(M,sizeof(size_t));
-                                        tempPointer[idx]=(unsigned short*)calloc(M,sizeof(unsigned short));
-                                }
-                                noPre[idx][j]+=1;
-
-                                if(k==0)
-                                        boundPointer[i][j][0]=idx;
-                                if(k==npost-1)
-                                        boundPointer[i][j][1]=idx;
-
-                        }
-                        T+=npost;
-                        if(!noPost[i]) {
-                                noPost[i]=(unsigned short*)calloc(M,sizeof(unsigned short));
-
-                                // postPointer[i]=(state_size_t*)calloc(M,sizeof(state_size_t));
-                                postPointer[i]=(size_t*)calloc(M,sizeof(size_t));
-
-                        }
-                        noPost[i][j]+=npost;
-
-                }
-        }
-
-        /* first loop  End */
-        tt.toc();
-        std::cout << "\t \t first loop ended  and T is: "<< T << std::endl;
-
-
-
-        size_t sumPre=0;
-        size_t sumPost=0;
-        for(size_t i=0; i<N; i++) {
-                for(size_t j=0; j<M; j++) {
-                        if(noPre[i] && noPre[i][j]!=0) {
-                                prePointer[i][j]=sumPre;
-                                sumPre=sumPre+(size_t)noPre[i][j]; // not sure (size_t) is required
-                        }
-                        if(noPost[i] && noPost[i][j]!=0) {
-                                postPointer[i][j]=sumPost;
-                                sumPost=sumPost+noPost[i][j];
-                        }
-                }
-        }
-
-        /* define pre/post list */
-        state_size_t *pre=NULL;
-        state_size_t *post=NULL;
-        switch(mode) {
-        case 0: {
-                pre=(state_size_t*)malloc(T*sizeof(state_size_t));
-                post=(state_size_t*)malloc(T*sizeof(state_size_t));
-                break;
-        }
-        case 1: {
-                pre=(state_size_t*)malloc(T*sizeof(state_size_t));
-                break;
-        }
-        case 2: {
-                post=(state_size_t*)malloc(T*sizeof(state_size_t));
-                break;
-        }
-        }
-
-
-        tt.tic();
-
-///////////////////////////////    second loop      ///////////////////////////////////////////////
-        std::cout << "\t \t second loop started " << std::endl;
-        /* second loop */
-        for(size_t i=0; i<N; i++) {
-                /* is x an element of the overflow symbols ? */
-                if(boundPointer[i]==NULL)
-                        continue;
-                /* loop over all inputs */
-                for(size_t j=0; j<M; j++) {
-                        if(boundPointer[i][j]==NULL)
-                                continue;
-                        /* extract lower-left and upper-bound points*/
-                        size_t k_lb=boundPointer[i][j][0];
-                        size_t k_ub=boundPointer[i][j][1];
-                        size_t npost=1;
-                        /* determin nn */
-                        for(int v=(dim-1); v>=0; v--) {
-                                if(v) {
-                                        lb[v]=k_lb/NN[v];
-                                        ub[v]=k_ub/NN[v];
-                                        k_lb=k_lb%NN[v];
-                                        k_ub=k_ub%NN[v];
-                                } else {
-                                        lb[v]=k_lb;
-                                        ub[v]=k_ub;
-                                }
-                                nn[v]=(ub[v]-lb[v]+1);
-                                npost*=(ub[v]-lb[v]+1);
-                        }
-                        /* recalculate nn */
-                        size_t temp1,temp2;
-                        for(size_t v=0; v<dim; v++) {
-                                if(v==0) {
-                                        temp2=nn[v];
-                                        nn[v]=1;
-                                }
-                                else {
-                                        temp1=nn[v];
-                                        nn[v]=temp2;
-                                        temp2=temp1*temp2;
-                                }
-                        }
-                        /* for each*/
-                        for(size_t k=0; k<npost; k++) {
-                                int t=(int) k;
-                                int s;
-                                size_t idx=0;
-
-                                for(int l=(dim-1); l>=0; l--) {
-                                        s=t/nn[l];
-                                        t=t%nn[l];
-                                        idx+=(lb[l]+s)*NN[l];
-
-                                }
-
-                                switch(mode) {
-                                case 0: {
-
-                                        //  state_size_t posPost=postPointer[i][j]+k;
-                                        size_t posPost=postPointer[i][j]+k;
-
-                                        post[posPost]=idx;
-
-                                        // state_size_t posPre=prePointer[idx][j]+tempPointer[idx][j];
-                                        size_t posPre=prePointer[idx][j]+tempPointer[idx][j];
-
-                                        pre[posPre]=i;
-                                        break;
-                                }
-                                case 1: {
-
-                                        //state_size_t posPre=prePointer[idx][j]+tempPointer[idx][j];
-                                        size_t posPre=prePointer[idx][j]+tempPointer[idx][j];
-
-                                        pre[posPre]=i;
-                                        break;
-                                }
-                                case 2: {
-
-                                        // state_size_t posPost=postPointer[i][j]+k;
-                                        size_t posPost=postPointer[i][j]+k;
-
-                                        post[posPost]=idx;
-                                        break;
-                                }
-                                }
-                                tempPointer[idx][j]++;
-                        }
-                }
-        }
-
-        tt.toc();
-        std::cout <<  "\t \t 2nd loop ended \n \n "<< std::endl;
-
-/* start comment for debugging
-
-do we need really to free tempPointer and ... ?
-
-        tt.tic();
-        std::cout <<  "\t \t free tempPointer and boundPointer  START\n \n "<< std::endl;
-
-        // free tempPointer and boundPointer
-        for(size_t i=0; i<N; i++) {
-                if(tempPointer[i])
-                        free(tempPointer[i]);
-                if(boundPointer[i]) {
-                        for(size_t j=0; j<M; j++) {
-                                if(boundPointer[i][j])
-                                        free(boundPointer[i][j]);
-                        }
-                        free(boundPointer[i]);
-                }
-        }
-        free(tempPointer);
-        free(boundPointer);
-        tt.toc();
-        std::cout <<  "\t \t free tempPointer and boundPointer  END \n \n "<< std::endl;
-
-   end debugging comment */
-
-        /* transitionsystem initialization*/
-        transitionSystem_->noPost_=noPost;
-        transitionSystem_->noPre_=noPre;
-        transitionSystem_->T_=T;
-        transitionSystem_->postPointer_=postPointer;
-        transitionSystem_->prePointer_=prePointer;
-        transitionSystem_->pre_=pre;
-        transitionSystem_->post_=post;
-        /* point relation of the transition system to the computed relation */
-        free(lb);
-        free(ub);
-        free(nn);
+template<class F1, class F2>
+void computeTransitionRelation(F1 &system_post, F2 &radius_post) {
+  computeTransitionRelation(system_post, radius_post, [](const state_type&, const state_type&) {return false;});
 }
 
+template<class F1, class F2, class F3>
+void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) {
+  /* number of cells (=grid points) */
+  size_t N=stateSpace_->getN(); 
+  /* number of inputs */
+  size_t M=inputSpace_->getN();
+  /* state space dimension */
+  int dim=stateSpace_->getDimension();
+  /* number of transitions */
+  size_t noT=0; 
+  /* variables for managing the post */
+  std::vector<abs_type> lb(dim);
+  std::vector<abs_type> ub(dim);
+  std::vector<abs_type> no(dim);
+  std::vector<abs_type> cc(dim);
+  /* on of grid points per dimension  */
+  std::vector<abs_type> NN(dim);
+  NN=stateSpace_->getNN();
+  /* radius of hyper interval containing the attainable set */
+  state_type eta=stateSpace_->getEta();
+  state_type z=stateSpace_->getZ();
+  state_type r;
+  /* state and input variables */
+  state_type x;
+  input_type u;
+  /* for out of bounds check */
+  state_type first;
+  state_type last;
+  first=stateSpace_->getFirstGridPoint();
+  std::vector<abs_type> npoints(dim);
+  npoints = stateSpace_->getNofGridPoints();
+  for(int i=0; i<dim; i++)
+    last[i]=first[i]+eta[i]*(npoints[i]-1);
+  /* list of cell (pre) cell indices  */
+  abs_type* pre=nullptr;
+  /* number of pre indices of (i,j) */
+  abs_type* noPre = new abs_type[N*M] ();  
+  /* number of post indices of (i,j) */
+  abs_type* noPost = new abs_type[N*M] ();  
+  /* index to pre, where the cell IDs of the pre are stored */
+  size_t* prePointer = new size_t[N*M];
+  /* lower-left & upper-right corners of hyper rectangle of cells that cover attainable set */
+  abs_type* cornerIDs = new abs_type[N*M*2];
+  /* is post of (i,j) out of domain ? */
+  bool* outOfDomain = new bool[N*M];
+  
 
+  /* loop over all cells */
+  for(abs_type i=0; i<N; i++) {
+    /* loop over all inputs */
+    for(size_t j=0; j<M; j++) {
+      outOfDomain[i*M+j]=false;
+      /* get center x of cell */
+      stateSpace_->itox(i,x);
+      /* is x an element of the overflow symbols ? */
+      if(!j & overflow(x,r)) {
+        for(size_t j=0; j<M; j++)
+          outOfDomain[i*M+j]=true;
+        break;
+      }
+      /* current input */
+      inputSpace_->itox(j,u);
+      /* cell radius (including measurement errors) */
+      for(int k=0; k<dim; k++)
+        r[k]=eta[k]/2.0+z[k];
+      /* integrate system and radius growth bound */
+      /* the result is stored in x and r */
+      radius_post(r,x,u);
+      system_post(x,u);
+      /* determine the cells which intersect with the attainable set: 
+       * discrete hyper interval of cell indices 
+       * [lb[0]; ub[0]] x .... x [lb[dim-1]; ub[dim-1]]
+       * covers attainable set 
+       */
+      size_t npost=1;
+      for(int k=0; k<dim; k++) {
+        /* check for out of bounds */
+        double left = x[k]-r[k]-z[k];
+        double right = x[k]+r[k]+z[k];
+        if(left <= first[k]-eta[k]/2.0  || right >= last[k]+eta[k]/2.0) {
+          outOfDomain[i*M+j]=true;
+          break;
+        } 
+        /* integer coordinate of lower left corner of post */
+        lb[k] = static_cast<abs_type>((left-first[k]+eta[k]/2.0)/eta[k]);
+        /* integer coordinate of upper right corner of post */
+        ub[k] = static_cast<abs_type>((right-first[k]+eta[k]/2.0)/eta[k]);
+        /* number of grid points in the post in each dimension */
+        no[k]=(ub[k]-lb[k]+1);
+        /* total number of post */
+        npost*=no[k];
+        cc[k]=0;
+      }
+      cornerIDs[i*(2*M)+2*j]=0;
+      cornerIDs[i*(2*M)+2*j+1]=0;
+      if(outOfDomain[i*M+j]) 
+        continue;
+      /* compute indices of post */
+      for(abs_type k=0; k<npost; k++) {
+        abs_type q=0;
+        for(int l=0; l<dim; l++) 
+          q+=(lb[l]+cc[l])*NN[l];
+        cc[0]++;
+        for(int l=0; l<dim-1; l++) {
+          if(cc[l]==no[l]) {
+            cc[l]=0;
+            cc[l+1]++;
+          }
+        }
+        /* (i,j,q) is a transition */    
+        /* increment number of pres for (q,j) */ 
+        noPre[q*M+j]++;
+        /* store id's of lower-left and upper-right cell */
+        if(k==0)
+          cornerIDs[i*(2*M)+2*j]=q;
+        if(k==npost-1)
+          cornerIDs[i*(2*M)+2*j+1]=q;
+      }
+      /* increment number of transitions by number of post */
+      noT+=npost;
+      noPost[i*M+j]=npost;
+    }
+  }
+  /* compute prePointer */
+  size_t sum=0;
+  for(size_t i=0; i<N; i++) {
+    for(size_t j=0; j<M; j++) {
+      sum+=noPre[i*M+j];
+      prePointer[i*M+j]=sum;
+    }
+  }
+  /* allocate memory for pre list (pre[0] is used as dummy) */
+  pre = new abs_type[noT];
+  /* fill in pre list */
+  for(abs_type i=0; i<N; i++) {
+    /* loop over all inputs */
+    for(abs_type j=0; j<M; j++) {
+    /* is x an element of the overflow symbols ? */
+      if(outOfDomain[i*M+j]) 
+        continue;
+      /* extract lower-left and upper-bound points */
+      abs_type k_lb=cornerIDs[i*2*M+2*j];
+      abs_type k_ub=cornerIDs[i*2*M+2*j+1];
+      abs_type npost=1;
+      /* cell idx to coordinates */
+      for(int k=dim-1; k>=0; k--) {
+        /* integer coordinate of lower left corner */
+        lb[k]=k_lb/NN[k];
+        k_lb=k_lb-lb[k]*NN[k];
+        /* integer coordinate of upper right corner */
+        ub[k]=k_ub/NN[k];
+        k_ub=k_ub-ub[k]*NN[k];
+        /* number of grid points in each dimension in the post */
+        no[k]=(ub[k]-lb[k]+1);
+        /* totoal no of post of (i,j) */
+        npost*=no[k];
+        cc[k]=0;
+      }
+      for(abs_type k=0; k<npost; k++) {
+        abs_type q=0;
+        for(int l=0; l<dim; l++) 
+          q+=(lb[l]+cc[l])*NN[l];
+        cc[0]++;
+        for(int l=0; l<dim-1; l++) {
+          if(cc[l]==no[l]) {
+            cc[l]=0;
+            cc[l+1]++;
+          }
+        }
+        /* (i,j,q) is a transition */
+        pre[--prePointer[q*M+j]]=i;
+      }
+    }
+  }
 
+  delete[] outOfDomain;
+  delete[] cornerIDs;
+
+  /* set values of abstract system */
+  transitionSystem_->N_=N;
+  transitionSystem_->M_=M;
+  transitionSystem_->T_=noT;
+  transitionSystem_->noPre_=noPre;
+  transitionSystem_->noPost_=noPost;
+  transitionSystem_->pre_=pre;
+  transitionSystem_->prePointer_=prePointer;
+
+}
 
 /* function getPre */
-std::vector<stateType> getPre(stateType x, inputType u) {
-        size_t k,j;
-        std::vector<stateType> pre;
-        std::vector<size_t> i;
-        pre.clear();
-        i.clear();
-        stateSpace_->xtoi(k,x);
-        inputSpace_->xtoi(j,u);
-        i=transitionSystem_->getPre(k,j);
-        for(int v=0; v<i.size(); v++) {
-                stateType s;
-                stateSpace_->itox(i[v],s);
-                pre.push_back(s);
-        }
-        return pre;
+std::vector<state_type> getPre(state_type x, input_type u) {
+  abs_type k,j;
+  std::vector<state_type> pre;
+  std::vector<abs_type> i;
+  pre.clear();
+  i.clear();
+  stateSpace_->xtoi(k,x);
+  inputSpace_->xtoi(j,u);
+  i=transitionSystem_->getPre(k,j);
+  for(abs_type v=0; v<i.size(); v++) {
+    state_type s;
+    stateSpace_->itox(i[v],s);
+    pre.push_back(s);
+  }
+  return pre;
 }
 
 /* function getPost */
-std::vector<stateType> getPost(stateType x, inputType u) {
-        size_t i,j;
-        std::vector<stateType> post;
-        std::vector<size_t> k;
-        post.clear();
-        k.clear();
-        stateSpace_->xtoi(i,x);
-        inputSpace_->xtoi(j,u);
-        k=transitionSystem_->getPost(i,j);
-        for(int v=0; v<k.size(); v++) {
-                stateType s;
-                stateSpace_->itox(k[v],s);
-                post.push_back(s);
-        }
-        return post;
+std::vector<state_type> getPost(state_type x, input_type u) {
+  abs_type i,j;
+  std::vector<state_type> post;
+  std::vector<abs_type> k;
+  post.clear();
+  k.clear();
+  stateSpace_->xtoi(i,x);
+  inputSpace_->xtoi(j,u);
+  k=transitionSystem_->getPost(i,j);
+  for(abs_type v=0; v<k.size(); v++) {
+    state_type s;
+    stateSpace_->itox(k[v],s);
+    post.push_back(s);
+  }
+  return post;
 }
-
 
 }; /* close class def */
 } /* close namespace */

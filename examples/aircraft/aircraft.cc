@@ -17,10 +17,13 @@
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
-#include "ReachabilityGame.hh"
+#include "StaticController.hh"
+
+/* ode solver */
+#include "RungeKutta4.hh"
 
 #include "TicToc.hh"
-#include "IO.hh"
+
 /* state space dim */
 #define sDIM 3
 #define iDIM 2
@@ -31,25 +34,25 @@
 typedef std::array<double,3> state_type;
 typedef std::array<double,2> input_type;
 
-/* forward declaration of the ode solver */
-template<class F>
-void ode_solver(F rhs, state_type &x, input_type &u, size_t nint, double h);
+/* sampling time */
+const double tau = 0.25;
+
+/* ode solver */
+OdeSolver ode_solver;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 double mg = 60000.0*9.81;
 double mi = 1.0/60000;
-auto aircraft_post = [] (state_type &x, input_type &u)->void {
+auto aircraft_post = [] (state_type &x, const input_type &u) {
         /* the ode describing the aircraft */
-        auto rhs =[] (state_type& xx,  const state_type &x, input_type &u)->void {
+        auto rhs =[] (state_type& xx,  const state_type &x, const input_type &u) {
                 double c=(1.25+4.2*u[1]);
                 xx[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
                 xx[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
                 xx[2] = x[0]*std::sin(x[1]);
         };
 
-        size_t nint=5; /* number of intermediate step size 5*/
-        double h=0.05; /* h* nint = sampling time 0.05*5=0.25*/
-        ode_solver(rhs,x,u,nint,h);
+  ode_solver(rhs,x,u,sDIM,tau,10);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
@@ -57,7 +60,7 @@ auto aircraft_post = [] (state_type &x, input_type &u)->void {
 double L[3][2];
 //state_type v={{2.77*0.01,5.16*0.0001,7.4*0.001}};
 state_type w={{.108,0.002,0}};
-auto radius_post = [] (state_type &r, input_type &u)->void {
+auto radius_post = [] (state_type &r, const state_type&, const input_type &u) {
 
         L[0][0]=-0.0019*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
         L[0][1]=9.81;
@@ -69,18 +72,13 @@ auto radius_post = [] (state_type &r, input_type &u)->void {
         L[2][1]=83;
 
         /* the ode for the growth bound */
-        auto rhs =[] (state_type& rr,  const state_type &r, input_type u)->void { //w u l input type ??? added
+        auto rhs =[] (state_type& rr,  const state_type &r, const input_type &) { 
                 rr[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; /* L[0][2]=0 */
                 rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
                 rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
         };
 
-        size_t nint=5; /* number of intermediate step size */
-        double h=0.05; /* h* nint = sampling time */
-        ode_solver(rhs,r,u,nint,h);
-
-        //for(size_t i=0; i<sDIM; i++)
-        //  r[i]+=v[i];
+        ode_solver(rhs,r,u,sDIM,tau,10);
 
 };
 
@@ -132,37 +130,20 @@ int main() {
 
         tt.tic();
         std::cout << "scots::AbstractionGB started & Compute transition relation" << std::endl;
-        scots::AbstractionGB<state_type,input_type> abs(&ss,&is,&ts);
+        scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
         tt.toc();
         std::cout << "scots::AbstractionGB ended \n"<< std::endl;
 
 
-        auto overflow = [] (state_type)->bool { return false; };
 
 
 
         tt.tic();
         std::cout << "abs.computeTransitionRelation started \n \n  " << std::endl;
-        abs.computeTransitionRelation(aircraft_post, radius_post, overflow,"preOnly" ); //"postOnly" "preOnly"
+        abs.computeTransitionRelation(aircraft_post, radius_post);
         std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
         tt.toc();
         std::cout << "\n abs.computeTransitionRelation ended \n" << std::endl;
-
-
-// scots::IO::writeToFile(&ts,"ts.scs"); // take one hour !
-
-
-//begin by Meysam commented :
-//  size_t no=0;
-// for(size_t i=0; i < ts.getN() ;i++)
-//  for(size_t j=0; j < ts.getM() ;j++)
-//   no = ( no < ts.relation_[i].label[j].no ? ts.relation_[i].label[j].no : no );
-
-//  std::cout << "Avg no of post: " << no << std::endl;
-
-// end by Meysam commented
-
-
 
 
 //  /* define function to check if the cell is in the  target set?  */
@@ -176,18 +157,17 @@ int main() {
                       &&  -0.91 <=  ( (x[0]+eta[0]/2.0) * std::sin(x[1]-eta[1]/2.0) )
                       )
                         return true;
-                else
-                        return false;
+                  return false;
         };
 
-        ss.clearAbstractSet();
-        ss.addIndices(target);
-        scots::IO::writeToFile(&ss,"target.scs");
-
-        ss.fillAbstractSet();
-        ss.remIndices(target);
-        ss.remGridPoints(overflow);
-        scots::IO::writeToFile(&ss,"problemdomain.scs");
+//        ss.clearAbstractSet();
+//        ss.addIndices(target);
+//        scots::IO::writeToFile(&ss,"target.scs");
+//
+//        ss.fillAbstractSet();
+//        ss.remIndices(target);
+//        ss.remGridPoints(overflow);
+//        scots::IO::writeToFile(&ss,"problemdomain.scs");
 
         /////////////////////////////  S   O   L    V   E  GAME  //////////////////////////////////////////////////
 
@@ -195,39 +175,13 @@ int main() {
 
         std::cout << "Solve game " << std::endl;
 
-        scots::ReachabilityGame reach(&ts);
-        reach.solve(target);
-
-        scots::IO::writeControllerToFile(&reach,"reach.scs",&ss,&is);
-
-        std::cout << "Size: " << reach.sizeOfDomain() << std::endl;
+        scots::StaticController con(ts);
+        con.reach(target);
         tt.toc();
+
+        std::cout << "Size: " << con.size() << std::endl;
 
 
         return 1;
 }
 
-template<class F>
-void ode_solver(F rhs, state_type &x, input_type &u, size_t nint, double h) {
-        /* runge kutte order 4 */
-        state_type k[4];
-        state_type tmp;
-
-        for(size_t t=0; t<nint; t++) {
-                rhs(k[0],x, u);
-                for(size_t i=0; i<sDIM; i++)
-                        tmp[i]=x[i]+h/2*k[0][i];
-
-                rhs(k[1],tmp, u);
-                for(size_t i=0; i<sDIM; i++)
-                        tmp[i]=x[i]+h/2*k[1][i];
-
-                rhs(k[2],tmp, u);
-                for(size_t i=0; i<sDIM; i++)
-                        tmp[i]=x[i]+h*k[2][i];
-
-                rhs(k[3],tmp, u);
-                for(size_t i=0; i<sDIM; i++)
-                        x[i] = x[i] + (h/6)*(k[0][i] + 2*k[1][i] + 2*k[2][i] + k[3][i]);
-        }
-}
