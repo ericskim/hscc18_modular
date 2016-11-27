@@ -106,14 +106,22 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   /* is post of (i,j) out of domain ? */
   bool* outOfDomain = new bool[N*M];
   
+  abs_type* abs_state_coord =  new abs_type[stateSpace_->dim_] ();
+  abs_type* abs_input_coord =  new abs_type[inputSpace_->dim_] ();
 
   /* loop over all cells */
   for(abs_type i=0; i<N; i++) {
     /* loop over all inputs */
     for(size_t j=0; j<M; j++) {
       outOfDomain[i*M+j]=false;
+      /* cell radius (including measurement errors) */
+      for(int k=0; k<dim; k++)
+        r[k]=eta[k]/2.0+z[k];
       /* get center x of cell */
-      stateSpace_->itox(i,x);
+      //stateSpace_->itox(i,x);
+      for(int k=0; k<stateSpace_->dim_; k++)
+        x[k]=stateSpace_->firstGridPoint_[k]+abs_state_coord[k]*stateSpace_->eta_[k];
+
       /* is x an element of the overflow symbols ? */
       if(!j & overflow(x,r)) {
         for(size_t j=0; j<M; j++)
@@ -121,10 +129,18 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
         break;
       }
       /* current input */
-      inputSpace_->itox(j,u);
-      /* cell radius (including measurement errors) */
-      for(int k=0; k<dim; k++)
-        r[k]=eta[k]/2.0+z[k];
+      //inputSpace_->itox(j,u);
+      for(int k=0; k<inputSpace_->dim_; k++)
+        u[k]=inputSpace_->firstGridPoint_[k]+abs_input_coord[k]*inputSpace_->eta_[k];
+      /* update input coordinate */
+      abs_input_coord[0]++;
+      for(int l=0; l<inputSpace_->dim_-1; l++) {
+        if(abs_input_coord[l]==inputSpace_->nofGridPoints_[l]) {
+          abs_input_coord[l]=0;
+          abs_input_coord[l+1]++;
+        }
+      }
+
       /* integrate system and radius growth bound */
       /* the result is stored in x and r */
       radius_post(r,x,u);
@@ -181,7 +197,21 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
       /* increment number of transitions by number of post */
       noT+=npost;
       noPost[i*M+j]=npost;
+
+
     }
+    for(int l=0; l<inputSpace_->dim_; l++) 
+      abs_input_coord[l]=0;
+
+    /* update state coordinate */
+    abs_state_coord[0]++;
+    for(int l=0; l<stateSpace_->dim_-1; l++) {
+      if(abs_state_coord[l]==stateSpace_->nofGridPoints_[l]) {
+        abs_state_coord[l]=0;
+        abs_state_coord[l+1]++;
+      }
+    }
+
   }
   /* compute prePointer */
   size_t sum=0;
@@ -237,6 +267,8 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
 
   delete[] outOfDomain;
   delete[] cornerIDs;
+  delete[] abs_state_coord;
+  delete[] abs_input_coord;
 
   /* set values of abstract system */
   transitionSystem_->N_=N;

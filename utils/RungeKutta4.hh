@@ -23,7 +23,7 @@ public:
    * nint - number of intermediate steps (default = 10)
    */
   template<class RHS, class X, class U>
-  void operator()(RHS rhs, X &x, U &u, const int dim, const double tau, const int nint=10) {
+  void operator()(RHS rhs, X &x, U &u, const int dim, const double tau, const int nint=10) noexcept {
 		X k[4];
 		X tmp;
 

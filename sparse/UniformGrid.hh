@@ -21,6 +21,10 @@
 #include "TransitionSystem.hh"
 
 namespace scots {
+  
+/* forward declaration of abstraction growth bound class */
+template<class state_type, class input_type> class AbstractionGB;
+
 
 /* class: UnifromGrid
  *
@@ -43,8 +47,9 @@ namespace scots {
  */
 template<class grid_point_t>
 class UniformGrid {
-friend class ReachabilityGame;
 friend class IO;
+template<class state_type, class input_type>
+friend class AbstractionGB;
 private:
 /* var: dim_
  * dimension of the real space */
