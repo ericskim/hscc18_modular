@@ -18,15 +18,14 @@ namespace scots {
 template<class state_type, class input_type>
 class AbstractionGB {
 private:
-/* var: stateSpace_
- */
+/* var: stateSpace_ */
 const UniformGrid<state_type>* stateSpace_;
-/* var: inputSpace_
- */
+/* var: inputSpace_ */
 const UniformGrid<input_type>* inputSpace_;
-/* var: transitionsSystem_
- */
+/* var: transitionsSystem_ */
 TransitionSystem* transitionSystem_;
+/* var: verbose_ */
+bool verbose_;
 
 public:
 /* constructor:  AbstractionGB
@@ -35,12 +34,12 @@ public:
  */
 AbstractionGB(const UniformGrid<state_type> &stateSpace,
               const UniformGrid<input_type> &inputSpace,
-              TransitionSystem &transitionSystem)
+              TransitionSystem &transitionSystem,
+              bool verbose=true)
         : stateSpace_(&stateSpace),
         inputSpace_(&inputSpace),
-        transitionSystem_(&transitionSystem) {
-
-}
+        transitionSystem_(&transitionSystem),
+        verbose_(verbose) { }
 
 /* function:  computeTransitionRelation
  *
@@ -72,14 +71,14 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   size_t noT=0; 
   /* for display purpose */
   abs_type counter=0;
-  /* variables for managing the post */
-  std::vector<abs_type> lb(dim);
-  std::vector<abs_type> ub(dim);
-  std::vector<abs_type> no(dim);
-  std::vector<abs_type> cc(dim);
-  /* on of grid points per dimension  */
+  /* some grid information */
   std::vector<abs_type> NN(dim);
   NN=stateSpace_->getNN();
+  /* variables for managing the post */
+  std::vector<abs_type> lb(dim);  /* lower-left corner */
+  std::vector<abs_type> ub(dim);  /* upper-right corner */
+  std::vector<abs_type> no(dim);  /* number of cells per dim */
+  std::vector<abs_type> cc(dim);  /* coordinate of current cell in the post */
   /* radius of hyper interval containing the attainable set */
   state_type eta=stateSpace_->getEta();
   state_type z=stateSpace_->getZ();
@@ -183,7 +182,9 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
       noPost[i*M+j]=npost;
     }
     /* print progress */
-    if(((double)i/(double)N*100)>counter){
+    if(verbose_ && ((double)i/(double)N*100)>counter){
+      if(counter==0)
+        std::cout << "1st loop: ";
       if((counter%10)==0)
         std::cout << counter;
       else if((counter%2)==0) {
@@ -193,7 +194,8 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
     }
     std::flush(std::cout); 
   }
-  std::cout << "100" << std::endl;
+  if(verbose_)
+    std::cout << "100" << std::endl;
 
   /* compute prePointer */
   size_t sum=0;
@@ -206,6 +208,7 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   /* allocate memory for pre list (pre[0] is used as dummy) */
   pre = new abs_type[noT];
   /* fill in pre list */
+  counter=0;
   for(abs_type i=0; i<N; i++) {
     /* loop over all inputs */
     for(abs_type j=0; j<M; j++) {
@@ -245,7 +248,21 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
         pre[--prePointer[q*M+j]]=i;
       }
     }
+    /* print progress */
+    if(verbose_ && ((double)i/(double)N*100)>counter){
+      if(counter==0)
+        std::cout << "2nd loop: ";
+      if((counter%10)==0)
+        std::cout << counter;
+      else if((counter%2)==0) {
+        std::cout << ".";
+      }
+      counter++;
+    }
+    std::flush(std::cout); 
   }
+  if(verbose_) 
+    std::cout << "100" << std::endl;
 
   delete[] outOfDomain;
   delete[] cornerIDs;
@@ -258,7 +275,6 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   transitionSystem_->noPost_=noPost;
   transitionSystem_->pre_=pre;
   transitionSystem_->prePointer_=prePointer;
-
 }
 
 /* function getPre */

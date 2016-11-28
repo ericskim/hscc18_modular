@@ -1,8 +1,8 @@
 /*
  * Boost Converter 
  *
- *  created on: 17.12.2015
- *      author: tong
+ *  created on: 28.11.2016
+ *      author: rungger
  */
 
 /*
@@ -16,9 +16,13 @@
 
 #include "UniformGrid.hh"
 #include "AbstractionGB.hh"
-#include "TicToc.hh"
 #include "SafetyGame.hh"
-#include "IO.hh"
+
+/* ode solver */
+#include "RungeKutta4.hh"
+
+#include "TicToc.hh"
+//#include "IO.hh"
 
 /* state space dim */
 #define sDIM 2      // dimension of statespace
@@ -38,108 +42,41 @@ double vs=1;
 
 /* parameters for radius calculation */
 double k=0.014;
-double tau_s=0.5;			// sampling time
-double tau_d=2;
+double tau=0.5;			// sampling time
 double mu=sqrt(2);
 
-/* we integrate the vehicle ode by 0.3 sec (the result is stored in x)  */
-auto  system_post = [](state_type &x, input_type &u) -> void {
+/* ode solver */
+OdeSolver ode_solver;
 
-  /* the ode describing the vehicle */
-  auto rhs =[](state_type& xx,  const state_type &x, input_type &u) -> void {
 
-    switch((int)u[0])
-    {
-      case 1:
-        xx[0]=-rl/xl*x[0]+vs/xl;
-        xx[1]=-1/(xc*(ro+rc))*x[1];
-        break;
-      case 2:
-        xx[0]=-(1/xl)*(rl+ro*rc/(ro+rc))*x[0]-(1/xl)*ro/(5*(ro+rc))*x[1]+vs/xl;
-        xx[1]=(1/xc)*5*ro/(ro+rc)*x[0]-(1/xc)*(1/(ro+rc))*x[1];
-        break;
+/* we integrate the dcdc ode by 0.5 sec (the result is stored in x)  */
+auto system_post = [](state_type &x, const input_type &u) noexcept {
+  /* the ode describing the dcdc converter */
+  auto rhs =[](state_type& xx,  const state_type &x, const input_type &u) noexcept {
+    if(u[0]==1) {
+      xx[0]=-rl/xl*x[0]+vs/xl;
+      xx[1]=-1/(xc*(ro+rc))*x[1];
+    } else {
+      xx[0]=-(1/xl)*(rl+ro*rc/(ro+rc))*x[0]-(1/xl)*ro/(5*(ro+rc))*x[1]+vs/xl;
+      xx[1]=(1/xc)*5*ro/(ro+rc)*x[0]-(1/xc)*(1/(ro+rc))*x[1];
     }
-
 	};
-
-	/* runge kutte order 4 */
-  state_type k[4];
-  state_type tmp;
-
-  size_t nint=5; /* number of intermediate step size */
-  double h=tau_s/nint; /* h* nint = sampling time */
-
-	for(size_t t=0; t<nint; t++) {
-		rhs(k[0],x, u);
-		for(size_t i=0;i<sDIM;i++)
-		  tmp[i]=x[i]+h/2*k[0][i];
-
-		rhs(k[1],tmp, u);
-		for(size_t i=0;i<sDIM;i++)
-		  tmp[i]=x[i]+h/2*k[1][i];
-
-		rhs(k[2],tmp, u);
-		for(size_t i=0;i<sDIM;i++)
-		  tmp[i]=x[i]+h*k[2][i];
-
-		rhs(k[3],tmp, u);
-		for(size_t i=0; i<sDIM; i++)
-		  x[i] = x[i] + (h/6)*(k[0][i] + 2*k[1][i] + 2*k[2][i] + k[3][i]);
-	}
-		
+  ode_solver(rhs,x,u,sDIM,tau);
 };
 
-auto overflow = [](const state_type &) -> bool {
-  return false;
-};
-
-
-/* we integrate the growth bound by 0.3 sec (the result is stored in r)  */
-auto radius_post = [](state_type &r, input_type &u) -> void {
-
-  /* the ode describing the vehicle */
-
-  auto rhs =[](state_type& rr,  const state_type &r, input_type &u) -> void {
-
-    switch((int)u[0])
-		{
-      case 1:
-        rr[0]=-rl/xl*r[0];
-        rr[1]=-1/(xc*(ro+rc))*r[1];
-        break;
-      case 2:
-        rr[0]=-(1/xl)*(rl+ro*rc/(ro+rc))*r[0]+(1/xl)*ro/(5*(ro+rc))*r[1];
-        rr[1]=5*(1/xc)*ro/(ro+rc)*r[0]-(1/xc)*(1/(ro+rc))*r[1];
-        break;
-      }
-
+/* we integrate the growth bound by 0.5 sec (the result is stored in r)  */
+auto radius_post = [](state_type &r, const state_type&, const input_type &u) noexcept {
+  /* the ode for the growth bound */
+  auto rhs =[](state_type& rr,  const state_type &r, const input_type &u) noexcept {
+    if(u[0]==1) {
+      rr[0]=-rl/xl*r[0];
+      rr[1]=-1/(xc*(ro+rc))*r[1];
+    } else {
+      rr[0]=-(1/xl)*(rl+ro*rc/(ro+rc))*r[0]+(1/xl)*ro/(5*(ro+rc))*r[1];
+      rr[1]=5*(1/xc)*ro/(ro+rc)*r[0]-(1/xc)*(1/(ro+rc))*r[1];
+    }
 	};
-
-	/* runge kutte order 4 */
-  state_type k[4];
-  state_type tmp;
-
-  size_t nint=5; /* number of intermediate step size */
-  double h=tau_s/nint; /* h* nint = sampling time */
-
-	for(size_t t=0; t<nint; t++) {
-		rhs(k[0],r, u);
-		for(size_t i=0;i<sDIM;i++)
-		  tmp[i]=r[i]+h/2*k[0][i];
-
-		rhs(k[1],tmp, u);
-		for(size_t i=0;i<sDIM;i++)
-		  tmp[i]=r[i]+h/2*k[1][i];
-
-		rhs(k[2],tmp, u);
-		for(size_t i=0;i<sDIM;i++)
-		  tmp[i]=r[i]+h*k[2][i];
-
-		rhs(k[3],tmp, u);
-		for(size_t i=0; i<sDIM; i++)
-		  r[i] = r[i] + (h/6)*(k[0][i] + 2*k[1][i] + 2*k[2][i] + k[3][i]);
-	}
-
+  ode_solver(rhs,r,u,sDIM,tau);
 };
 
 int main() {
@@ -160,8 +97,7 @@ int main() {
   /* upper bounds of the hyper rectangle */
   state_type ub={{1.55,5.85}};
   /* grid node distance diameter */
-//  state_type eta={{1/(4000*sqrt(2)),1/(4000*sqrt(2))}};
-  state_type eta={{1/(4000*sqrt(2)),1/(4000*sqrt(2))}};
+  state_type eta={{2/4e3,2/4e3}};
   scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
@@ -177,46 +113,37 @@ int main() {
   input_type ieta={{1}};
   scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
 
+  std::cout << "Compute absraction "<< std::endl;
+  /* transition system to be computed */
   scots::TransitionSystem ts;
   tt.tic();
-  scots::AbstractionGB<state_type,input_type> abs(&ss,&is,&ts);
-  abs.computeTransitionRelation(system_post,radius_post,overflow);
+  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
+  abs.computeTransitionRelation(system_post,radius_post);
 
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
-
   tt.toc();
 
 
   /* calculate maximal fixed point */
-  state_type lb_s={{1.15,5.45}};
-  state_type ub_s={{1.55,5.85}};
-
   /* define function to check if the cell is in the safe set?  */
-    state_type x;
-    auto specification = [&](const size_t idx) -> bool {
-      ss.itox(idx,x);
-      /* function returns 1 if cell associated with x is in target set  */
-      if (lb_s[0] <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= ub_s[0] && lb_s[1] <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= ub_s[1])
-        return true;
-      else
-        return false;
-    };
-
-  /* save the result of safety controller in safe.scs */
-  scots::SafetyGame sg(&ts);
-  tt.tic();
-  sg.solve(specification);
-  tt.toc();
-  scots::IO::writeControllerToFile(&sg,"safe.scs",&ss,&is);
-  std::cout << "Size: " << sg.sizeOfDomain() << std::endl;
-
-  /* save the safety domain in safedomain.scs */
-  auto result = [&](const size_t idx) -> bool {
-    return sg.ifInDomain(idx);
+  state_type x;
+  auto safeset = [&](const size_t idx) noexcept {
+    ss.itox(idx,x);
+    /* function returns 1 if cell associated with x is in target set  */
+    if (lb[0] <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= ub[0] && lb[1] <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= ub[1])
+      return true;
+    return false;
   };
-  ss.addIndices(result);
-  scots::IO::writeToFile(&ss,"safedomain.scs");
 
+  std::cout << "Start synthesis "<< std::endl;
+  /* save the result of safety controller in safe.scs */
+  scots::SafetyGame safety(ts);
+  tt.tic();
+  safety.solve(safeset);
+  tt.toc();
+
+  std::cout << "Size: " << safety.size() << std::endl;
+  std::cout << "Size pairs: " << safety.sizePairs() << std::endl;
 
   return 1;
 }

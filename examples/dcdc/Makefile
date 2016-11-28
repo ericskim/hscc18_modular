@@ -3,16 +3,15 @@
 #
 #CC        = g++
 CC       	  = g++
-CXXFLAGS 		= -g -Wall -Wextra -std=c++11
-CXXFLAGS 		= -g -Wall -Wextra -std=c++11
-CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG
+CXXFLAGS 		= -g -Wall -Wextra -std=c++14
+CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3 -DNDEBUG
 
 
 #
 # scots 
 #
 SCOTSROOT		= ../..
-SCOTSINC		= -I$(SCOTSROOT)/src/sparse  -I$(SCOTSROOT)/src/
+SCOTSINC		= -I$(SCOTSROOT)/sparse  -I$(SCOTSROOT)/utils/
 
 
 #
@@ -31,4 +30,4 @@ dcdc:
 
 
 clean:
-	rm dcdc  *.o
+	rm dcdc

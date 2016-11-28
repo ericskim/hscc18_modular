@@ -33,6 +33,19 @@ TransitionSystem *ts_=nullptr;
 bool* domain_=nullptr;
 
 public:
+/* function: SafetyGame */
+SafetyGame(TransitionSystem &ts) {
+  ts_=&ts;
+  N_=ts_->N_;
+  M_=ts_->M_;
+  domain_ = new bool[N_*M_] ();
+}
+
+/* function: ~SafetyGame */
+~SafetyGame() {
+  delete[] domain_;
+}
+
 /* function:  size
  * compute the number of states for which there exists a valid input */
 abs_type size(void) const {
@@ -64,20 +77,6 @@ abs_type sizePairs(void) const {
   return n;
 }
 
-public:
-/* function: SafetyGame */
-SafetyGame(TransitionSystem &ts) {
-  ts_=&ts;
-  N_=ts_->N_;
-  M_=ts_->M_;
-  domain_ = new bool[N_*M_] ();
-}
-
-/* function: ~SafetyGame */
-~SafetyGame() {
-  delete[] domain_;
-}
-
 
 /* function: solve the safety game with respect to the set defined by
  * safe(idx)
@@ -86,74 +85,61 @@ SafetyGame(TransitionSystem &ts) {
  * if safe(idx)==false -> grid point with index idx is not in safe set
  *
  */
-//template<class F>
-//void solve(F &safe) {
-//        std::deque<size_t> heap;
-//        /* noLabel: keep track of the number of labels leading to safe states */
-//        size_t* noLabel=(size_t*)calloc(N_,sizeof(size_t));
-//        /* initialization */
-//        for(size_t i=0; i<N_; i++) {
-//                if(safe(i)) {
-//                        if(!ts_->noPost_[i]) {
-//                                domain_[i]=NULL;
-//                                heap.push_back(i);
-//                        }
-//                        else {
-//                                domain_[i]=(bool*)calloc(M_,sizeof(bool));
-//                                for(size_t j=0; j<M_; j++) {
-//                                        if(ts_->noPost_[i][j]!=0) {
-//                                                domain_[i][j]=1;
-//                                                noLabel[i]++;
-//                                        }
-//                                }
-//                        }
-//                }
-//                else {
-//                        domain_[i]=NULL;
-//                        heap.push_back(i);
-//                }
-//        }
-//
-//        while(!heap.empty()) {
-//                size_t length=heap.size();
-//                /* loop over all the unsafe states found in the previous loop */
-//                for(size_t count=0; count<length; count++) {
-//                        size_t k=heap.front();
-//                        heap.pop_front();
-//                        /* loop over all the labels */
-//                        for(size_t j=0; j<M_; j++) {
-//                                size_t numOfPre=0;
-//                                if(ts_->noPre_[k])
-//                                        numOfPre=ts_->noPre_[k][j];
-//                                /* loop over all the source states */
-//                                for(size_t v=0; v<numOfPre; v++) {
-//                                        size_t pos=ts_->prePointer_[k][j]+v;
-//                                        size_t i=ts_->pre_[pos];
-//                                        /* check if the source states is safe */
-//                                        if(noLabel[i]!=0) {
-//                                                /* set source states i with label j as unsafe pair */
-//                                                if(domain_[i][j]!=0) {
-//                                                        domain_[i][j]=0;
-//                                                        noLabel[i]--;
-//                                                }
-//                                                /* add to unsafe set if the source state has no label leading to safe states */
-//                                                if(noLabel[i]==0) {
-//                                                        heap.push_back(i);
-//                                                        free(domain_[i]);
-//                                                        domain_[i]=NULL;
-//                                                }
-//                                        }
-//                                }
-//                        }
-//                }
-//        }
-//        for(size_t i=0; i<N_; i++) {
-//                if(noLabel[i]!=0)
-//                        val_[i]=noLabel[i];
-//        }
-//        free(noLabel);
-//
-//}     /* end of solve function*/
+template<class F>
+void solve(F &safe) {
+  std::queue<abs_type> fifo;
+
+  /* no_input: keep track of the number of valid inputs (that lead to safe states) */
+  abs_type* no_val_in= new abs_type[N_] ();
+  /* keep track if an unsafe  state was already added to the fifo */
+  bool* added = new bool[N_] ();
+
+  /* initialization */
+  for(size_t i=0; i<N_; i++) {
+    if(safe(i)) {
+      for(size_t j=0; j<M_; j++) {
+        if(ts_->noPost_[i*M_+j]) {
+          domain_[i*M_+j]=1;
+          no_val_in[i]++;
+        }
+      }
+    }
+    if(!no_val_in[i] && !added[i]) {
+      fifo.push(i);
+      added[i]=true;
+    }
+  }
+
+  while(!fifo.empty()) {
+    abs_type length=fifo.size();
+    /* loop over all the unsafe states found in the previous loop */
+    for(abs_type count=0; count<length; count++) {
+      abs_type k=fifo.front();
+      fifo.pop();
+      /* loop over all inputs */
+      for(abs_type j=0; j<M_; j++) {
+        /* loop over all pre states of (k,j) */
+        for(abs_type p=0; p<ts_->noPre_[k*M_+j]; p++) {
+          /* (i,j,k) is a transition */
+          abs_type i=ts_->pre_[ts_->prePointer_[k*M_+j]+p];
+          /* check if input j at state i is considered safe */
+          if(domain_[i*M_+j]) {
+            /* set source states i with label j as unsafe pair */
+            domain_[i*M_+j]=false;
+            no_val_in[i]--;
+          }
+          /* add to unsafe set if state i has no more valid inputs */
+          if(!no_val_in[i] && !added[i]) {
+            fifo.push(i);
+            added[i]=true;
+          }
+        }
+      }
+    }
+  }
+  delete[] no_val_in;
+  delete[] added;
+}/* end of solve function*/
 
 }; /* close class def */
 } /* close namespace */
