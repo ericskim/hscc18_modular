@@ -10,6 +10,15 @@
 
 namespace scots {
 
+/*
+ * class: StaticController
+ *
+ * helper class used in mexFiles to access the controller 
+ * 
+ *
+ *
+ */
+
 class StaticController {
 friend class IO;
 /* var: N_
@@ -26,17 +35,17 @@ TransitionSystem *ts_=nullptr;
 bool* domain_=nullptr;
 /* var: val_ 
  * contains the value function */
-float* val_=nullptr;
+double* val_=nullptr;
 
 public:
 /* function: StaticController
  * construction */
-StaticController( TransitionSystem &ts) {
+StaticController(TransitionSystem &ts) {
   ts_=&ts;
   N_=ts_->N_;
   M_=ts_->M_;
   domain_ = new bool[N_*M_] ();
-  val_ = new float[N_] ();
+  val_ = new double[N_] ();
 }
 
 /* function: ~StaticController
@@ -47,7 +56,7 @@ StaticController( TransitionSystem &ts) {
 }
 
 /* function: getLabel
- * return the index of the controller input */
+ * return the indices the controller inputs */
 std::vector<abs_type> getLabel(abs_type idx) const {
   std::vector<abs_type> label;
   if(!domain_)
@@ -136,71 +145,6 @@ bool inDomain(abs_type idx) const {
       return true;
   }
   return false;
-}
-
-/* function: reach 
- * solve the reachability problem with respect to target set
- *
- * if target(idx)==true -> grid point with index idx is in target set
- * if target(idx)==false -> grid point with index idx is not in target set
- *
- */
-template<class F>
-void reach(F &target) {
-  /* use fifo list */
-  std::queue<abs_type> fifo;
-  /* controller */
-  abs_type* label = new abs_type[N_];
-  /* keep track of the number of processed post */
-  abs_type* K = new abs_type[N_*M_];
-  /* keep track of the values */
-  float* edge_val = new float[N_*M_];
-
-  /* init fifo */
-  for(abs_type i=0; i<N_; i++) {
-    val_[i]=std::numeric_limits<float>::infinity();
-    if(target(i)) {
-      domain_[i*M_]=true;
-      /* nodes in the target set have value zero */
-      val_[i]=0;
-      //fifo[last++]=i;
-      fifo.push(i);
-    }
-    for(abs_type j=0; j<M_; j++) {
-      edge_val[i*M_+j]=0;
-      K[i*M_+j]=ts_->noPost_[i*M_+j];
-    }
-  }
-
-  while(!fifo.empty()) {
-    /* get state to be processed */
-    abs_type q=fifo.front();
-    fifo.pop();
-    /* save input label to domain_ */
-    domain_[q*M_+label[q]]=true;
-    /* loop over each label */
-    for(abs_type j=0; j<M_; j++) {
-      /* loop over pre's associated with this label */
-      for(abs_type v=0; v<ts_->noPre_[q*M_+j]; v++) {
-        abs_type i=ts_->pre_[ts_->prePointer_[q*M_+j]+v];
-        /* (i,j,q) is a transition */
-        /* update the number of processed posts */
-        K[i*M_+j]--;
-        /* update the max value of processed posts */
-        edge_val[i*M_+j]=(edge_val[i*M_+j]>=1+val_[q] ? edge_val[i*M_+j] : 1+val_[q]);
-        /* check if for node i and label j all posts are processed */
-        if(!K[i*M_+j] && val_[i]>edge_val[i*M_+j]) {
-          fifo.push(i);
-          val_[i]=edge_val[i*M_+j];
-          label[i]=j;
-        }  
-      }  /* end loop over all pres of node i  under label j */
-    }  /* end loop over all label j */
-  }  /* fifo is empty */
-
-  delete[] label;
-  delete[] edge_val;
-  delete[] K;
 }
 
 }; /* close class def */

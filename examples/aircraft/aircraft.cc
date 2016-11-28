@@ -17,7 +17,7 @@
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
-#include "StaticController.hh"
+#include "ReachabilityGame.hh"
 
 /* ode solver */
 #include "RungeKutta4.hh"
@@ -175,11 +175,11 @@ int main() {
 
         std::cout << "Solve game " << std::endl;
 
-        scots::StaticController con(ts);
-        con.reach(target);
+        scots::ReachabilityGame reach(ts);
+        reach.solve(target);
         tt.toc();
 
-        std::cout << "Size: " << con.size() << std::endl;
+        std::cout << "Size: " << reach.size() << std::endl;
 
 
         return 1;

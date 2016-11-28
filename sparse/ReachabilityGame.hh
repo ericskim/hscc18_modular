@@ -2,23 +2,17 @@
  * ReachabilityGame.hh
  *
  *  created on: 08.01.2016
- *      author: rungger, rigas
+ *      author: rungger
  */
 #ifndef REACHABILITYGAME_HH_
 #define REACHABILITYGAME_HH_
 
 #include <iostream>
-#include <fstream>
-#include <limits>
-#include <sstream>
-#include <cassert>
-#include <vector>
+#include <climits>
+#include <stdexcept>
 #include <queue>
-#include <functional>
 
 #include "TransitionSystem.hh"
-#include "Heap.hh"
-#include "Game.hh"
 
 
 namespace scots {
@@ -35,38 +29,63 @@ namespace scots {
  * to solve a reachability problem
  *
  */
-class ReachabilityGame : public Game {
+class ReachabilityGame {
+friend class IO;
+/* var: N_
+ * number of states in the transition system */
+size_t N_;
+/* var: M_
+ * number of inputs in the transition system */
+size_t M_;
+/* var: ts_
+ * pointer to the transition system */
+TransitionSystem *ts_=nullptr;
+/* var: inputs_
+ * inputs_[i] = j 
+ * contains the input j associated with state i
+ * j=-1 if the target is not reachable from i */
+int* inputs_=nullptr;
+/* var: val_ 
+ * contains the value function */
+double* val_=nullptr;
 
 public:
-/* constructor */
-ReachabilityGame(const TransitionSystem *ts) {
-        ts_=ts;
-        N_=ts->N_;
-        M_=ts->M_;
-        /* allocate memory for the controller domain */
-        domain_ = (bool**)malloc(N_*sizeof(bool*));
-        val_ = (double*)malloc(N_*sizeof(double));
-        for(size_t i=0; i<N_; i++) {
-                domain_[i]=NULL;
-                val_[i]=std::numeric_limits<double>::infinity();
-        }
-}
-/* constructor */
-ReachabilityGame(){
+/* function: ReachabilityGame
+ * construction */
+ReachabilityGame( TransitionSystem &ts) {
+  ts_=&ts;
+  N_=ts_->N_;
+  M_=ts_->M_;
+  if(M_> INT_MAX)
+    throw std::runtime_error("scots::ReachabilityGame: Number of inputs exceeds maximum supported value");
+  inputs_ = new int[N_];
+  val_ = new double[N_];
+  for(abs_type i=0; i<N_; i++)
+    inputs_[i]=-1;
 }
 
+/* function: ~ReachabilityGame
+ * construction */
 ~ReachabilityGame() {
-        if(domain_) {
-                for(size_t i=0; i<N_; i++) {
-                        if(domain_[i])
-                                free(domain_[i]);
-                }
-                free(domain_);
-                free(val_);
-        }
+  delete[] inputs_;
+  delete[] val_;
 }
 
-/* function: solve the reachability problem with respect to target set
+/* function:  size
+ * compute the number of states for which there exists a valid input value */
+abs_type size(void) const {
+  abs_type n=0;
+  if(!inputs_)
+    return n;
+  for(abs_type i=0; i<N_; i++) {
+    if(inputs_[i]!=-1)
+      n++;
+  }
+  return n;
+}
+
+/* function: solve 
+ * solve the reachability problem with respect to target set
  *
  * if target(idx)==true -> grid point with index idx is in target set
  * if target(idx)==false -> grid point with index idx is not in target set
@@ -74,145 +93,57 @@ ReachabilityGame(){
  */
 template<class F>
 void solve(F &target) {
-        if(!ts_) {
-                std::ostringstream os;
-                os << "ReachabilityGame.hh: Error: There is no transition system initialized.";
-                throw std::runtime_error(os.str().c_str());
-        }
+  /* use fifo list */
+  std::queue<abs_type> fifo;
+  /* keep track of the number of processed post */
+  abs_type* K = new abs_type[N_*M_];
+  /* keep track of the values */
+  float* edge_val = new float[N_*M_];
 
+  /* init fifo */
+  for(abs_type i=0; i<N_; i++) {
+    val_[i]=std::numeric_limits<float>::infinity();
+    if(target(i)) {
+      inputs_[i]=0;
+      /* nodes in the target set have value zero */
+      val_[i]=0;
+      fifo.push(i);
+    }
+    for(abs_type j=0; j<M_; j++) {
+      edge_val[i*M_+j]=0;
+      K[i*M_+j]=ts_->noPost_[i*M_+j];
+    }
+  }
 
-        //Heap<double> heap(val_,N_);
-        std::deque<size_t> heap;
-        //std::vector<size_t> heap;
+  while(!fifo.empty()) {
+    /* get state to be processed */
+    abs_type q=fifo.front();
+    fifo.pop();
+    /* loop over each input */
+    for(abs_type j=0; j<M_; j++) {
+      /* loop over pre's associated with this input */
+      for(abs_type v=0; v<ts_->noPre_[q*M_+j]; v++) {
+        abs_type i=ts_->pre_[ts_->prePointer_[q*M_+j]+v];
+        /* (i,j,q) is a transition */
+        /* update the number of processed posts */
+        K[i*M_+j]--;
+        /* update the max value of processed posts */
+        edge_val[i*M_+j]=(edge_val[i*M_+j]>=1+val_[q] ? edge_val[i*M_+j] : 1+val_[q]);
+        /* check if for node i and input j all posts are processed */
+        if(!K[i*M_+j] && val_[i]>edge_val[i*M_+j]) {
+          fifo.push(i);
+          val_[i]=edge_val[i*M_+j];
+          inputs_[i]=j;
+        }  
+      }  /* end loop over all pres of state i under input j */
+    }  /* end loop over all input j */
+  }  /* fifo is empty */
 
-        /* initialize heap with indices of the target set and auxiliary matrices */
-        size_t** k=(size_t**)malloc(N_*sizeof(size_t*));
-        double** edgevalues=(double**)malloc(N_*sizeof(double*));
-        size_t* hidx=(size_t*)malloc(N_*sizeof(size_t));
-        for(size_t i=0; i<N_; i++) {
-                k[i]=NULL;
-                edgevalues[i]=NULL;
-                if(target(i)) {
-                        /* nodes in the target set have value zero */
-                        val_[i]=0;
-                        domain_[i]=(bool*)calloc(M_,sizeof(bool));
-                        domain_[i][0]=1;
-                        /* put node in heap */
-                        //heap.push(i);
-                        //hidx[i]=heap.size();
-                        hidx[i]=1;
-                        heap.push_back(i);
-                }
-                else
-                        hidx[i]=0;
-        }
-        /* done heap initilization */
-
-        /* while heap non-empty */
-        while(!heap.empty()) {
-                /* pop idx of domain_ with minimum val from heap */
-                //size_t idx = heap.pop();
-                //size_t idx = heap.back();
-                //heap.pop_back();
-                size_t idx = heap.front();
-                heap.pop_front();
-                hidx[idx]=0;
-                /* is the node in the avoid set ? */
-                if(!ts_->noPre_[idx] && !ts_->noPost_[idx])
-                        continue;
-                /* loop over each label */
-                for(size_t j=0; j<M_; j++) {
-                        /* loop over pre's associated wiht this label */
-
-                        //debug:
-                        size_t numOfPre=0;
-                        //unsigned short numOfPre=0;
-
-                        if(ts_->noPre_[idx])
-                                numOfPre=ts_->noPre_[idx][j];
-                        for(size_t v=0; v<numOfPre; v++) {
-                                size_t pos=ts_->prePointer_[idx][j]+v;
-                                size_t i=ts_->pre_[pos];
-                                /* check if the array to keep track of number of processed post's is
-                                 * initialized */
-                                if(!k[i]) {
-                                        k[i]=(size_t*)malloc(M_*sizeof(size_t));
-                                        for(size_t l=0; l<M_; l++)
-                                                k[i][l]=0;
-                                }
-                                /* update the number of processed posts */
-                                k[i][j]++;
-                                /* check if the edgevalues to keep track of max value in the post's is
-                                 * initialized */
-                                if(!edgevalues[i]) {
-                                        edgevalues[i]=(double*)malloc(M_*sizeof(double));
-                                        for(size_t ll=0; ll<M_; ll++)
-                                                edgevalues[i][ll]=0;
-                                }
-                                /* update the max value of processed posts */
-                                edgevalues[i][j]=(edgevalues[i][j]>=1+val_[idx] ? edgevalues[i][j] :  1+val_[idx]);
-
-
-
-                                /* check if for node i and label j all posts are processed */
-                                if(ts_->noPost_[i] && k[i][j]==ts_->noPost_[i][j]) {
-                                        /* leads this label to a better value ? */
-                                        if(val_[i]>edgevalues[i][j]) {
-                                                if(hidx[i]==0) {
-                                                        //heap.push(i);
-                                                        //hidx[i]=heap.size();
-                                                        hidx[i]=1;
-                                                        heap.push_back(i);
-
-                                                        if(val_[i]<std::numeric_limits<double>::infinity()) {
-
-                                                                //debuging
-                                                                size_t numOfPre2=0;
-                                                                //  unsigned short numOfPre2=0;
-
-
-                                                                if(ts_->noPre_[i]) {
-                                                                        for(size_t jj=0; jj<M_; jj++) {
-                                                                                numOfPre2=ts_->noPre_[i][jj];
-                                                                                for(size_t u=0; u<numOfPre2; u++) {
-                                                                                        size_t pos2=ts_->prePointer_[i][jj]+u;
-                                                                                        size_t pre2=ts_->pre_[pos2];
-                                                                                        k[pre2][jj]--;
-                                                                                }
-                                                                        }
-                                                                }
-                                                        }
-                                                }
-                                                else {                 /* update heap */
-                                                                       //heap.heapifyup(hidx[i]-1);
-                                                }
-                                                val_[i]=edgevalues[i][j];
-                                                domain_[i]=(bool*)calloc(M_,sizeof(bool));
-                                                domain_[i][j]=1;
-
-                                        }
-                                }                   /* end update of heap */
-                        }         /* end loop over all pres of node i  under label j */
-                }         /* end loop over all label j */
-        }         /* heap is empty */
-
-        if(edgevalues)
-                for(size_t i=0; i<N_; i++) {
-                        if(edgevalues[i]!=NULL)
-                                free(edgevalues[i]);
-                }
-        if(k)
-                for(size_t i=0; i<N_; i++) {
-                        if(k[i]!=NULL)
-                                free(k[i]);
-                }
-        free(k);
-        free(edgevalues);
-        free(hidx);
-}               /* end solve() */
+  delete[] edge_val;
+  delete[] K;
+}
 
 }; /* close class def */
 } /* close namespace */
-
 
 #endif

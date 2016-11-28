@@ -23,7 +23,7 @@ template<class state_type, class input_type> class AbstractionGB;
 /* define type of abstract state 
  * determines an upper limit on the number of states 
   */
-typedef uint32_t abs_type;
+using abs_type=uint32_t;
 
 /*
  * class: TransitionSystem
@@ -39,6 +39,8 @@ friend class IO;
 template<class state_type, class input_type>
 friend class AbstractionGB;
 friend class StaticController;
+friend class ReachabilityGame;
+friend class SafetyGame;
 private:
 /* var: N_
  * number of states */

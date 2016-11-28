@@ -70,6 +70,8 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   int dim=stateSpace_->getDimension();
   /* number of transitions */
   size_t noT=0; 
+  /* for display purpose */
+  abs_type counter=0;
   /* variables for managing the post */
   std::vector<abs_type> lb(dim);
   std::vector<abs_type> ub(dim);
@@ -105,7 +107,6 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   abs_type* cornerIDs = new abs_type[N*M*2];
   /* is post of (i,j) out of domain ? */
   bool* outOfDomain = new bool[N*M];
-  
   /* loop over all cells */
   for(abs_type i=0; i<N; i++) {
     /* loop over all inputs */
@@ -180,10 +181,20 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
       /* increment number of transitions by number of post */
       noT+=npost;
       noPost[i*M+j]=npost;
-
-
     }
+    /* print progress */
+    if(((double)i/(double)N*100)>counter){
+      if((counter%10)==0)
+        std::cout << counter;
+      else if((counter%2)==0) {
+        std::cout << ".";
+      }
+      counter++;
+    }
+    std::flush(std::cout); 
   }
+  std::cout << "100" << std::endl;
+
   /* compute prePointer */
   size_t sum=0;
   for(size_t i=0; i<N; i++) {

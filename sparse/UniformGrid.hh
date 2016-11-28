@@ -13,10 +13,11 @@
 #include <string>
 #include <cassert>
 #include <cmath>
-#include <set>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <climits>
+#include <set>
 
 #include "TransitionSystem.hh"
 
@@ -137,7 +138,7 @@ inline void xtoi(abs_type &idx, const grid_point_t x) const {
     double d_idx=x[k]-firstGridPoint_[k];
     if ( d_idx <= -eta_[k]/2.0 || d_idx >= nofGridPoints_[k]*eta_[k]+eta_[k]/2.0) {
       std::ostringstream os;
-      os << "Error: UniformGrid: x is outside uniform grid." << x[k] ; 
+      os << "scots::UniformGrid: x is outside uniform grid." << x[k] ; 
       throw std::runtime_error(os.str().c_str());
     }
 
@@ -149,7 +150,7 @@ inline void xtoi(abs_type &idx, const grid_point_t x) const {
 inline void itox(abs_type idx, grid_point_t &x) const {
   if (idx >= N_) {
    std::ostringstream os;
-   os << "Error: UniformGrid: idx larger than number of grid points.";
+   os << "scots::UniformGrid: idx larger than number of grid points.";
    throw std::runtime_error(os.str().c_str());
   }
   abs_type num;
@@ -166,7 +167,7 @@ inline void itox(abs_type idx, grid_point_t &x) const {
 /* function: printInfo
  * print some numbers related to the symbolic set*/
 void printInfo(int verbosity=0) const {
-  std::cout << "Grid node distance (eta)in each dimension: ";
+  std::cout << "Grid node distance (eta) in each dimension: ";
   for(int i=0; i<dim_; i++)
     std::cout << eta_[i] << " ";
   std::cout << std::endl;
@@ -325,13 +326,13 @@ std::vector<abs_type> projectSet(std::vector<abs_type> projectDimension) {
   int n=projectDimension.size();
   if(n>dim_) {
     std::ostringstream os;
-    os << "Error: UniformGrid: project dimension larger than dimension of grid points.";
+    os << "scots::UniformGrid: project dimension larger than dimension of grid points.";
     throw std::runtime_error(os.str().c_str());
   }
   for(int i=0; i<n; i++) {
     if(projectDimension[i]>dim_) {
       std::ostringstream os;
-      os << "Error: UniformGrid: Cannot project UniformGrid onto given dimensions.";
+      os << "scots::UniformGrid: Cannot project UniformGrid onto given dimensions.";
       throw std::runtime_error(os.str().c_str());
     }
   }
@@ -378,13 +379,13 @@ std::vector<abs_type> project(std::vector<abs_type> idxSet, std::vector<abs_type
   int n=projectDimension.size();
   if(n>dim_) {
     std::ostringstream os;
-    os << "Error: UniformGrid: project dimension larger than dimension of grid points.";
+    os << "scots::UniformGrid: project dimension larger than dimension of grid points.";
     throw std::runtime_error(os.str().c_str());
   }
   for(int i=0; i<n; i++) {
     if(projectDimension[i]>dim_) {
       std::ostringstream os;
-      os << "Error: UniformGrid: Cannot project UniformGrid onto given dimensions.";
+      os << "scots::UniformGrid: Cannot project UniformGrid onto given dimensions.";
       throw std::runtime_error(os.str().c_str());
     }
   }
@@ -428,7 +429,7 @@ void initGrid(const int dim, const grid_point_t &lb, const grid_point_t &ub, con
   for (int i=0; i<dim; i++) {
     if((lb[i] > ub[i])) {
       std::ostringstream os;
-      os << "Error: scots::UniformGrid: lower bound must be less than or equal upper bound.";
+      os << "scots::UniformGrid: lower bound must be less than or equal upper bound.";
       throw std::invalid_argument(os.str().c_str());
     }
   }
@@ -456,6 +457,10 @@ void initGrid(const int dim, const grid_point_t &lb, const grid_point_t &ub, con
     NN_[i]=N_;
     N_*=nofGridPoints_[i];
   }
+
+  if (N_>std::numeric_limits<abs_type>::max()) 
+   throw std::runtime_error("scots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in TransitionSystem.hh).");
+
 }
 }; /* close class def */
 
