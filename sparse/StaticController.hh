@@ -20,7 +20,7 @@ size_t N_;
 size_t M_;
 /* var: ts_
  * pointer to the transition system */
- TransitionSystem *ts_=nullptr;
+TransitionSystem *ts_=nullptr;
 /* var: domain_
  * contains the controller domain N_ x M_ */
 bool* domain_=nullptr;
@@ -152,7 +152,7 @@ void reach(F &target) {
   /* controller */
   abs_type* label = new abs_type[N_];
   /* keep track of the number of processed post */
-  //abs_type* k = new abs_type[N_*M_];
+  abs_type* K = new abs_type[N_*M_];
   /* keep track of the values */
   float* edge_val = new float[N_*M_];
 
@@ -166,8 +166,10 @@ void reach(F &target) {
       //fifo[last++]=i;
       fifo.push(i);
     }
-    for(abs_type j=0; j<M_; j++) 
+    for(abs_type j=0; j<M_; j++) {
       edge_val[i*M_+j]=0;
+      K[i*M_+j]=ts_->noPost_[i*M_+j];
+    }
   }
 
   while(!fifo.empty()) {
@@ -183,11 +185,11 @@ void reach(F &target) {
         abs_type i=ts_->pre_[ts_->prePointer_[q*M_+j]+v];
         /* (i,j,q) is a transition */
         /* update the number of processed posts */
-        ts_->noPost_[i*M_+j]--;
+        K[i*M_+j]--;
         /* update the max value of processed posts */
         edge_val[i*M_+j]=(edge_val[i*M_+j]>=1+val_[q] ? edge_val[i*M_+j] : 1+val_[q]);
         /* check if for node i and label j all posts are processed */
-        if(!ts_->noPost_[i*M_+j] && val_[i]>edge_val[i*M_+j]) {
+        if(!K[i*M_+j] && val_[i]>edge_val[i*M_+j]) {
           fifo.push(i);
           val_[i]=edge_val[i*M_+j];
           label[i]=j;
@@ -198,6 +200,7 @@ void reach(F &target) {
 
   delete[] label;
   delete[] edge_val;
+  delete[] K;
 }
 
 }; /* close class def */
