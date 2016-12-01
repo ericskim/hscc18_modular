@@ -7,18 +7,19 @@
 
 #include <iostream>
 #include <array>
-#include <iomanip> 
+#include <iomanip>
 
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
 #include "ReachabilityGame.hh"
+#include "StaticController.hh"
 
 /* ode solver */
 #include "RungeKutta4.hh"
 
 #include "TicToc.hh"
-//#include "IO.hh"
+#include "IO.hh"
 
 /* state space dim */
 #define sDIM 3
@@ -26,7 +27,7 @@
 
 /*
  * data types for the state space elements and input space
- * elements used in uniform grid and ode solvers 
+ * elements used in uniform grid and ode solvers
  */
 typedef std::array<double,3> state_type;
 typedef std::array<double,2> input_type;
@@ -57,6 +58,7 @@ auto radius_post = [](state_type &r, const state_type &, const input_type &u) {
 };
 
 int main() {
+
   /* to measure time */
   TicToc tt;
 
@@ -65,11 +67,11 @@ int main() {
   /****************************************************************************/
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* lower bounds of the hyper rectangle */
-  state_type lb={{0,0,-M_PI-0.4}};  
+  state_type lb={{0,0,-M_PI-0.4}};
   /* upper bounds of the hyper rectangle */
-  state_type ub={{10,10,M_PI+0.4}}; 
+  state_type ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
-  state_type eta={{.2,.2,.2}};   
+  state_type eta={{.2,.2,.2}};
   scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
@@ -78,11 +80,11 @@ int main() {
   /* construct grid for the input space */
   /****************************************************************************/
   /* lower bounds of the hyper rectangle */
-  input_type ilb={{-1,-1}};  
+  input_type ilb={{-1,-1}};
   /* upper bounds of the hyper rectangle */
-  input_type iub={{1,1}};  
+  input_type iub={{1,1}};
   /* grid node distance diameter */
-  input_type ieta={{.3,.3}};  
+  input_type ieta={{.3,.3}};
   scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
 
   /****************************************************************************/
@@ -108,7 +110,7 @@ int main() {
 
   /* overflow function returns 1 if x \in overflow symbol  */
   auto overflow = [&](const state_type &x, const state_type&) {
-    double c1= eta[0]/2.0;
+  double c1= eta[0]/2.0;
     double c2= eta[1]/2.0;
     for(size_t i=0; i<15; i++) {
       if ((H[i][0]-c1) <= x[0] && x[0]<= (H[i][1]+c1) && (H[i][2]-c2) <= x[1] && x[1] <= (H[i][3]+c2))
@@ -116,6 +118,12 @@ int main() {
     }
     return false;
   };
+  auto of =[&](const state_type &x){
+  return overflow(x,x);
+  };
+
+  ss.addGridPoints(of);
+  scots::IO::writeToFile(&ss,"obstacles.scs");
 
   /* transition system to be computed */
   scots::TransitionSystem ts;
@@ -125,40 +133,31 @@ int main() {
   scots::AbstractionGB<state_type,input_type> abs(ss, is, ts);
   abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
 
-  tt.toc(); 
+  tt.toc();
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
-            
+
   /* define function to check if the cell is in the  target set?  */
   state_type x;
   auto target = [&](size_t idx) -> bool {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
-    if (9 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 9.5 && 0 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0.5) 
+    if (9 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 9.5 && 0 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0.5)
       return true;
+    else
     return false;
   };
 
-  scots::ReachabilityGame reach(ts);
+  ss.fillAbstractSet();
+  ss.remIndices(target);
+  ss.remGridPoints(of);
+  scots::IO::writeToFile(&ss,"problemdomain.scs");
 
+  scots::ReachabilityGame reach(ts);
   tt.tic();
   reach.solve(target);
   tt.toc();
+  //scots::IO::writeControllerToFile(&reach,"reach.scs",&ss,&is);
   std::cout << "Size: " << reach.size() << std::endl;
-
-  state_type x={9,9,9}
-
-  for(;;) {
-
-  ss.xtoi(i,x);
-
-  int j = reach.getInput(i);
-
-  is.itox(j,u);
-
-  vehicle_post(xx,x,u);
-
-  }
-
 
   return 1;
 }
