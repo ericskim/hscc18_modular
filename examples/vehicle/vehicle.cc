@@ -5,11 +5,6 @@
  *      author: rungger
  */
 
-/*
- * information about this example is given in the readme file
- *
- */
-
 #include <iostream>
 #include <array>
 #include <iomanip> 
@@ -17,7 +12,7 @@
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
-#include "StaticController.hh"
+#include "ReachabilityGame.hh"
 
 /* ode solver */
 #include "RungeKutta4.hh"
@@ -74,7 +69,7 @@ int main() {
   /* upper bounds of the hyper rectangle */
   state_type ub={{10,10,M_PI+0.4}}; 
   /* grid node distance diameter */
-  state_type eta={{.05,.1,.1}};   
+  state_type eta={{.2,.2,.2}};   
   scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
@@ -122,16 +117,13 @@ int main() {
     return false;
   };
 
-  //ss.addGridPoints(overflow);
-  //scots::IO::writeToFile(&ss,"obstacles.scs");
-
   /* transition system to be computed */
   scots::TransitionSystem ts;
 
   tt.tic();
 
-  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
-  abs.computeTransitionRelation(vehicle_post, radius_post,overflow);
+  scots::AbstractionGB<state_type,input_type> abs(ss, is, ts);
+  abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
 
   tt.toc(); 
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
@@ -146,18 +138,27 @@ int main() {
     return false;
   };
 
-  //ss.fillAbstractSet();
-  //ss.remIndices(target);
-  //ss.remGridPoints(overflow);
-  //scots::IO::writeToFile(&ss,"problemdomain.scs");
-
-  scots::StaticController con(ts);
+  scots::ReachabilityGame reach(ts);
 
   tt.tic();
-  con.reach(target);
+  reach.solve(target);
   tt.toc();
-//  scots::IO::writeControllerToFile(con,"reach.scs",&ss,&is);
-  std::cout << "Size: " << con.size() << std::endl;
+  std::cout << "Size: " << reach.size() << std::endl;
+
+  state_type x={9,9,9}
+
+  for(;;) {
+
+  ss.xtoi(i,x);
+
+  int j = reach.getInput(i);
+
+  is.itox(j,u);
+
+  vehicle_post(xx,x,u);
+
+  }
+
 
   return 1;
 }

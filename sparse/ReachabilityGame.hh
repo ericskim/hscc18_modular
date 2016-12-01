@@ -139,6 +139,7 @@ void solve(F &target) {
     }  /* end loop over all input j */
   }  /* fifo is empty */
 
+
   delete[] edge_val;
   delete[] K;
 }
