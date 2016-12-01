@@ -17,6 +17,7 @@
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
+#include "StaticController.hh"
 #include "ReachabilityGame.hh"
 
 /* ode solver */
@@ -52,7 +53,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
                 xx[2] = x[0]*std::sin(x[1]);
         };
 
-  ode_solver(rhs,x,u,sDIM,tau,10);
+        ode_solver(rhs,x,u,sDIM,tau,10);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
@@ -60,19 +61,19 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 double L[3][2];
 //state_type v={{2.77*0.01,5.16*0.0001,7.4*0.001}};
 state_type w={{.108,0.002,0}};
-auto radius_post = [] (state_type &r, const state_type&, const input_type &u) {
+auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
 
         L[0][0]=-0.0019*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
-        L[0][1]=9.81;
+        L[0][1]=9.8100004196;
 
         L[1][0]=0.00447+0.00481*u[1];
-        L[1][1]=0.005163;
+        L[1][1]=0.0035356693;
 
-        L[2][0]=.03;
-        L[2][1]=83;
+        L[2][0]=0.0740960166;
+        L[2][1]=83.2098617554;
 
         /* the ode for the growth bound */
-        auto rhs =[] (state_type& rr,  const state_type &r, const input_type &) { 
+        auto rhs =[] (state_type& rr,  const state_type &r, const input_type &) {
                 rr[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; /* L[0][2]=0 */
                 rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
                 rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
@@ -93,7 +94,8 @@ int main() {
         /* grid node distance diameter */
         //state_type eta={{25.0/100,3*M_PI/180/100,56.0/100}};
         double c=1;
-        state_type eta={{c*25.0/362,c*3*M_PI/180/66,c*56.0/334}};
+        //state_type eta={{c*25.0/362,c*3*M_PI/180/66,c*56.0/334}}; //  optimized values
+        state_type eta={{c*25.0/210,c*3*M_PI/180/209,c*56.0/209}};
         /* lower bounds of the hyper rectangle */
         state_type lb={{58,-3*M_PI/180,0}};
         /* upper bounds of the hyper rectangle */
@@ -119,7 +121,10 @@ int main() {
         input_type iub={{32000,8*M_PI/180}};
         /* grid node distance diameter */
         input_type ieta={{32000,8.0/9.0*M_PI/180}};
-        scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
+        /* input disturbance */
+        input_type iz={{5000,0.25*M_PI/180}};
+
+        scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta,iz);
         is.printInfo(1);
 
         /* transition system to be computed */
@@ -157,7 +162,7 @@ int main() {
                       &&  -0.91 <=  ( (x[0]+eta[0]/2.0) * std::sin(x[1]-eta[1]/2.0) )
                       )
                         return true;
-                  return false;
+                return false;
         };
 
 //        ss.clearAbstractSet();
@@ -184,4 +189,3 @@ int main() {
 
         return 1;
 }
-
