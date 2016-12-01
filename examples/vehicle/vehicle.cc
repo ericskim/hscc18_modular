@@ -146,7 +146,6 @@ int main() {
     else
     return false;
   };
-
   ss.fillAbstractSet();
   ss.remIndices(target);
   ss.remGridPoints(of);
