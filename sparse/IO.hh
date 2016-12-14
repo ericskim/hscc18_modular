@@ -7,6 +7,7 @@
 #include "StaticController.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
+#include "ReachabilityGame.hh"
 namespace scots {
 /*
  * class: IO
@@ -210,7 +211,7 @@ static void writeToFile(const UniformGrid<U>* gs, const char* filename, const ch
 /* function: writeToFile()
  * ts: TransitionSystem
  * filename: name of file */
-static void writeToFile(const TransitionSystem& ts, const char* filename) {
+static void writeToFile(const TransitionSystem* ts, const char* filename) {
     /* open file */
     std::ofstream file(filename);
     if(!file.good()) {
@@ -224,34 +225,34 @@ static void writeToFile(const TransitionSystem& ts, const char* filename) {
     file << "################################################################################" << std::endl;
     file << std::endl;
     file << "#Transition System" << std::endl;
-    file << "#no of states in the transition system: " <<ts.N_ << std::endl;
-    file << "#no of labels in the transition system: " << ts.M_ << std::endl;
-    file << "#no of transitions in the transition system: " << ts.T_ << std::endl;
+    file << "#no of states in the transition system: " <<ts->N_ << std::endl;
+    file << "#no of labels in the transition system: " << ts->M_ << std::endl;
+    file << "#no of transitions in the transition system: " << ts->T_ << std::endl;
 
-    if(ts.pre_!=NULL) {
+    if(ts->pre_!=NULL) {
         file << "#transition relation:" << std::endl;
         file << "#\"idx of source state\"  \"idx of input\"  \"idx of target state\" " << std::endl;
-        for(size_t k=0; k<ts.N_; k++) {
-            for(size_t j=0; j<ts.M_; j++) {
-                if(ts.noPre_[k] && ts.noPre_[k*ts.M_+j]!=0) {
-                    for(size_t no=0; no<(size_t)ts.noPre_[k*ts.M_+j]; no++) {
-                        size_t pos=ts.prePointer_[k*ts.M_+j]+no;
-                        size_t i=ts.pre_[pos];
+        for(size_t k=0; k<ts->N_; k++) {
+            for(size_t j=0; j<ts->M_; j++) {
+                if(ts->noPre_[k] && ts->noPre_[k*ts->M_+j]!=0) {
+                    for(size_t no=0; no<(size_t)ts->noPre_[k*ts->M_+j]; no++) {
+                        size_t pos=ts->prePointer_[k*ts->M_+j]+no;
+                        size_t i=ts->pre_[pos];
                         file << i << " " << j << " " << k << std::endl;
                     }
                 }
             }
         }
     }
-    else if(ts.post_!=NULL) {
+    else if(ts->post_!=NULL) {
         file << "#transition relation:" << std::endl;
         file << "#\"idx of source state\"  \"idx of input\"  \"idx of target state\" " << std::endl;
-        for(size_t i=0; i<ts.N_; i++) {
-            for(size_t j=0; j<ts.M_; j++) {
-                if(ts.noPost_[i] && ts.noPost_[i*ts.M_+j]!=0) {
-                    for(size_t no=0; no<(size_t)ts.noPost_[i*ts.M_+j]; no++) {
-                        size_t pos=ts.postPointer_[i*ts.M_+j]+no;
-                        size_t k=ts.post_[pos];
+        for(size_t i=0; i<ts->N_; i++) {
+            for(size_t j=0; j<ts->M_; j++) {
+                if(ts->noPost_[i] && ts->noPost_[i*ts->M_+j]!=0) {
+                    for(size_t no=0; no<(size_t)ts->noPost_[i*ts->M_+j]; no++) {
+                        size_t pos=ts->postPointer_[i*ts->M_+j]+no;
+                        size_t k=ts->post_[pos];
                         file << i << " " << j << " " << k << std::endl;
                     }
                 }
@@ -269,7 +270,8 @@ static void writeToFile(const TransitionSystem& ts, const char* filename) {
 
 /* function: writeControllerToFile()
 * only save the state-input pairs */
-static void writeControllerToFile(const StaticController &con, const char* filename) {
+//const ReachabilityGame* reach,
+static void writeControllerToFile(const ReachabilityGame* reach, const char* filename) {
     /* open file */
     std::ofstream file(filename);
     if(!file.good()) {
@@ -283,16 +285,16 @@ static void writeControllerToFile(const StaticController &con, const char* filen
     file << "################################################################################" << std::endl;
     file << std::endl;
     file << "#Controller" << std::endl;
-    file << "#no of states in the transition system: " << con.N_ << std::endl;
-    file << "#no of labels in the transition system: " << con.M_ << std::endl;
+    file << "#no of states in the transition system: " << reach->N_ << std::endl;
+    file << "#no of labels in the transition system: " << reach->M_ << std::endl;
     file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
 
     bool m=false;
-    for(size_t i=0; i<con.N_; i++) {
-        for(size_t j=0; j<con.M_; j++) {
-            if(con.domain_[i*con.M_ + j]) {
+    for(size_t i=0; i<reach->N_; i++) {
+        for(size_t j=0; j<reach->M_; j++) {
+            if(reach->inputs_[i]!=-1) {
                 if(!m) {
-                    file << i << " " << con.val_[i] <<" ";
+                    file << i << " " << reach->val_[i] <<" ";
                     m=true;
                 }
                 file << j << " ";
@@ -311,8 +313,9 @@ static void writeControllerToFile(const StaticController &con, const char* filen
  * con: StaticController
  * filename: name of file */
 // template<class T=std::array<double,1>, class U=std::array<double,1>>
+//const ReachabilityGame* reach,
 template <class T, class U>
-static void writeControllerToFile(const StaticController &con, const char* filename, const UniformGrid<T> *ss, const UniformGrid<U> *is) {
+static void writeControllerToFile(const ReachabilityGame* reach, const char* filename, const UniformGrid<T>* ss, const UniformGrid<U>* is) {
   /* open file */
   std::ofstream file(filename);
   if(!file.good()) {
@@ -332,15 +335,15 @@ static void writeControllerToFile(const StaticController &con, const char* filen
   file << createUniformGridParameterString(is,"input space");
   file << std::endl;
   file << "#Controller" << std::endl;
-  file << "#no of states in the transition system: " << con.N_ << std::endl;
-  file << "#no of labels in the transition system: " << con.M_ << std::endl;
+  file << "#no of states in the transition system: " << reach->N_ << std::endl;
+  file << "#no of labels in the transition system: " << reach->M_ << std::endl;
   file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
 
-  for(size_t i=0; i<con.N_; i++) {
-    if(con.domain_[i] && con.val_[i] < std::numeric_limits<double>::infinity()) {
-      file << i << " " << con.val_[i] <<" ";
-      for(size_t j=0; j<con.M_; j++)
-        if(con.domain_[i*con.M_+j])
+  for(size_t i=0; i<reach->N_; i++) {
+    if(reach->inputs_[i]!=-1 && reach->val_[i] < std::numeric_limits<double>::infinity()) {
+      file << i << " " << reach->val_[i] <<" ";
+      for(size_t j=0; j<reach->M_; j++)
+        if(reach->inputs_[i]!=-1 && reach->inputs_[i]==j)
           file << j << " ";
       file << std::endl;
     }

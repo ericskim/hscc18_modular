@@ -129,12 +129,25 @@ int main() {
   scots::TransitionSystem ts;
 
   tt.tic();
-
+  std::cout << "\n scots::AbstractionGB started & Compute transition relation \n" << std::endl;
   scots::AbstractionGB<state_type,input_type> abs(ss, is, ts);
-  abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
+  tt.toc();
+  std::cout << "\n scots::AbstractionGB ended \n"<< std::endl;
 
+  tt.tic();
+  std::cout << "\n abs.computeTransitionRelation started \n" << std::endl;
+  abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
   tt.toc();
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
+  std::cout << "\n abs.computeTransitionRelation ended \n" << std::endl;
+
+  /* write ts to file start
+  tt.tic();
+  std::cout << "\n writeToFile (ts) started \n" << std::endl;
+  scots::IO::writeToFile(&ts,"ts.scs");
+  tt.toc();
+  std::cout << "\n writeToFile (ts) ended \n" << std::endl;
+  write ts to file  END */
 
   /* define function to check if the cell is in the  target set?  */
   state_type x;
@@ -152,10 +165,11 @@ int main() {
   scots::IO::writeToFile(&ss,"problemdomain.scs");
 
   scots::ReachabilityGame reach(ts);
+  //scots::StaticController con(ts);
   tt.tic();
   reach.solve(target);
   tt.toc();
-  //scots::IO::writeControllerToFile(&reach,"reach.scs",&ss,&is);
+  scots::IO::writeControllerToFile(&reach,"reach.scs",&ss,&is);
   std::cout << "Size: " << reach.size() << std::endl;
 
   return 1;

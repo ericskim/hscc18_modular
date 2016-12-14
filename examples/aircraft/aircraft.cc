@@ -24,6 +24,7 @@
 #include "RungeKutta4.hh"
 
 #include "TicToc.hh"
+#include "IO.hh"
 
 /* state space dim */
 #define sDIM 3
@@ -121,34 +122,32 @@ int main() {
         input_type iub={{32000,8*M_PI/180}};
         /* grid node distance diameter */
         input_type ieta={{32000,8.0/9.0*M_PI/180}};
-        /* input disturbance */
-        input_type iz={{5000,0.25*M_PI/180}};
 
-        scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta,iz);
+        scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
         is.printInfo(1);
 
         /* transition system to be computed */
         scots::TransitionSystem ts;
 
 
-        std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
-
         tt.tic();
-        std::cout << "scots::AbstractionGB started & Compute transition relation" << std::endl;
+        std::cout << "\n scots::AbstractionGB started & Compute transition relation \n" << std::endl;
         scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
         tt.toc();
-        std::cout << "scots::AbstractionGB ended \n"<< std::endl;
-
-
-
-
+        std::cout << "\n scots::AbstractionGB ended \n"<< std::endl;
 
         tt.tic();
-        std::cout << "abs.computeTransitionRelation started \n \n  " << std::endl;
+        std::cout << "\n abs.computeTransitionRelation started \n" << std::endl;
         abs.computeTransitionRelation(aircraft_post, radius_post);
-        std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
         tt.toc();
+        std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
         std::cout << "\n abs.computeTransitionRelation ended \n" << std::endl;
+
+        //tt.tic();
+        //std::cout << "\n writeToFile (ts) started \n" << std::endl;
+        //scots::IO::writeToFile(&ts,"ts.scs");
+        //tt.toc();
+        //std::cout << "\n writeToFile (ts) ended \n" << std::endl;
 
 
 //  /* define function to check if the cell is in the  target set?  */
@@ -165,27 +164,23 @@ int main() {
                 return false;
         };
 
-//        ss.clearAbstractSet();
-//        ss.addIndices(target);
-//        scots::IO::writeToFile(&ss,"target.scs");
-//
-//        ss.fillAbstractSet();
-//        ss.remIndices(target);
-//        ss.remGridPoints(overflow);
-//        scots::IO::writeToFile(&ss,"problemdomain.scs");
+        ss.clearAbstractSet();
+        ss.addIndices(target);
+        scots::IO::writeToFile(&ss,"target.scs");
+
+        ss.fillAbstractSet();
+        ss.remIndices(target);
+        //ss.remGridPoints(of);
+        scots::IO::writeToFile(&ss,"problemdomain.scs");
 
         /////////////////////////////  S   O   L    V   E  GAME  //////////////////////////////////////////////////
-
-        tt.tic();
-
-        std::cout << "Solve game " << std::endl;
-
         scots::ReachabilityGame reach(ts);
+        //scots::StaticController con(ts);
+        tt.tic();
         reach.solve(target);
         tt.toc();
-
+        scots::IO::writeControllerToFile(&reach,"reach.scs",&ss,&is);
         std::cout << "Size: " << reach.size() << std::endl;
-
 
         return 1;
 }
