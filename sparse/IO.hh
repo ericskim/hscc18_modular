@@ -1,12 +1,16 @@
 #ifndef IO_HH_
 #define IO_HH_
 
+#include <cstring>
+#include <cstdint>
+#include <stdio.h>
 #include <iostream>
 #include <limits>
 #include "UniformGrid.hh"
 #include "StaticController.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
+#include "ReachabilityGame.hh"
 namespace scots {
 /*
  * class: IO
@@ -47,7 +51,7 @@ static std::string createUniformGridParameterString(const UniformGrid<U>* gs, co
         z << gs->z_[i] << " ";
         eta << gs->eta_[i] << " ";
         first << gs->firstGridPoint_[i] << " ";
-        nofGridPoints << gs->nofGridPoints_[i] << " ";
+      nofGridPoints << gs->nofGridPoints_[i] << " ";
     }
     z << std::endl;
     eta << std::endl;
@@ -171,7 +175,7 @@ static void readMembersFromFile(UniformGrid<T> *ss, const char *filename, const 
         std::getline(file,line);
         if(now==1) {
             try {
-//    idx = std::stoull(line);
+//  idx = std::stoull(line);
                 idx =(size_t)strtol(line.c_str(),NULL,10);
                 ss->abstractSet_.insert(idx);
             }
@@ -195,7 +199,7 @@ static void writeToFile(const UniformGrid<U>* gs, const char* filename, const ch
         throw std::runtime_error(os.str().c_str());
     }
     file << "################################################################################" << std::endl;
-    file << "########### SCOTS: uniform grid parameter data      ############" << std::endl;
+    file << "########### SCOTS: uniform grid parameter data  ############" << std::endl;
     file << "################################################################################" << std::endl;
     /* append the parameter data of the uniform grid */
     file << createUniformGridParameterString(gs,key) << std::endl;
@@ -210,7 +214,7 @@ static void writeToFile(const UniformGrid<U>* gs, const char* filename, const ch
 /* function: writeToFile()
  * ts: TransitionSystem
  * filename: name of file */
-static void writeToFile(const TransitionSystem& ts, const char* filename) {
+static void writeToFile(const TransitionSystem* ts, const char* filename) {
     /* open file */
     std::ofstream file(filename);
     if(!file.good()) {
@@ -220,44 +224,44 @@ static void writeToFile(const TransitionSystem& ts, const char* filename) {
     }
     /* write to file */
     file << "################################################################################" << std::endl;
-    file << "###########  SCOTS: TransitionSystem information    ##########"<< std::endl;
+    file << "###########  SCOTS: TransitionSystem information  ##########"<< std::endl;
     file << "################################################################################" << std::endl;
     file << std::endl;
     file << "#Transition System" << std::endl;
-    file << "#no of states in the transition system: " <<ts.N_ << std::endl;
-    file << "#no of labels in the transition system: " << ts.M_ << std::endl;
-    file << "#no of transitions in the transition system: " << ts.T_ << std::endl;
+    file << "#no of states in the transition system: " <<ts->N_ << std::endl;
+    file << "#no of labels in the transition system: " << ts->M_ << std::endl;
+    file << "#no of transitions in the transition system: " << ts->T_ << std::endl;
+    if(ts->pre_!=NULL) {
+        file << "#transition relation:" << std::endl;
+        file << "#\"idx of source state\"  \"idx of input\"  \"idx of target state\" " << std::endl;
+        for(size_t k=0; k<ts->N_; k++) {
+            for(size_t j=0; j<ts->M_; j++) {
+                if(ts->noPre_[k] && ts->noPre_[k*ts->M_+j]!=0) {
+                    for(size_t no=0; no<(size_t)ts->noPre_[k*ts->M_+j]; no++) {
+                        size_t pos=ts->prePointer_[k*ts->M_+j]+no;
+                        size_t i=ts->pre_[pos];
+                        file << i << " " << j << " " << k << std::endl;
+                    }
+                }
+            }
+        }
+    }
+    else if(ts->post_!=NULL) {
+        file << "#transition relation:" << std::endl;
+        file << "#\"idx of source state\"  \"idx of input\"  \"idx of target state\" " << std::endl;
+        for(size_t i=0; i<ts->N_; i++) {
+            for(size_t j=0; j<ts->M_; j++) {
+                if(ts->noPost_[i] && ts->noPost_[i*ts->M_+j]!=0) {
+                    for(size_t no=0; no<(size_t)ts->noPost_[i*ts->M_+j]; no++) {
+                        size_t pos=ts->postPointer_[i*ts->M_+j]+no;
+                        size_t k=ts->post_[pos];
+                        file << i << " " << j << " " << k << std::endl;
+                    }
+                }
+            }
+        }
+    }
 
-    if(ts.pre_!=NULL) {
-        file << "#transition relation:" << std::endl;
-        file << "#\"idx of source state\"  \"idx of input\"  \"idx of target state\" " << std::endl;
-        for(size_t k=0; k<ts.N_; k++) {
-            for(size_t j=0; j<ts.M_; j++) {
-                if(ts.noPre_[k] && ts.noPre_[k*ts.M_+j]!=0) {
-                    for(size_t no=0; no<(size_t)ts.noPre_[k*ts.M_+j]; no++) {
-                        size_t pos=ts.prePointer_[k*ts.M_+j]+no;
-                        size_t i=ts.pre_[pos];
-                        file << i << " " << j << " " << k << std::endl;
-                    }
-                }
-            }
-        }
-    }
-    else if(ts.post_!=NULL) {
-        file << "#transition relation:" << std::endl;
-        file << "#\"idx of source state\"  \"idx of input\"  \"idx of target state\" " << std::endl;
-        for(size_t i=0; i<ts.N_; i++) {
-            for(size_t j=0; j<ts.M_; j++) {
-                if(ts.noPost_[i] && ts.noPost_[i*ts.M_+j]!=0) {
-                    for(size_t no=0; no<(size_t)ts.noPost_[i*ts.M_+j]; no++) {
-                        size_t pos=ts.postPointer_[i*ts.M_+j]+no;
-                        size_t k=ts.post_[pos];
-                        file << i << " " << j << " " << k << std::endl;
-                    }
-                }
-            }
-        }
-    }
     else {
         std::ostringstream os;
         os << "IO: TransitionSystem: Error: Unable to write to file. Transition relation is empty, i.e.,  pre_ and post_ are NULL.";
@@ -269,7 +273,8 @@ static void writeToFile(const TransitionSystem& ts, const char* filename) {
 
 /* function: writeControllerToFile()
 * only save the state-input pairs */
-static void writeControllerToFile(const StaticController &con, const char* filename) {
+//const ReachabilityGame* reach,
+static void writeControllerToFile(const ReachabilityGame* reach, const char* filename) {
     /* open file */
     std::ofstream file(filename);
     if(!file.good()) {
@@ -279,20 +284,20 @@ static void writeControllerToFile(const StaticController &con, const char* filen
     }
     /* write to file */
     file << "################################################################################" << std::endl;
-    file << "#############    SCOTS: controller information    ############" << std::endl;
+    file << "#############  SCOTS: controller information  ############" << std::endl;
     file << "################################################################################" << std::endl;
     file << std::endl;
     file << "#Controller" << std::endl;
-    file << "#no of states in the transition system: " << con.N_ << std::endl;
-    file << "#no of labels in the transition system: " << con.M_ << std::endl;
+    file << "#no of states in the transition system: " << reach->N_ << std::endl;
+    file << "#no of labels in the transition system: " << reach->M_ << std::endl;
     file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
 
     bool m=false;
-    for(size_t i=0; i<con.N_; i++) {
-        for(size_t j=0; j<con.M_; j++) {
-            if(con.domain_[i*con.M_ + j]) {
+    for(size_t i=0; i<reach->N_; i++) {
+        for(size_t j=0; j<reach->M_; j++) {
+            if(reach->inputs_[i]!=-1) {
                 if(!m) {
-                    file << i << " " << con.val_[i] <<" ";
+                    file << i << " " << reach->val_[i] <<" ";
                     m=true;
                 }
                 file << j << " ";
@@ -306,50 +311,141 @@ static void writeControllerToFile(const StaticController &con, const char* filen
 }
 
 
+
 /* function: writeControllerToFile()  (save the graph and grid points)
  * ss,is: UniformGrid
  * con: StaticController
  * filename: name of file */
 // template<class T=std::array<double,1>, class U=std::array<double,1>>
+//const ReachabilityGame* reach,
 template <class T, class U>
-static void writeControllerToFile(const StaticController &con, const char* filename, const UniformGrid<T> *ss, const UniformGrid<U> *is) {
-  /* open file */
-  std::ofstream file(filename);
-  if(!file.good()) {
-    std::ostringstream os;
-    os << "IO: Game: Error: Unable to open file:" << filename << "'.";
-    throw std::runtime_error(os.str().c_str());
-  }
-  /* write to file */
-  file << "################################################################################" << std::endl;
-  file << "#############    SCOTS: controller information    ############" << std::endl;
-  file << "################################################################################" << std::endl;
-  file << std::endl;
-  file << "#StateSpace Parameters " << std::endl;
-  file << createUniformGridParameterString(ss,"state space");
-  file << std::endl;
-  file << "#InputSpace Parameters" << std::endl;
-  file << createUniformGridParameterString(is,"input space");
-  file << std::endl;
-  file << "#Controller" << std::endl;
-  file << "#no of states in the transition system: " << con.N_ << std::endl;
-  file << "#no of labels in the transition system: " << con.M_ << std::endl;
-  file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
-
-  for(size_t i=0; i<con.N_; i++) {
-    if(con.domain_[i] && con.val_[i] < std::numeric_limits<double>::infinity()) {
-      file << i << " " << con.val_[i] <<" ";
-      for(size_t j=0; j<con.M_; j++)
-        if(con.domain_[i*con.M_+j])
-          file << j << " ";
-      file << std::endl;
+static void writeControllerToFile(const ReachabilityGame* reach, const char* filename, const UniformGrid<T>* ss, const UniformGrid<U>* is) {
+    /* open file */
+    std::ofstream file(filename);
+    if(!file.good()) {
+        std::ostringstream os;
+        os << "IO: Game: Error: Unable to open file:" << filename << "'.";
+        throw std::runtime_error(os.str().c_str());
     }
-  }
+    /* write to file */
+    file << "################################################################################" << std::endl;
+    file << "#############  SCOTS: controller information  ############" << std::endl;
+    file << "################################################################################" << std::endl;
+    file << std::endl;
+    file << "#StateSpace Parameters " << std::endl;
+    file << createUniformGridParameterString(ss,"state space");
+    file << std::endl;
+    file << "#InputSpace Parameters" << std::endl;
+    file << createUniformGridParameterString(is,"input space");
+    file << std::endl;
+    file << "#Controller" << std::endl;
+    file << "#no of states in the transition system: " << reach->N_ << std::endl;
+    file << "#no of labels in the transition system: " << reach->M_ << std::endl;
+    file << "#\"idx of state\"  \"value of value function\"  \"idx of input\" " << std::endl;
 
-  file.close();
-  std::cout << "controller saved to file: "<< filename << std::endl;
+    for(size_t i=0; i<reach->N_; i++) {
+        if(reach->inputs_[i]!=-1 && reach->val_[i] < std::numeric_limits<double>::infinity()) {
+            file << i << " " << reach->val_[i] <<" ";
+            for(size_t j=0; j<reach->M_; j++)
+                if(reach->inputs_[i]!=-1 && reach->inputs_[i]==j)
+                    file << j << " ";
+            file << std::endl;
+        }
+    }
+
+    file.close();
+    std::cout << "controller saved to file: "<< filename << std::endl;
+}
+/* function: writeToFileHard()
+ * ts: TransitionSystem
+ * filename: name of file */
+static void writeToFileHard(const TransitionSystem* ts, const char* filename) {
+    if(ts->pre_!=NULL) {
+        FILE* pFile;
+        pFile = fopen (filename, "w");
+        fwrite (&ts->N_, sizeof(uint32_t), 1, pFile);
+        fwrite (&ts->M_, sizeof(uint32_t), 1, pFile);
+        fwrite (&ts->T_, sizeof(size_t), 1, pFile);
+        fwrite (ts->pre_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+        fwrite (ts->noPre_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+        fwrite (ts->noPost_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+        fclose (pFile);
+    }
+
+    else if(ts->pre_!=NULL) {
+        FILE* pFile;
+        pFile = fopen (filename, "w");
+        fwrite (&ts->N_, sizeof(uint32_t), 1, pFile);
+        fwrite (&ts->M_, sizeof(uint32_t), 1, pFile);
+        fwrite (&ts->T_, sizeof(size_t), 1, pFile);
+        fwrite (ts->post_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+        fwrite (ts->noPre_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+        fwrite (ts->noPost_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+        fclose (pFile);
+    }
+
+    else {
+        std::ostringstream os;
+        os << "IO: TransitionSystem: Error: Unable to write to file. Transition relation is empty, i.e.,  pre_ and post_ are NULL.";
+        throw std::runtime_error(os.str().c_str());
+    }
+
+    std::cout << "Hard Transition System saved to file: "<< filename << std::endl;
 }
 
+/* function: readFromFileHard()
+ * ts: TransitionSystem
+ * filename: name of file */
+
+static void readFromFileHard(TransitionSystem *ts, const char* filename) {
+
+   FILE * pFile;
+  // std::cout << "\n 1 \n"<< std::endl;
+   long lSize;
+  // std::cout << "\n 2 \n"<< std::endl;
+   //TransitionSystem* ts;
+   pFile = fopen ( filename , "r" );
+   //if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+// std::cout << "\n 3 \n"<< std::endl;
+   // obtain file size:
+   fseek (pFile , 0 , SEEK_END);
+   lSize = ftell (pFile);
+   rewind (pFile);
+// std::cout << "\n 4 \n"<< std::endl;
+   // allocate memory to contain the whole file:
+   ts = (TransitionSystem*) malloc (sizeof(uint32_t)*lSize);
+   //if (ts == NULL) {fputs ("Memory error",stderr); exit (2);}
+// std::cout << "\n 5 \n"<< std::endl;
+   /*  init
+   ts->N_=0;
+   ts->M_=0;
+   ts->T_=0;
+   ts->pre_=nullptr;
+   ts->post_=nullptr;
+   ts->noPost_=nullptr;
+   ts->noPre_=nullptr;
+   */
+
+   // copy the file into the buffer:
+   //fread(ts,sizeof(uint32_t),lSize,pFile);
+   fread (&ts->N_, sizeof(uint32_t), 1, pFile);
+   //std::cout << "\n 6 \n"<< std::endl;
+   fread (&ts->M_, sizeof(uint32_t), 1, pFile);
+   //std::cout << "\n 7 \n"<< std::endl;
+   fread (&ts->T_, sizeof(size_t), 1, pFile);
+   //std::cout << "\n 8 \n"<< std::endl;
+   fread (&ts->post_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+   //std::cout << "\n 9 \n"<< std::endl;
+   fread (&ts->noPre_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+   //std::cout << "\n 10 \n"<< std::endl;
+   fread (&ts->noPost_, sizeof(uint32_t), (ts->N_)*(ts->M_), pFile);
+   //std::cout << "\n 11 \n"<< std::endl;
+
+   /* the whole file is now loaded in the memory ts. */
+   // terminate
+   fclose (pFile);
+   // std::cout << "\n 12 \n"<< std::endl;
+}
 
 /* function: readFromFile()
 * ts: TransitionSystem

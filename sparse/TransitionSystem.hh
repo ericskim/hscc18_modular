@@ -20,8 +20,8 @@ namespace scots {
 /* forward declaration of abstraction growth bound class */
 template<class state_type, class input_type> class AbstractionGB;
 
-/* define type of abstract state 
- * determines an upper limit on the number of states 
+/* define type of abstract state
+ * determines an upper limit on the number of states
   */
 using abs_type=uint32_t;
 

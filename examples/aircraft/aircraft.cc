@@ -23,6 +23,7 @@
 #include "RungeKutta4.hh"
 
 #include "TicToc.hh"
+#include "IO.hh"
 
 /* state space dim */
 #define sDIM 3
@@ -135,9 +136,6 @@ int main() {
 
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
   tt.toc();
-
-
-//  /* define function to check if the cell is in the  target set?  */
   state_type x;
   auto target = [&](const size_t idx)->bool {
     ss.itox(idx,x);
@@ -150,17 +148,6 @@ int main() {
       return true;
     return false;
   };
-
-//  ss.clearAbstractSet();
-//  ss.addIndices(target);
-//  scots::IO::writeToFile(&ss,"target.scs");
-//
-//  ss.fillAbstractSet();
-//  ss.remIndices(target);
-//  ss.remGridPoints(overflow);
-//  scots::IO::writeToFile(&ss,"problemdomain.scs");
-
-  /////////////////////////////  S   O   L  V   E  GAME  //////////////////////////////////////////////////
 
   tt.tic();
 

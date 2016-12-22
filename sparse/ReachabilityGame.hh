@@ -13,7 +13,7 @@
 #include <queue>
 
 #include "TransitionSystem.hh"
-
+#include "StaticController.hh"
 
 namespace scots {
 
@@ -41,11 +41,11 @@ size_t M_;
  * pointer to the transition system */
 TransitionSystem *ts_=nullptr;
 /* var: inputs_
- * inputs_[i] = j 
+ * inputs_[i] = j
  * contains the input j associated with state i
  * j=-1 if the target is not reachable from i */
 int* inputs_=nullptr;
-/* var: val_ 
+/* var: val_
  * contains the value function */
 double* val_=nullptr;
 
@@ -84,7 +84,7 @@ abs_type size(void) const {
   return n;
 }
 
-/* function: solve 
+/* function: solve
  * solve the reachability problem with respect to target set
  *
  * if target(idx)==true -> grid point with index idx is in target set
@@ -134,7 +134,7 @@ void solve(F &target) {
           fifo.push(i);
           val_[i]=edge_val[i*M_+j];
           inputs_[i]=j;
-        }  
+        }
       }  /* end loop over all pres of state i under input j */
     }  /* end loop over all input j */
   }  /* fifo is empty */
