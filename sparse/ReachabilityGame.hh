@@ -11,6 +11,7 @@
 #include <climits>
 #include <stdexcept>
 #include <queue>
+#include <memory>
 
 #include "TransitionSystem.hh"
 #include "StaticController.hh"
@@ -38,37 +39,29 @@ size_t N_;
  * number of inputs in the transition system */
 size_t M_;
 /* var: ts_
- * pointer to the transition system */
-TransitionSystem *ts_=nullptr;
+ * reference of the transition system */
+const TransitionSystem& ts_;
 /* var: inputs_
  * inputs_[i] = j
  * contains the input j associated with state i
  * j=-1 if the target is not reachable from i */
-int* inputs_=nullptr;
+std::unique_ptr<int[]> inputs_;
 /* var: val_
  * contains the value function */
-double* val_=nullptr;
+std::unique_ptr<double[]> val_;
 
 public:
 /* function: ReachabilityGame
  * construction */
-ReachabilityGame( TransitionSystem &ts) {
-  ts_=&ts;
-  N_=ts_->N_;
-  M_=ts_->M_;
+ReachabilityGame(const TransitionSystem &ts) : ts_(ts) {
+  N_=ts_.N_;
+  M_=ts_.M_;
   if(M_> INT_MAX)
     throw std::runtime_error("scots::ReachabilityGame: Number of inputs exceeds maximum supported value");
-  inputs_ = new int[N_];
-  val_ = new double[N_];
+  inputs_.reset(new int[N_]);
+  val_.reset(new double[N_]);
   for(abs_type i=0; i<N_; i++)
     inputs_[i]=-1;
-}
-
-/* function: ~ReachabilityGame
- * construction */
-~ReachabilityGame() {
-  delete[] inputs_;
-  delete[] val_;
 }
 
 /* function:  size
@@ -87,23 +80,35 @@ abs_type size(void) const {
 /* function: solve
  * solve the reachability problem with respect to target set
  *
- * if target(idx)==true -> grid point with index idx is in target set
- * if target(idx)==false -> grid point with index idx is not in target set
+ * if target(idx)==true : grid point with index idx is in target set
+ * if target(idx)==false : grid point with index idx is not in target set
  *
+ * OPTIONAL:
+ * 
+ * solve(target, avoid)
+ * 
+ * if avoid(idx)==true : grid point with index idx is in avoid set
+ * if avoid(idx)==false : grid point with index idx is not in avoid set
+ * 
  */
+
 template<class F>
-void solve(F &target) {
+void solve(F& target) {
+  solve(target, [](const abs_type&) noexcept {return false;}); 
+};
+
+template<class F1, class F2>
+void solve(F1& target, F2&& avoid) {
   /* use fifo list */
   std::queue<abs_type> fifo;
   /* keep track of the number of processed post */
-  abs_type* K = new abs_type[N_*M_];
+  std::unique_ptr<abs_type[]> K (new abs_type[N_*M_]);
   /* keep track of the values */
-  float* edge_val = new float[N_*M_];
-
+  std::unique_ptr<double[]> edge_val (new double[N_*M_]);
   /* init fifo */
   for(abs_type i=0; i<N_; i++) {
-    val_[i]=std::numeric_limits<float>::infinity();
-    if(target(i)) {
+    val_[i]=std::numeric_limits<double>::infinity();
+    if(target(i) && !avoid(i)) {
       inputs_[i]=0;
       /* nodes in the target set have value zero */
       val_[i]=0;
@@ -111,10 +116,9 @@ void solve(F &target) {
     }
     for(abs_type j=0; j<M_; j++) {
       edge_val[i*M_+j]=0;
-      K[i*M_+j]=ts_->noPost_[i*M_+j];
+      K[i*M_+j]=ts_.noPost_[i*M_+j];
     }
   }
-
   while(!fifo.empty()) {
     /* get state to be processed */
     abs_type q=fifo.front();
@@ -122,8 +126,10 @@ void solve(F &target) {
     /* loop over each input */
     for(abs_type j=0; j<M_; j++) {
       /* loop over pre's associated with this input */
-      for(abs_type v=0; v<ts_->noPre_[q*M_+j]; v++) {
-        abs_type i=ts_->pre_[ts_->prePointer_[q*M_+j]+v];
+      for(abs_type v=0; v<ts_.noPre_[q*M_+j]; v++) {
+        abs_type i=ts_.pre_[ts_.prePointer_[q*M_+j]+v];
+        if(avoid(i))
+          continue;
         /* (i,j,q) is a transition */
         /* update the number of processed posts */
         K[i*M_+j]--;
@@ -138,10 +144,6 @@ void solve(F &target) {
       }  /* end loop over all pres of state i under input j */
     }  /* end loop over all input j */
   }  /* fifo is empty */
-
-
-  delete[] edge_val;
-  delete[] K;
 }
 
 }; /* close class def */

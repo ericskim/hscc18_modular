@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <cstring>
+#include <memory>
+
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "TicToc.hh"
@@ -19,11 +21,11 @@ template<class state_type, class input_type>
 class AbstractionGB {
 private:
 /* var: stateSpace_ */
-const UniformGrid<state_type>* stateSpace_;
+const UniformGrid<state_type>& stateSpace_;
 /* var: inputSpace_ */
-const UniformGrid<input_type>* inputSpace_;
+const UniformGrid<input_type>& inputSpace_;
 /* var: transitionsSystem_ */
-TransitionSystem* transitionSystem_;
+TransitionSystem& transitionSystem_;
 /* var: verbose_ */
 bool verbose_;
 
@@ -32,13 +34,13 @@ public:
  *
  * initialize with the state space <UniformGrid>  and input space  <UniformGrid>
  */
-AbstractionGB(const UniformGrid<state_type> &stateSpace,
-              const UniformGrid<input_type> &inputSpace,
-              TransitionSystem &transitionSystem,
+AbstractionGB(const UniformGrid<state_type>& stateSpace,
+              const UniformGrid<input_type>& inputSpace,
+              TransitionSystem& transitionSystem,
               bool verbose=true)
-        : stateSpace_(&stateSpace),
-        inputSpace_(&inputSpace),
-        transitionSystem_(&transitionSystem),
+        : stateSpace_(stateSpace),
+        inputSpace_(inputSpace),
+        transitionSystem_(transitionSystem),
         verbose_(verbose) { }
 
 /* function:  computeTransitionRelation
@@ -55,33 +57,33 @@ AbstractionGB(const UniformGrid<state_type> &stateSpace,
  *
  */
 template<class F1, class F2>
-void computeTransitionRelation(F1 &system_post, F2 &radius_post) {
-  computeTransitionRelation(system_post, radius_post, [](const state_type&, const state_type&) {return false;});
+void computeTransitionRelation(F1& system_post, F2& radius_post) {
+  computeTransitionRelation(system_post, radius_post, [](const state_type&, const state_type&) noexcept {return false;});
 }
 
 template<class F1, class F2, class F3>
-void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) {
+void computeTransitionRelation(F1& system_post, F2& radius_post, F3&& overflow) {
   /* number of cells (=grid points) */
-  size_t N=stateSpace_->getN(); 
+  size_t N=stateSpace_.getN(); 
   /* number of inputs */
-  size_t M=inputSpace_->getN();
+  size_t M=inputSpace_.getN();
   /* state space dimension */
-  int dim=stateSpace_->getDimension();
+  int dim=stateSpace_.getDimension();
   /* number of transitions */
   size_t noT=0; 
   /* for display purpose */
   abs_type counter=0;
   /* some grid information */
   std::vector<abs_type> NN(dim);
-  NN=stateSpace_->getNN();
+  NN=stateSpace_.getNN();
   /* variables for managing the post */
   std::vector<abs_type> lb(dim);  /* lower-left corner */
   std::vector<abs_type> ub(dim);  /* upper-right corner */
   std::vector<abs_type> no(dim);  /* number of cells per dim */
   std::vector<abs_type> cc(dim);  /* coordinate of current cell in the post */
   /* radius of hyper interval containing the attainable set */
-  state_type eta=stateSpace_->getEta();
-  state_type z=stateSpace_->getZ();
+  state_type eta=stateSpace_.getEta();
+  state_type z=stateSpace_.getZ();
   state_type r;
   /* state and input variables */
   state_type x;
@@ -89,23 +91,21 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   /* for out of bounds check */
   state_type first;
   state_type last;
-  first=stateSpace_->getFirstGridPoint();
+  first=stateSpace_.getFirstGridPoint();
   std::vector<abs_type> npoints(dim);
-  npoints = stateSpace_->getNofGridPoints();
+  npoints = stateSpace_.getNofGridPoints();
   for(int i=0; i<dim; i++)
     last[i]=first[i]+eta[i]*(npoints[i]-1);
-  /* list of cell (pre) cell indices  */
-  abs_type* pre=nullptr;
   /* number of pre indices of (i,j) */
-  abs_type* noPre = new abs_type[N*M] ();  
+  std::unique_ptr<abs_type[]> noPre(new abs_type[N*M] ());  
   /* number of post indices of (i,j) */
-  abs_type* noPost = new abs_type[N*M] ();  
+  std::unique_ptr<abs_type[]> noPost(new abs_type[N*M] ());  
   /* index to pre, where the cell IDs of the pre are stored */
-  size_t* prePointer = new size_t[N*M];
+  std::unique_ptr<size_t[]> prePointer(new size_t[N*M]);
   /* lower-left & upper-right corners of hyper rectangle of cells that cover attainable set */
-  abs_type* cornerIDs = new abs_type[N*M*2];
+  std::unique_ptr<abs_type[]> cornerIDs(new abs_type[N*M*2]);
   /* is post of (i,j) out of domain ? */
-  bool* outOfDomain = new bool[N*M];
+  std::unique_ptr<bool[]> outOfDomain(new bool[N*M]);
   /* loop over all cells */
   for(abs_type i=0; i<N; i++) {
     /* loop over all inputs */
@@ -115,7 +115,7 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
       for(int k=0; k<dim; k++)
         r[k]=eta[k]/2.0+z[k];
       /* get center x of cell */
-      stateSpace_->itox(i,x);
+      stateSpace_.itox(i,x);
       /* is x an element of the overflow symbols ? */
       if(!j & overflow(x,r)) {
         for(size_t j=0; j<M; j++)
@@ -123,7 +123,7 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
         break;
       }
       /* current input */
-      inputSpace_->itox(j,u);
+      inputSpace_.itox(j,u);
       /* integrate system and radius growth bound */
       /* the result is stored in x and r */
       radius_post(r,x,u);
@@ -196,7 +196,6 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   }
   if(verbose_)
     std::cout << "100" << std::endl;
-
   /* compute prePointer */
   size_t sum=0;
   for(size_t i=0; i<N; i++) {
@@ -205,8 +204,8 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
       prePointer[i*M+j]=sum;
     }
   }
-  /* allocate memory for pre list (pre[0] is used as dummy) */
-  pre = new abs_type[noT];
+  /* allocate memory for pre list */
+  std::unique_ptr<abs_type[]> pre(new abs_type[noT]);
   /* fill in pre list */
   counter=0;
   for(abs_type i=0; i<N; i++) {
@@ -245,6 +244,7 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
           }
         }
         /* (i,j,q) is a transition */
+        //pre[(prePointer[q*M+j]--)-1];
         pre[--prePointer[q*M+j]]=i;
       }
     }
@@ -263,18 +263,14 @@ void computeTransitionRelation(F1 &system_post, F2 &radius_post, F3 &&overflow) 
   }
   if(verbose_) 
     std::cout << "100" << std::endl;
-
-  delete[] outOfDomain;
-  delete[] cornerIDs;
-
   /* set values of abstract system */
-  transitionSystem_->N_=N;
-  transitionSystem_->M_=M;
-  transitionSystem_->T_=noT;
-  transitionSystem_->noPre_=noPre;
-  transitionSystem_->noPost_=noPost;
-  transitionSystem_->pre_=pre;
-  transitionSystem_->prePointer_=prePointer;
+  transitionSystem_.N_=N;
+  transitionSystem_.M_=M;
+  transitionSystem_.T_=noT;
+  transitionSystem_.noPre_=std::move(noPre);
+  transitionSystem_.noPost_=std::move(noPost);
+  transitionSystem_.pre_=std::move(pre);
+  transitionSystem_.prePointer_=std::move(prePointer);
 }
 
 /* function getPre */
@@ -284,12 +280,12 @@ std::vector<state_type> getPre(state_type x, input_type u) {
   std::vector<abs_type> i;
   pre.clear();
   i.clear();
-  stateSpace_->xtoi(k,x);
-  inputSpace_->xtoi(j,u);
-  i=transitionSystem_->getPre(k,j);
+  stateSpace_.xtoi(k,x);
+  inputSpace_.xtoi(j,u);
+  i=transitionSystem_.getPre(k,j);
   for(abs_type v=0; v<i.size(); v++) {
     state_type s;
-    stateSpace_->itox(i[v],s);
+    stateSpace_.itox(i[v],s);
     pre.push_back(s);
   }
   return pre;
@@ -302,12 +298,12 @@ std::vector<state_type> getPost(state_type x, input_type u) {
   std::vector<abs_type> k;
   post.clear();
   k.clear();
-  stateSpace_->xtoi(i,x);
-  inputSpace_->xtoi(j,u);
-  k=transitionSystem_->getPost(i,j);
+  stateSpace_.xtoi(i,x);
+  inputSpace_.xtoi(j,u);
+  k=transitionSystem_.getPost(i,j);
   for(abs_type v=0; v<k.size(); v++) {
     state_type s;
-    stateSpace_->itox(k[v],s);
+    stateSpace_.itox(k[v],s);
     post.push_back(s);
   }
   return post;

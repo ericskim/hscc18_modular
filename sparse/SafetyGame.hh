@@ -24,26 +24,20 @@ size_t N_;
  * number of inputs in the transition system */
 size_t M_;
 /* var: ts_
- * pointer to the transition system */
-TransitionSystem *ts_=nullptr;
+ * reference to the transition system */
+const TransitionSystem& ts_;
 /* var: domain_
  * boolean matrix N_ x M_ 
  * domain_[i*M_+j]=true if input j 
  * is a valid input at state i */
-bool* domain_=nullptr;
+std::unique_ptr<bool[]> domain_;
 
 public:
 /* function: SafetyGame */
-SafetyGame(TransitionSystem &ts) {
-  ts_=&ts;
-  N_=ts_->N_;
-  M_=ts_->M_;
-  domain_ = new bool[N_*M_] ();
-}
-
-/* function: ~SafetyGame */
-~SafetyGame() {
-  delete[] domain_;
+SafetyGame(const TransitionSystem &ts) : ts_(ts) {
+  N_=ts_.N_;
+  M_=ts_.M_;
+  domain_.reset(new bool[N_*M_] ());
 }
 
 /* function:  size
@@ -87,18 +81,17 @@ abs_type sizePairs(void) const {
  */
 template<class F>
 void solve(F &safe) {
+  /*fifo*/
   std::queue<abs_type> fifo;
-
   /* no_input: keep track of the number of valid inputs (that lead to safe states) */
-  abs_type* no_val_in= new abs_type[N_] ();
+  std::unique_ptr<abs_type[]> no_val_in(new abs_type[N_] ());
   /* keep track if an unsafe  state was already added to the fifo */
-  bool* added = new bool[N_] ();
-
+  std::unique_ptr<bool[]> added(new bool[N_] ()); 
   /* initialization */
   for(size_t i=0; i<N_; i++) {
     if(safe(i)) {
       for(size_t j=0; j<M_; j++) {
-        if(ts_->noPost_[i*M_+j]) {
+        if(ts_.noPost_[i*M_+j]) {
           domain_[i*M_+j]=1;
           no_val_in[i]++;
         }
@@ -109,7 +102,6 @@ void solve(F &safe) {
       added[i]=true;
     }
   }
-
   while(!fifo.empty()) {
     abs_type length=fifo.size();
     /* loop over all the unsafe states found in the previous loop */
@@ -119,9 +111,9 @@ void solve(F &safe) {
       /* loop over all inputs */
       for(abs_type j=0; j<M_; j++) {
         /* loop over all pre states of (k,j) */
-        for(abs_type p=0; p<ts_->noPre_[k*M_+j]; p++) {
+        for(abs_type p=0; p<ts_.noPre_[k*M_+j]; p++) {
           /* (i,j,k) is a transition */
-          abs_type i=ts_->pre_[ts_->prePointer_[k*M_+j]+p];
+          abs_type i=ts_.pre_[ts_.prePointer_[k*M_+j]+p];
           /* check if input j at state i is considered safe */
           if(domain_[i*M_+j]) {
             /* set source states i with label j as unsafe pair */
@@ -137,8 +129,6 @@ void solve(F &safe) {
       }
     }
   }
-  delete[] no_val_in;
-  delete[] added;
 }/* end of solve function*/
 
 }; /* close class def */

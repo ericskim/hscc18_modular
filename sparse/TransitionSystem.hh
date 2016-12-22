@@ -13,6 +13,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdint>
+#include <memory>
 
 
 namespace scots {
@@ -20,9 +21,10 @@ namespace scots {
 /* forward declaration of abstraction growth bound class */
 template<class state_type, class input_type> class AbstractionGB;
 
-/* define type of abstract state
- * determines an upper limit on the number of states
-  */
+/* var: abs_type  
+ * define type of abstract states and abstract inputs
+ * determines implicitly an upper limit on the number of states/inputs
+ */
 using abs_type=uint32_t;
 
 /*
@@ -54,38 +56,24 @@ size_t T_=0;
 
 /* var: pre_
  * list of pre cell ids */
-abs_type *pre_=nullptr;
+std::unique_ptr<abs_type[]> pre_={nullptr};
 /* var: post_
  * list of post cell ids */
-abs_type *post_=nullptr;
+std::unique_ptr<abs_type[]> post_={nullptr};
 /* var: postPointer_
  * array saving the addresses for post */
-size_t *postPointer_=nullptr;
+std::unique_ptr<size_t[]> postPointer_={nullptr};
 /* var: prePointer_
  * array saving the addresses for pre */
-size_t *prePointer_=nullptr;
+std::unique_ptr<size_t[]> prePointer_={nullptr};
 /* var: noPost_
  * array saving the number of post for each state-action pair */
-abs_type *noPost_=nullptr;
+std::unique_ptr<abs_type[]> noPost_={nullptr};
 /* var: noPre_
  * array saving the number of pre for each state-action pair */
-abs_type *noPre_=nullptr;
+std::unique_ptr<abs_type[]> noPre_={nullptr};
 
 public:
-~TransitionSystem(){
-  if(pre_)
-    delete[] pre_;
-  if(post_)
-    delete[] pre_;
-  if(prePointer_)
-    delete[] prePointer_;
-  if(postPointer_)
-    delete[] postPointer_;
-  if(noPre_)
-    delete[] noPre_;
-  if(noPost_)
-    delete[] noPost_;
-}
 
 size_t getNoTransitions(void) {
   return T_;
@@ -118,7 +106,7 @@ std::vector<abs_type> getPre(abs_type k, abs_type j) {
   }
   else {
     std::ostringstream os;
-    os << "TransitionSystem.hh: Error: Unable to get post. Transition relation is empty, i.e.,  pre_ and post_ are NULL.";
+    os << "TransitionSystem.hh: Error: Unable to get pre. Transition relation is empty, i.e.,  pre_ and post_ are NULL.";
     throw std::runtime_error(os.str().c_str());
   }
   return vec;
