@@ -23,7 +23,7 @@
 #include "RungeKutta4.hh"
 
 #include "TicToc.hh"
-#include "IO.hh"
+//#include "IO.hh"
 
 /* state space dim */
 #define sDIM 3
@@ -53,24 +53,26 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
     xx[2] = x[0]*std::sin(x[1]);
   };
 
+  /* use 10 intermediate step sizes */
   ode_solver(rhs,x,u,sDIM,tau,10);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
 /* lischitz matrix */
 double L[3][2];
-//state_type v={{2.77*0.01,5.16*0.0001,7.4*0.001}};
 state_type w={{.108,0.002,0}};
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
 
-  L[0][0]=-0.0019*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
-  L[0][1]=9.8100004196;
+  //L[0][0]=-0.0019*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
+  L[0][0]=-0.0144;
+  L[0][1]=9.8100000000000041;
 
-  L[1][0]=0.00447+0.00481*u[1];
-  L[1][1]=0.0035356693;
+  //L[1][0]=0.00447+0.00481*u[1];
+  L[1][0]=0.0076;
+  L[1][1]=0.003521;
 
-  L[2][0]=0.0740960166;
-  L[2][1]=83.2098617554;
+  L[2][0]=0.07425;
+  L[2][1]=83.2;
 
   /* the ode for the growth bound */
   auto rhs =[] (state_type& rr,  const state_type &r, const input_type &) {
@@ -79,8 +81,8 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
 
+  /* use 10 intermediate step sizes */
   ode_solver(rhs,r,u,sDIM,tau,10);
-
 };
 
 int main() {
@@ -92,24 +94,16 @@ int main() {
   /****************************************************************************/
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
-  //state_type eta={{25.0/100,3*M_PI/180/100,56.0/100}};
-  double c=1;
-  //state_type eta={{c*25.0/362,c*3*M_PI/180/66,c*56.0/334}}; //  optimized values
-  state_type eta={{c*25.0/210,c*3*M_PI/180/209,c*56.0/209}};
+  state_type eta={{25.0/362,3*M_PI/180/66,56.0/334}}; //  optimized values
+  //state_type eta={{c*27.0/210,c*3*M_PI/180/209,c*56.0/209}};
   /* lower bounds of the hyper rectangle */
   state_type lb={{58,-3*M_PI/180,0}};
   /* upper bounds of the hyper rectangle */
-  state_type ub={{83,0,56}}; // changes the 56 to 28 for debugging reason and making the example smaller
+  state_type ub={{83,0,56}}; 
   /* measurement disturbances  */
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};
-  //for(size_t i=0; i< sDIM; i++) {
-  //  lb[i]=lb[i]+eta[i]/2+z[i];
-  //  ub[i]=ub[i]-eta[i]/2-z[i];
-  //}
   scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta,z);
-  //scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  std::cout << "eta factor C is:" << c << std::endl;
   ss.printInfo(1);
 
   /****************************************************************************/
@@ -140,10 +134,10 @@ int main() {
   auto target = [&](const size_t idx)->bool {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
-    if (  63 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 75
-      && -3*M_PI/180 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0
-      && 0 <= (x[2]-eta[2]/2.0) &&  (x[2]+eta[2]/2.0) <= 2.5
-      &&  -0.91 <=  ( (x[0]+eta[0]/2.0) * std::sin(x[1]-eta[1]/2.0) )
+    if(  63 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 75 &&
+         -3*M_PI/180 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0 &&
+         0 <= (x[2]-eta[2]/2.0) &&  (x[2]+eta[2]/2.0) <= 2.5 &&
+         -0.91 <=  ( (x[0]+eta[0]/2.0) * std::sin(x[1]-eta[1]/2.0) )
       )
       return true;
     return false;

@@ -26,19 +26,19 @@ VNODELPLIB = -L$(SCOTSROOT)/external/vnodelp/lib \
 
 LIBS = -lvnode -lProfil -lBias -llr
 
-TARGET = comp_enclosure comp_enclosure_per_input
+TARGET = comp_growth_bound comp_growth_bound_per_input
 
 all: $(TARGET)
 
 %.o: %.cc
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(VNODELPINC) -c -o $@ $<
 
-comp_enclosure:  comp_enclosure.o
-	$(CC) $(LDFLAGS) -o comp_enclosure  comp_enclosure.o $(VNODELPLIB) $(LIBS) 
+comp_growth_bound:  comp_growth_bound.o
+	$(CC) $(LDFLAGS) -o comp_growth_bound  comp_growth_bound.o $(VNODELPLIB) $(LIBS) 
 
-comp_enclosure_per_input:  comp_enclosure_per_input.o
-	$(CC) $(LDFLAGS) -o comp_enclosure_per_input  comp_enclosure_per_input.o $(VNODELPLIB) $(LIBS) 
+comp_growth_bound_per_input:  comp_growth_bound_per_input.o
+	$(CC) $(LDFLAGS) -o comp_growth_bound_per_input  comp_growth_bound_per_input.o $(VNODELPLIB) $(LIBS) 
 
 
 clean:
-	rm comp_enclosure.o comp_enclosure comp_enclosure_per_input.o comp_enclosure_per_input
+	rm comp_growth_bound.o comp_growth_bound comp_growth_bound_per_input.o comp_growth_bound_per_input

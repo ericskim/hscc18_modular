@@ -83,7 +83,6 @@ int main(){
   }
 
 
-  vnodelp::setprecision(4);
   std::cout << "Apriori enclosure computed for " << std::endl;
   std::cout << "sampling interval " << interval(inf(t0),tau) << std::endl;
   std::cout << "input bounds " << param->u1 << "x" << param->u2 << std::endl;
