@@ -1,0 +1,26 @@
+CXX      = g++
+CXXFLAGS = -O2 -g -Wall
+GPP_LIBS = -lstdc++ -lgfortran
+LDFLAGS += -bind_at_load
+
+# interval package
+I_PACKAGE = FILIB_VNODE
+I_INCLUDE = /usr/local/filib/include
+I_LIBS    =  -lprim 
+
+MAX_ORDER = 40
+
+# LAPACK and BLAS				
+LAPACK_LIB = -llapack
+BLAS_LIB   = -lblas
+
+# --- DO NOT CHANGE BELOW ---
+INCLUDES  = $(addprefix -I, $(I_INCLUDE))	\
+	-I$(PWD)/FADBAD++
+LIB_DIRS  = $(addprefix -L, $(I_LIBDIR)		\
+	$(L_LAPACK) $(L_BLAS))
+CXXFLAGS += -D${I_PACKAGE} \
+	-DMAXORDER=$(MAX_ORDER) $(INCLUDES)
+LDFLAGS += $(LIB_DIRS)
+LIBS = $(I_LIBS) $(LAPACK_LIB) $(BLAS_LIB)	\
+	$(GPP_LIBS)

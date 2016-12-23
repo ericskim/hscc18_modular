@@ -1,0 +1,10 @@
++0.10 Nearest : 9A 99 99 99 99 99 B9 3F 
++0.10 Up      : 9A 99 99 99 99 99 B9 3F 
++0.10 Down    : 99 99 99 99 99 99 B9 3F 
+-0.10 Nearest : 9A 99 99 99 99 99 B9 BF 
+-0.10 Up      : 99 99 99 99 99 99 B9 BF 
+-0.10 Down    : 9A 99 99 99 99 99 B9 BF 
+-= Test basic rounding mode changes
+
+
+-= Passed

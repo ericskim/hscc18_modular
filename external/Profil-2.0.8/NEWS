@@ -1,0 +1,40 @@
+Profil-2.0.8 - 2009-02-18
+-------------------------'
+New:
++ PROFIL/BIAS now supports a check Makefile target executing (yet basic) tests of the installation.
++ There is a new configuration for x86-64. This suffers from a current bug in glibc's libm that
+forces PROFIL/BIAS to reset the rounding mode to round-to-nearest after each operation.
+
+Fixed:
++ BiasPowerI(pR, [0,0], pY>0) now returns [0,0] instead of failing with error message.
++ The memory management was depending on the architecture to be 32bit
++ Minor bugfixes.
+
+Profil-2.0.6 - 2008-10-14
+-------------------------'
+Fixed:
++ Starting with GCC series 4.2 functions aren't allowed to have a (VOID) argument list with VOID
+being typedef'ed to void. The current version uses (void) instead.
++ Since GCC series 4.3 C++ header file dependencies have been streamlined causing the memcpy
+prototype to be missing in Utilities.C.
+
+Profil-2.0.4 - 2006-10-05
+--------------------------'
+New:
++ PROFIL/BIAS is now licensed under the GPL.
+
+Fixed:
++ GCC 4.1 changed the handling of friend functions causing the build of
+PROFIL/BIAS to fail. This is fixed in the current release.
++ The automatic differentiation package's handling of hessian matrices was
+fixed. This should enhance performance and reduce the memory usage considerably.
++ There were some minor bugs in the local Brent solver.
+
+2005-10-19 - Profil-2.0.2
+--------------------------'
++ Added ILSS version with approximate inverse supplied as a parameter.
++ Fixed some comments in BIAS/Bias1.c, BIAS/Bias2.c.
++ Bugs fixed:
+  + minor issues with memory management
+  + missing CONST added to 2nd parameter of 
+    src/Functions.C:Power(CONST INTERVAL &, CONST INTERVAL &)

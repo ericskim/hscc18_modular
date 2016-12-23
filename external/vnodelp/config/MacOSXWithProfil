@@ -1,0 +1,34 @@
+CXX      = clang++
+CXXFLAGS = -O2 -g -Wall -pedantic -Wno-deprecated
+GPP_LIBS = 
+# GPP_LIBS = -lstdc++ /sw/lib/libg2c.a  
+# LDFLAGS += -bind_at_load -Wno
+
+# interval package
+I_PACKAGE = PROFIL_VNODE
+PROFILPATH = $(HOME)/Documents/projects/scots/symsyn/external/
+I_INCLUDE = 	$(PROFILPATH)/Profil-2.0.8/src		\
+              $(PROFILPATH)/Profil-2.0.8/src/BIAS	\
+              $(PROFILPATH)/Profil-2.0.8/src/Base
+
+I_LIBDIR  = 	$(PROFILPATH)/Profil-2.0.8/lib	
+I_LIBS    = 	-lProfil -lBias -llr
+
+MAX_ORDER = 50
+
+# LAPACK and BLAS				
+L_LAPACK   = # $(HOME)/NUMLIB/LAPACK
+L_BLAS     = # $(HOME)/NUMLIB/LAPACK
+LAPACK_LIB = -llapack
+BLAS_LIB   = -lblas
+
+# --- DO NOT CHANGE BELOW ---
+INCLUDES  = $(addprefix -I, $(I_INCLUDE))	\
+	-I$(PWD)/FADBAD++
+LIB_DIRS  = $(addprefix -L, $(I_LIBDIR)		\
+	$(L_LAPACK) $(L_BLAS))
+CXXFLAGS += -D${I_PACKAGE} \
+	-DMAXORDER=$(MAX_ORDER) $(INCLUDES)
+LDFLAGS += $(LIB_DIRS)
+LIBS = $(I_LIBS) $(LAPACK_LIB) $(BLAS_LIB)	\
+	$(GPP_LIBS)

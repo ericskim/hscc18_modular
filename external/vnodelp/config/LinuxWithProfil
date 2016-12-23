@@ -1,0 +1,31 @@
+CXX = gcc 
+CXXFLAGS = -O2 -Wall -Wno-deprecated -DNDEBUG
+GPP_LIBS = -lstdc++ -lg2c
+
+# interval package
+I_PACKAGE = PROFIL_VNODE
+I_INCLUDE =					\
+	$(HOME)/NUMLIB/Profil-2.0/include	\
+	$(HOME)/NUMLIB/Profil-2.0/include/BIAS	\
+	$(HOME)/NUMLIB/Profil-2.0/src/Base
+I_LIBDIR  = $(HOME)/NUMLIB/Profil-2.0/lib
+I_LIBS    = -lProfil -lBias -llr
+
+MAX_ORDER = 50
+
+# LAPACK and BLAS
+L_LAPACK   =
+L_BLAS     =
+LAPACK_LIB = -llapack
+BLAS_LIB   = -lblas
+
+# --- DO NOT CHANGE BELOW ---
+INCLUDES = $(addprefix -I, $(I_INCLUDE))	\
+	-I$(PWD)/FADBAD++
+LIB_DIRS = $(addprefix -L, $(I_LIBDIR)		\
+	$(L_LAPACK) $(L_BLAS))
+CXXFLAGS += -D${I_PACKAGE} \
+	-DMAXORDER=$(MAX_ORDER) $(INCLUDES) 
+LDFLAGS += $(LIB_DIRS)
+LIBS = $(I_LIBS) $(LAPACK_LIB) $(BLAS_LIB)	\
+	$(GPP_LIBS)

@@ -1,0 +1,29 @@
+CXX      = g++
+CXXFLAGS = -g -O2 -Wno-deprecated -DNDEBUG
+GPP_LIBS = -lstdc++ -lg2c
+
+# interval package
+I_PACKAGE = FILIB_VNODE
+I_INCLUDE = $(HOME)/NUMLIB/FILIB/include
+I_LIBDIR  = $(HOME)/NUMLIB/FILIB/lib
+I_LIBS    = -lfi -lprim -lieee
+
+MAX_ORDER = 50
+
+# LAPACK and BLAS
+L_LAPACK   =
+L_BLAS     =
+LAPACK_LIB = -llapack
+BLAS_LIB   = -lblas
+
+
+# --- DO NOT CHANGE BELOW ---
+INCLUDES = $(addprefix -I, $(I_INCLUDE))	\
+	-I$(PWD)/FADBAD++
+LIB_DIRS = $(addprefix -L, $(I_LIBDIR)		\
+	e$(L_LAPACK) $(L_BLAS))
+CXXFLAGS += -D${I_PACKAGE}			\
+	-DMAXORDER=$(MAX_ORDER)	$(INCLUDES) 
+LDFLAGS += $(LIB_DIRS)
+LIBS = $(I_LIBS) $(LAPACK_LIB) $(BLAS_LIB)	\
+	$(GPP_LIBS)

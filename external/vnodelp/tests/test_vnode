@@ -1,0 +1,63 @@
+#!/bin/sh 
+
+echo " *************************************"
+echo " ***  Testing VNODE-LP installation..."
+
+for test_p in ./test0 ./test01 ./test1 ./test2 ./test3 ./test4\
+    ./test5 ./test6 ./test_n1 ./test_n2 ./test_n3 ./test_n4 ./test_n5\
+    ./test_n6
+
+  do 
+  echo ""
+  echo "  ***  EXECUTING $test_p *** "
+  $test_p
+  exit_code=$?
+
+  if [ $exit_code -eq 1 ]; then
+      echo ""
+      echo " ***********************************************"
+      echo " *** THIS TEST HAS FAILED                       "         
+      echo " *** Perhaps there is a problem with the        "
+      echo " *** installation of the interval arithmetic    "
+      echo " *** package                                    "
+      echo " *** PLEASE CONTACT Ned Nedialkov               "
+      echo " *** at nedialk@mcmaster.ca                     "
+      echo " ***********************************************"
+      echo ""
+      exit 1
+  else
+      if [ $exit_code -eq 2 ]; then
+	  echo ""
+	  echo " ***********************************************"
+	  echo " *** THIS TEST HAS FAILED                       "         
+	  echo " *** BUT THE FAILURE IS NOT FATAL               "
+	  echo " ***********************************************"
+	  echo ""
+      else
+	  if [ $exit_code -ne 0 ]; then 
+	      echo ""
+	      echo " ***********************************************"
+	      echo " *** THIS TEST HAS FAILED                       "         
+	      echo " *** Unexpected exit code                       "
+	      echo " *** PLEASE CONTACT Ned Nedialkov               "
+	      echo " *** at nedialk@mcmaster.ca                     "
+	      echo " ***********************************************"
+	      echo ""
+	      exit $exit_code
+	  fi
+      fi
+  fi
+done
+
+
+
+echo ""
+echo " *****************************************"
+echo " ***  VNODE-LP has compiled successfully  "
+echo " ***  All tests have executed successfully"
+echo " *****************************************"
+echo " If you have set the install directory, type "
+echo "      make install                           "
+echo ""
+echo ""
+exit 0

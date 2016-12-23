@@ -1,0 +1,8 @@
+-= Test for known standard functions problems
+
+BiasExp(1.000000e+00 = 0x1p+0) = 2.718282e+00 = 0x1.5bf0a8b145769p+1
+ D: [2.718282e+00, 2.718282e+00] = [0x1.5bf0a8b145765p+1, 0x1.5bf0a8b14576bp+1]
+ N: [2.718282e+00, 2.718282e+00] = [0x1.5bf0a8b145766p+1, 0x1.5bf0a8b14576cp+1]
+ U: [2.718282e+00, 2.718282e+00] = [0x1.5bf0a8b145768p+1, 0x1.5bf0a8b14576ep+1]
+
+-= Passed
