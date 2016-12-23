@@ -46,5 +46,5 @@ How to use:
    Successfully tested on macOS Sierra 10.12.1 with 
    - Apple LLVM version 8.0.0 (clang-800.0.42.1), Target: x86_64-apple-darwin16.1.0
    - vnodelp (downloaded in Dec 2016)
-   - filibsrc-3.0.2
+   - Profil-2.0.8
    - gfortran-6.2-bin

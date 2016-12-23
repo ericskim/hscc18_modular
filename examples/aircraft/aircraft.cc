@@ -3,43 +3,49 @@
  *
  *  created on: 18.01.2016
  *  author: rungger
+ *
  */
 
 /*
  * information about this example is given in
  * http://arxiv.org/abs/1503.03715
+ * doi: 10.1109/TAC.2016.2593947
+ * doi: 10.1109/CDC.2015.7403185
  *
  */
 
 #include <iostream>
 #include <array>
 
+/* SCOTS header */
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
 #include "ReachabilityGame.hh"
 
+/* time profiling */
+#include "TicToc.hh"
+
 /* ode solver */
 #include "RungeKutta4.hh"
 
-#include "TicToc.hh"
-//#include "IO.hh"
+/* ode solver */
+OdeSolver ode_solver;
 
 /* state space dim */
-#define sDIM 3
-#define iDIM 2
-
-/* data types for the state space elements and input space
- * elements used in uniform grid and ode solvers
- */
-typedef std::array<double,3> state_type;
-typedef std::array<double,2> input_type;
+const int sDIM=3;
+const int iDIM=2;
 
 /* sampling time */
 const double tau = 0.25;
 
-/* ode solver */
-OdeSolver ode_solver;
+/*
+ * data types of the state space elements and input 
+ * space elements used in uniform grid and ode solver
+ *
+ */
+typedef std::array<double,sDIM> state_type;
+typedef std::array<double,iDIM> input_type;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 double mg = 60000.0*9.81;
@@ -52,26 +58,24 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
     xx[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
     xx[2] = x[0]*std::sin(x[1]);
   };
-
-  /* use 10 intermediate step sizes */
+  /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
   ode_solver(rhs,x,u,sDIM,tau,10);
 };
 
-/* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
-/* lischitz matrix */
 double L[3][2];
+/* to account for input disturbances */
 state_type w={{.108,0.002,0}};
+/* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
 
-  //L[0][0]=-0.0019*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
-  L[0][0]=-0.0144;
+  /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
+  L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
   L[0][1]=9.8100000000000041;
 
-  //L[1][0]=0.00447+0.00481*u[1];
-  L[1][0]=0.0076;
-  L[1][1]=0.003521;
+  L[1][0]=0.00294+0.00481*u[1];
+  L[1][1]=0.003526;
 
-  L[2][0]=0.07425;
+  L[2][0]=0.074252;
   L[2][1]=83.2;
 
   /* the ode for the growth bound */
@@ -80,8 +84,7 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
-
-  /* use 10 intermediate step sizes */
+  /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
   ode_solver(rhs,r,u,sDIM,tau,10);
 };
 
@@ -94,8 +97,8 @@ int main() {
   /****************************************************************************/
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
-  state_type eta={{25.0/362,3*M_PI/180/66,56.0/334}}; //  optimized values
-  //state_type eta={{c*27.0/210,c*3*M_PI/180/209,c*56.0/209}};
+  /* optimized values computed according to doi: 10.1109/CDC.2015.7403185 */
+  state_type eta={{25.0/362,3*M_PI/180/66,56.0/334}}; 
   /* lower bounds of the hyper rectangle */
   state_type lb={{58,-3*M_PI/180,0}};
   /* upper bounds of the hyper rectangle */
