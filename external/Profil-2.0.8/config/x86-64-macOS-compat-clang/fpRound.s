@@ -32,9 +32,9 @@
 		.text
 
 		.align		4
-		.globl		BiasRoundUp
-		.type			BiasRoundUp,@function
-BiasRoundUp:
+		.globl		_BiasRoundUp
+		#.type			BiasRoundUp,@function
+_BiasRoundUp:
 		movsd     .L1e0(%rip),%xmm0
 		movsd     %xmm0,%xmm1
 		addsd     .L1em30(%rip),%xmm0
@@ -49,12 +49,12 @@ BiasRoundUp:
 .LUpExit:
 		ret
 .LUp:
-		.size			BiasRoundUp,.LUp-BiasRoundUp
+		#.size			_BiasRoundUp,.LUp-BiasRoundUp
 
 		.align		4
-		.globl		BiasRoundDown
-		.type			BiasRoundDown,@function
-BiasRoundDown:
+		.globl		_BiasRoundDown
+		#.type			BiasRoundDown,@function
+_BiasRoundDown:
 		movsd     .Lm1e0(%rip),%xmm0
 		movsd     %xmm0,%xmm1
 		subsd     .L1em30(%rip),%xmm0
@@ -69,12 +69,12 @@ BiasRoundDown:
 .LDownExit:
 		ret
 .LDown:
-		.size			BiasRoundDown,.LDown-BiasRoundDown
+		#.size			_BiasRoundDown,.LDown-BiasRoundDown
 
 		.align		4
-		.globl		BiasRoundNear
-		.type			BiasRoundNear,@function
-BiasRoundNear:
+		.globl		_BiasRoundNear
+		#.type			BiasRoundNear,@function
+_BiasRoundNear:
 		movsd     .L1e0(%rip),%xmm0
 		movsd     .L1e0(%rip),%xmm1
 		addsd     .L1em30(%rip),%xmm0
@@ -95,9 +95,9 @@ BiasRoundNear:
 .LNearExit:
 		ret
 .LNear:
-		.size			BiasRoundNear,.LNear-BiasRoundNear
+		#.size			BiasRoundNear,.LNear-BiasRoundNear
 
-		.local		_cw
+		#.local		_cw
 		.comm			_cw,4,4
 .L1e0:
 		.double   0e1e+0
