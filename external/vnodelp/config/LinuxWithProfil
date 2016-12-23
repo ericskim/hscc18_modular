@@ -1,15 +1,18 @@
-CXX = gcc 
-CXXFLAGS = -O2 -Wall -Wno-deprecated -DNDEBUG
-GPP_LIBS = -lstdc++ -lg2c
+CXX = g++
+CXXFLAGS = -O2 -Wall -Wno-deprecated 
+GPP_LIBS =   -lm
 
 # interval package
 I_PACKAGE = PROFIL_VNODE
-I_INCLUDE =					\
-	$(HOME)/NUMLIB/Profil-2.0/include	\
-	$(HOME)/NUMLIB/Profil-2.0/include/BIAS	\
-	$(HOME)/NUMLIB/Profil-2.0/src/Base
-I_LIBDIR  = $(HOME)/NUMLIB/Profil-2.0/lib
-I_LIBS    = -lProfil -lBias -llr
+PROFILPATH = $(HOME)/repositories/symsyn/external/
+
+I_INCLUDE = 	$(PROFILPATH)/Profil-2.0.8/include		\
+              $(PROFILPATH)/Profil-2.0.8/src		\
+              $(PROFILPATH)/Profil-2.0.8/src/BIAS	\
+              $(PROFILPATH)/Profil-2.0.8/src/Base
+
+I_LIBDIR  = 	$(PROFILPATH)/Profil-2.0.8/lib	
+I_LIBS    = 	-lProfil -lBias -llr
 
 MAX_ORDER = 50
 
