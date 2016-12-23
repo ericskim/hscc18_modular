@@ -33,8 +33,9 @@
 OdeSolver ode_solver;
 
 /* state space dim */
-const int sDIM=3;
-const int iDIM=2;
+const int state_dim=3;
+/* input space dim */
+const int input_dim=2;
 
 /* sampling time */
 const double tau = 0.25;
@@ -44,8 +45,8 @@ const double tau = 0.25;
  * space elements used in uniform grid and ode solver
  *
  */
-typedef std::array<double,sDIM> state_type;
-typedef std::array<double,iDIM> input_type;
+typedef std::array<double,state_dim> state_type;
+typedef std::array<double,input_dim> input_type;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 double mg = 60000.0*9.81;
@@ -59,7 +60,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
     xx[2] = x[0]*std::sin(x[1]);
   };
   /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
-  ode_solver(rhs,x,u,sDIM,tau,10);
+  ode_solver(rhs,x,u,state_dim,tau,10);
 };
 
 double L[3][2];
@@ -85,7 +86,7 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
   /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
-  ode_solver(rhs,r,u,sDIM,tau,10);
+  ode_solver(rhs,r,u,state_dim,tau,10);
 };
 
 int main() {
@@ -105,7 +106,7 @@ int main() {
   state_type ub={{83,0,56}}; 
   /* measurement disturbances  */
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};
-  scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta,z);
+  scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta,z);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
 
@@ -119,7 +120,7 @@ int main() {
   /* grid node distance diameter */
   input_type ieta={{32000,8.0/9.0*M_PI/180}};
 
-  scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
+  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
   is.printInfo(1);
 
   /* transition system to be computed */
@@ -134,6 +135,7 @@ int main() {
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
   tt.toc();
   state_type x;
+  /* define target set */
   auto target = [&](const size_t idx)->bool {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */

@@ -5,37 +5,47 @@
  *      author: rungger
  */
 
+/*
+ * information about this example is given in
+ * http://arxiv.org/abs/1503.03715
+ * doi: 10.1109/TAC.2016.2593947
+ *
+ */
+
 #include <iostream>
 #include <array>
 #include <iomanip>
 
+/* SCOTS header */
 #include "UniformGrid.hh"
 #include "TransitionSystem.hh"
 #include "AbstractionGB.hh"
 #include "ReachabilityGame.hh"
 #include "StaticController.hh"
 
+/* time profiling */
+#include "TicToc.hh"
+
 /* ode solver */
 #include "RungeKutta4.hh"
-
-#include "TicToc.hh"
-#include "IO.hh"
+OdeSolver ode_solver;
 
 /* state space dim */
-#define sDIM 3
-#define iDIM 2
+const int state_dim=3;
+/* input space dim */
+const int input_dim=2;
+
+/* sampling time */
+const double tau = 0.3;
+
 
 /*
  * data types for the state space elements and input space
  * elements used in uniform grid and ode solvers
+ *
  */
-typedef std::array<double,3> state_type;
-typedef std::array<double,2> input_type;
-
-/* sampling time */
-const double tau = 0.3;
-/* ode solver */
-OdeSolver ode_solver;
+typedef std::array<double,state_dim> state_type;
+typedef std::array<double,input_dim> input_type;
 
 /* we integrate the vehicle ode by 0.3 sec (the result is stored in x)  */
 auto  vehicle_post = [](state_type &x, const input_type &u) {
@@ -47,7 +57,7 @@ auto  vehicle_post = [](state_type &x, const input_type &u) {
     xx[2] = u[0]*std::tan(u[1]);
   };
   /* simulate (use 10 intermediate steps in the ode solver) */
-  ode_solver(rhs,x,u,sDIM,tau,10);
+  ode_solver(rhs,x,u,state_dim,tau,10);
 };
 
 /* we integrate the growth bound by 0.3 sec (the result is stored in r)  */
@@ -72,7 +82,7 @@ int main() {
   state_type ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
   state_type eta={{.2,.2,.2}};
-  scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);
+  scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
 
@@ -85,7 +95,7 @@ int main() {
   input_type iub={{1,1}};
   /* grid node distance diameter */
   input_type ieta={{.3,.3}};
-  scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
+  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
 
   /****************************************************************************/
   /* set up constraint functions with obtacles */
@@ -118,55 +128,21 @@ int main() {
     }
     return false;
   };
-  auto of =[&](const state_type &x){
-  return overflow(x,x);
-  };
-
-  ss.addGridPoints(of);
-  scots::IO::writeToFile(&ss,"obstacles.scs");
 
   /* transition system to be computed */
   scots::TransitionSystem ts;
 
-
-  // scots::TransitionSystem
-   // read ts from file start
-   tt.tic();
-   std::cout << "\n readFromFileHard (ts) started " << std::endl;
-   scots::IO::readFromFileHard(&ts , "ts.scs");
-   tt.toc();
-   std::cout << "\n readFromFileHard (ts) ended \n" << std::endl;
-   // write ts to file  END //
-
-
-
-/* CHECKKKKKKKKKKKKKKKKKKK
   tt.tic();
-  std::cout << "\n scots::AbstractionGB started & Compute transition relation \n" << std::endl;
-  scots::AbstractionGB<state_type,input_type> abs(ss, is, ts);
-  tt.toc();
-  std::cout << "\n scots::AbstractionGB ended \n"<< std::endl;
-//CHECKKKKKKKKKKKKKKKKK
-  tt.tic();
-  std::cout << "\n abs.computeTransitionRelation started \n" << std::endl;
+  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
+
   abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
-  tt.toc();
-  //CHECKKKKKKKKKKKKKKKKK */
-  //std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
-  //std::cout << "Number of transitions: " << ts.T_<< std::endl;
-  //std::cout << "\n abs.computeTransitionRelation ended \n" << std::endl;
 
-  /* write ts to file start
-  tt.tic();
-  std::cout << "\n writeToFile (ts) started " << std::endl;
-  scots::IO::writeToFileHard(&ts,"ts.scs");
+  std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
   tt.toc();
-  std::cout << "\n writeToFile (ts) ended \n" << std::endl;
-  // write ts to file  END */
 
-  /* define function to check if the cell is in the  target set?  */
+  /* define target set */
   state_type x;
-  auto target = [&](size_t idx) -> bool {
+  auto target = [&](size_t idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
     if (9 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 9.5 && 0 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0.5)
@@ -174,17 +150,12 @@ int main() {
     else
     return false;
   };
-  ss.fillAbstractSet();
-  ss.remIndices(target);
-  ss.remGridPoints(of);
-  scots::IO::writeToFile(&ss,"problemdomain.scs");
 
   scots::ReachabilityGame reach(ts);
-  //scots::StaticController con(ts);
   tt.tic();
+  std::cout << "Solve game " << std::endl;
   reach.solve(target);
   tt.toc();
-  scots::IO::writeControllerToFile(&reach,"reach.scs",&ss,&is);
   std::cout << "Size: " << reach.size() << std::endl;
 
   return 1;

@@ -1,6 +1,6 @@
 # set CONFIG_FILE and INSTALL_DIR
 
-CONFIG_FILE ?= MacOSXWithProfil
+CONFIG_FILE ?= LinuxWithProfil
 INSTALL_DIR ?= $(HOME)
 
 #--- DO NOT CHANGE BELOW ---
