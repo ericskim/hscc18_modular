@@ -1,0 +1,34 @@
+
+
+Helper program to check the RungeKutta solver accuracy of the aircraft ode for
+some grid points. The computation uses the interval arithmetic based solution of
+ODEs implemented in the C++ package vnodelp available at 
+
+http://www.cas.mcmaster.ca/~nedialk/vnodelp/
+
+
+How to use:
+
+1. install the vnodelp package  
+
+2. edit the Makefile and adjust header and library paths
+
+  the current makefile is supposed to be used with vnodelp in combination with
+  BIAS/Profil
+
+  If you chose to install vnodelp with Filib++ you need to adjust the makefile
+  accordingly
+
+  Note: the MAXORDER number must coincide with the MAXORDER number used in the
+  compilation of the vnodelp package
+
+3. the solver accuracy check depends on a variety of different parameters and
+you should edit the ode_test.cc to your needs
+
+4. compile ode_test.cc via make
+
+   Successfully tested on macOS Sierra 10.12.1 with 
+   - Apple LLVM version 8.0.0 (clang-800.0.42.1), Target: x86_64-apple-darwin16.1.0
+   - vnodelp (downloaded in Dec 2016)
+   - Profil-2.0.8
+   - gfortran-6.2-bin
