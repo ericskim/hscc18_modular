@@ -134,7 +134,6 @@ int main() {
 
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
   tt.toc();
-  state_type x;
   /* define target set */
   auto target = [&](const size_t idx)->bool {
     ss.itox(idx,x);
@@ -147,6 +146,8 @@ int main() {
       return true;
     return false;
   };
+
+  return 0;
 
   tt.tic();
 

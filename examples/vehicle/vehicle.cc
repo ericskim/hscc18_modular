@@ -81,7 +81,7 @@ int main() {
   /* upper bounds of the hyper rectangle */
   state_type ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
-  state_type eta={{.2,.2,.2}};
+  state_type eta={{.1,.1,.2}};
   scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
@@ -119,8 +119,11 @@ int main() {
   };
 
   /* overflow function returns 1 if x \in overflow symbol  */
-  auto overflow = [&](const state_type &x, const state_type&) {
-  double c1= eta[0]/2.0;
+  state_type x;
+  //auto overflow = [&](const size_t idx) {
+  auto overflow = [&](const state_type &x) {
+    //ss.itox(idx,x);
+    double c1= eta[0]/2.0;
     double c2= eta[1]/2.0;
     for(size_t i=0; i<15; i++) {
       if ((H[i][0]-c1) <= x[0] && x[0]<= (H[i][1]+c1) && (H[i][2]-c2) <= x[1] && x[1] <= (H[i][3]+c2))
@@ -141,7 +144,6 @@ int main() {
   tt.toc();
 
   /* define target set */
-  state_type x;
   auto target = [&](size_t idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */

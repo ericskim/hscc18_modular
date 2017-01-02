@@ -117,7 +117,8 @@ void computeTransitionRelation(F1& system_post, F2& radius_post, F3&& overflow) 
       /* get center x of cell */
       stateSpace_.itox(i,x);
       /* is x an element of the overflow symbols ? */
-      if(!j & overflow(x,r)) {
+      if(!j & overflow(x)) {
+      //if(!j & overflow(i)) {
         for(size_t j=0; j<M; j++)
           outOfDomain[i*M+j]=true;
         break;
