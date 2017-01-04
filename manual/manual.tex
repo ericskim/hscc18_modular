@@ -152,763 +152,222 @@ backend=biber
 
 
 
-\title{SCOTS -- User Manual}
+\title{SCOTS (0.2) -- User Manual}
 
 \author{Matthias Rungger}
 
 \begin{document}
   \maketitle
 
+  \addtocontents{toc}{\setcounter{tocdepth}{1}}
 	\tableofcontents
 	\newpage
 	
 
- 
+\section{ToDo}
 
-\part{INTRODUCTION}
+\begin{enumerate}
+  \item measurement error move to AbstractionGB.computeTransitionRelation 
+  \item UniformGrid check overflow
+  \item UniformGrid make pointers to std::vectors
+  \item delta increase of pre array in construction of abstraction
+  \item correction of a-priori enclosure and computation of growth bound
+	\item remove post from transition system
+	\item rename overflow to avoid in vehicle example
+\end{enumerate}
+
+\newpage
 
 
-\section{About {\tt SCOTS}}
+\section{About {\tt SCOTS} v0.2}
 
 {\tt SCOTS} is an open source software tool (available at
-\mbox{\url{http://www.hcs.ei.tum.de}}) for the synthesis of 
-symbolic controllers for possibly perturbed, nonlinear, control systems
-according to~\cite{ReissigWeberRungger15}. It is mainly implemented
-in \Cpp and it comes with a small MATLAB interface to access the synthesized controller
-from within MATLAB. 
+\mbox{\url{http://www.hcs.ei.tum.de}}) published under the 3-Clause BSD License. It
+provides a basic implementation of the construction of symbolic models, also
+known as discrete abstractions, of possibly perturbed, nonlinear control systems
+according to~\cite{ReissigWeberRungger15} together with the implementation of
+two algorithms for the synthesis of symbolic controllers. It is mainly implemented
+in \Cpp, but also provides a small MATLAB interface to access atomic propositions
+and the synthesized controllers from the MATLAB workspace.
 
-%Given a control problem
-%$(S_1,\Sigma_1)$ consisting of a plant $S_1$ and a specification $\Sigma_1$, the
-%synthesis scheme roughly proceeds as follows
-%\begin{enumerate}
-%  \item An auxiliary control problem $(S_2,\Sigma_2)$ is constructed.\\
-%    Here $S_2$ is an \emph{symbolic model} (a.k.a.~\emph{abstraction}) and $\Sigma_2$
-%    is an \emph{abstract specification}.
-%  \item A controller $C$ for $S_2$, which solves the auxiliary controller problem
-%    $(S_2,\Sigma_2)$ is computed.
-%  \item The controller $C$ is \emph{refined} to a controller for $S_1$.
-%\end{enumerate}
+{\tt SCOTS} natively supports invariance and reachability
+specifications. To account for more general specifications, it is either
+possible to write a customized synthesis algorithm or use {\tt SCOTS} in
+combination with the GR(1) synthesizer {\tt slugs}, see 
+\url{https://github.com/VerifiableRobotics/slugs} and \cite{EhlersRaman16}.
 
-The tool is intended to be used and extended by researches in the area of formal methods for
-cyber-physical systems. {\tt SCOTS} provides a baseline implementation of one of the most
-basic approaches to symbolic synthesis. 
+{\tt SCOTS} is mainly intended to be used (and possibly extended) by researchers and
+lecturers in the area of formal methods for
+cyber-physical systems. The implementation does not use validated numerics or similar
+methods for rigorous implementations and such is prone to ODE solver
+inaccuracies and rounding errors.
 
-{\tt SCOTS} provides an implementation of the various algorithms using two
-different data structures. One implementation is based on \emph{binary decision
-diagrams} (BDD)~\cite{Bryant92} and one implementation is based on a sparse
-matrix data structure {\color{red} (not yet included in the repository)}. 
+Although, there are no compelling reasons, why {\tt SCOTS} should not work
+under Windows, we developed and tested the code only under Linux and macOS
+environments. As a result, the installation notes apply to
+Linux/macOS systems only. 
 
-%It can be used to compare the
-%performance of more advanced algorithms with the basic implementation as well as  to rapidly 
-%prototype extensions.
+\section{Quickstart}
 
-\section{Symbolic Controller Synthesis Basics}
-\subsection{Control Problems} 
-{\tt SCOTS} supports the computation of
-controllers for  
-nonlinear control systems of the form
-\begin{IEEEeqnarray}{c}\label{e:System:c-time}
-\dot \xi(t) \in f(\xi(t),u) + \segcc{-w,w}
-\end{IEEEeqnarray}
-where $f$ is given by \mbox{$f:\mathbb{R}^n\times U\to \mathbb{R}^n$} and
-$U\subseteq \R^m$. The vector $w=\intcc{w_1,\ldots,w_n}\in \mathbb{R}_+^n$ is a perturbation
-bound and $\segcc{-w,w}$ denotes the hyper-interval
-$\intcc{-w_1,w_1}\times\ldots\times \intcc{-w_n,w_n}$. Given a  time horizon $\tau>0$, we define a \emph{solution
-of~\eqref{e:System:c-time} on $\intcc{0,\tau}$ under (constant) input
-\mbox{$u\in U$}} 
-as an absolutely continuous function \mbox{$\xi \colon \intcc{0,\tau}
-\to \mathbb{R}^n$} that satisfies
-\eqref{e:System:c-time} for almost every (a.e.) \mbox{$t \in
-\intcc{0,\tau}$}.
+The best way to try {\tt SCOTS} is to clone the source code from
+\url{https://gitlab.lrz.de/hcs/SCOTS} and run one of the examples. Each of the
+example directories contains a {\tt readme} file that provides some background
+information on the example itself and explains the compilation
+process. 
+
+Optionally, some examples contain an m-file for the simulation of the
+closed loop in MATLAB. See \url{http://www.mathworks.com} for installation
+instructions.
 
 
-The desired behavior of the closed loop is defined with respect to the
-$\tau$-sampled behavior of the continuous-time systems~\eqref{e:System:c-time}.
-To this end, the sampled behavior of~\eqref{e:System:c-time} is casted as
-\emph{simple system}~\cite{ReissigWeberRungger15} 
-\begin{IEEEeqnarray}{c}
-  S_1:=(X_1,U_1,F_1)
-\end{IEEEeqnarray}
-with the \emph{state alphabet} $X_1:=\R^n$, \emph{input alphabet} $U_1:=U$ and
-the \emph{transition function} $F_1:X_1 \times U_1\rightrightarrows X_1$ defined
-by 
-\begin{IEEEeqnarray*}{c}
-  F_1(x,u):=\{x'\mid \exists_{ \text{$\xi$ is a solution of~\eqref{e:System:c-time} on
-  $\intcc{0,\tau}$ under $u$}}: \xi(0)=x \land \xi(\tau)=x'\}.
-\end{IEEEeqnarray*}
-A \emph{specification} $\Sigma_1$ for a simple system $S_1=(X_1,U_1,F_1)$ is
-simply a set 
-\begin{IEEEeqnarray}{c}
-  \Sigma_1\subseteq \bigcup_{T\in \Z_{\ge0}\cup \{\infty\}}(U_1\times
-  X_1)^{\intco{0;T}} =: (U_1\times X_1)^\infty
-\end{IEEEeqnarray}
-of possibly finite and infinite input-state sequences.
-A simple system $S_1$ together with a specification $\Sigma_1$ constitute an
-\emph{control problem} $(S_1,\Sigma_1)$.
+\subsection{Invariance and Reachability}
 
-{\tt SCOTS} natively supports invariance (often referred to as safety)  and
-reachability specifications. Consider two sets $I_1\subseteq X_1$ and
-$Z_1\subseteq X_1\times U_1 $.
-A \emph{reachability} specification associated
-with $I_1,Z_1$ is defined by
-\begin{IEEEeqnarray*}{c}
-  \Sigma_1:=\{(u,x)\in (U_1\times X_1)^\infty
-  \mid  x(0)\in I_1\implies \exists_{t\in\intco{0;T}}: (x(t),u(t))\in Z_1\}.
-\end{IEEEeqnarray*}
-An
-\emph{invariance} specification associated with $I_1,Z_1$ follows by 
-\begin{IEEEeqnarray*}{c}
-\Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid x(0)\in I_1\implies
-\forall_{t\in\intco{0;\infty}}: (x(t),u(t))\in Z_1\}.
-\end{IEEEeqnarray*}
-In this context, the sets $I_1$ and $Z_1$ are referred to as \emph{atomic
-propositions}.
-\texttt{SCOTS} allows to define arbitrary sets as atomic propositions. In the BDD implementation, it provides
-customized commands to define 
-\begin{itemize}
-\item polytopes $\{x\in \R^n\mid Hx \le h\}$ parameterized by $H\in\R^{q\times n}$,
-$h\in\R^q$, and 
-\item ellipsoids $\{x\in\R^n\mid |L(x-y)|_2\le 1\}$ parameterized by
-$L\in\R^{n\times n}$ and $y\in\R^n$.
-\end{itemize}
-It is also possible to synthesize
-controllers with respect more general specifications such as 
-\begin{itemize}
-  \item \emph{reach-and-stay}, see the example in {\tt\small
-    ./examples/bdd/dcdc2/} and Sec.~\ref{ss:controllersynthesis}.
-  \item \emph{reactivity} {\color{red} (not yet included)}.
-\end{itemize}
+The three most easy-to-compile examples are found in
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+./examples/dcdc      	/* invariance problem for a DCDC boost converter */ 
+./examples/vehicle    /* reach-avoid problem for a vehicle */ 
+./examples/aircraft   /* landing maneuver of an aircraft (requires 32GB memory) */ 
+\end{lstlisting}
+The examples can be run without any additional software and require only a
+\Cpp compiler with \Cpp{\tt11} support. 
+
+\subsection{Persistence and Recurrence} In the two examples in
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+./examples/dcdc_bdd        	/* reach-and-stay spec for a DCDC boost converter */ 
+./examples/unicycle_bdd  	/* recurrence spec involving a unicycle dynamics */ 
+\end{lstlisting}
+we write our own synthesis algorithms using a binary decision diagram representation of the
+atomic propositions and transition relation. In order to run the examples, an
+installation of the 
+{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
+
+\subsection{GR(1) specifications}
+An example that demonstrates the usage of {\tt SCOTS} in combination with {\tt
+slugs} is provided in the directory
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+./examples/slugs        	/* the usage of SCOTS in combination with slugs  */ 
+\end{lstlisting}
 
 
-
-\subsection{Auxiliary Control Problems}
-\label{ss:symbolicmodel}
-
-Given a simple system $S_1=(X_1,U_1,F_1)$ representing the $\tau$-sampled
-behavior of~\eqref{e:System:c-time} and a specification $\Sigma_1$ for $S_1$,
-the control problem $(S_1,\Sigma_1)$ is not solved directly, but an auxiliary,
-finite control problem $(S_2,\Sigma_2)$ is used in the synthesis process. Here, 
-$S_2=(X_2,U_2,F_2)$ is a  \emph{symbolic model} or (discrete)
-\emph{abstraction} of $S_1$ and $\Sigma_2$ is an abstract specification.
-
-The state alphabet of $X_2$ is a cover of $X_1$ and the input alphabet $U_2$ is
-a subset of $U_1$. The set $X_2$ contains a subset $\bar X_2$, representing the ``real'' quantizer symbols,
-while the remaining symbols $X_2\smallsetminus \bar X_2$ are interpreted as
-``overflow'' symbols. The set of real quantizer symbols $\bar X_2$ are given by
-congruent hyper-rectangles aligned on a uniform grid 
-\begin{IEEEeqnarray}{c}
-\label{e:grid}
-  \eta\Z^n=\{c\in \R^n\mid \exists_{k\in\Z^n}\forall_{i\in\intcc{1;n}}\; c_i=k_i\eta_i\}
-\end{IEEEeqnarray}
-with \emph{grid parameter} $\eta\in(\R_+\smallsetminus\{0\})^n$, i.e., 
-\begin{IEEEeqnarray}{c}\label{e:abs:ss}
-  x_2\in \bar X_2\implies \exists_{c\in \eta\Z^n}\;x_2=c+\segcc{-\eta/2,\eta/2}.
-\end{IEEEeqnarray}
-{\tt SCOTS} computes symbolic models that are related via feedback
-refinement relations with the plant. A \emph{feedback refinement relation} from
-$S_1$ to $S_2$ is a strict relation $Q\subseteq X_1\times X_2$ that satisfies
-for all $(x_1,x_2)\in Q$ and for all $u\in U_2$ with $F_2(x_2,u)\neq\emptyset$
-the conditions
-\begin{enumerate}
-  \item $F_1(x_1,u)\neq \emptyset$ and
-  \item $Q(F_1(x_1,u))\subseteq F_2(x_2,u)$.
-\end{enumerate}
-In {\tt SCOTS}, the feedback refinement relation $Q$ is given by the set-membership
-relation
-\begin{IEEEeqnarray}{c}
-  Q:=\{ (x_1,x_2) \mid x_1 \in x_2\}.
-\end{IEEEeqnarray}
-Given an invariance (reachability) specification $\Sigma_1$ for $S_1$ associated with
-$(I_1,Z_1)$ an \emph{abstract specification} is given by the invariance
-(reachability) specification for $S_2$ associated with 
-\begin{IEEEeqnarray}{c't'c}
-  I_2=\{ x_2 \in X_2\mid x_2\cap I_1\neq\emptyset\} & and & Z_2=\{ x_2 \in
-X_2\mid x_2\subseteq  Z_1\neq\emptyset\}.
-\end{IEEEeqnarray}
-For the solution of the auxiliary control problems $(S_2,\Sigma_2)$ {\tt SCOTS}
-provides minimal and maximal fixed point algorithms~\cite{RunggerZamani16}.
-
-
-\subsection{Growth Bound}
-\label{ss:GB} 
-
-The construction of a symbolic model $S_2$ of $S_1$
-is based on the over-approximation of
-attainable sets. To this end, we use the notion of a growth bound
-introduced in~\cite{ReissigWeberRungger15}.
-A \emph{growth bound} of~\eqref{e:System:c-time} is a function $\beta \colon
-\mathbb{R}_{+}^n \times U' \to \mathbb{R}_{+}^n$, which is defined with respect to a sampling time
-$\tau>0$, a set $K\subseteq \mathbb{R}^n$ and a set $U'\subseteq U$.
-Basically, it provides an upper bound on the deviation of solutions $\xi$
-of~\eqref{e:System:c-time} from \emph{nominal
-solutions}\footnote{A nominal solution $\varphi(\cdot,p,u)$ of
-\eqref{e:System:c-time} is defined as solution of the initial value problem $\dot x=f(x,u)$,
-$x(0)=p$.} $\varphi$ of~\eqref{e:System:c-time}, i.e., for every solution $\xi$ of \eqref{e:System:c-time} on $\intcc{0,\tau}$ with input $u \in U'$ and $\xi(0),p \in K$,
-we have
-\begin{IEEEeqnarray}{c}
-\label{e:growthbound}
-| \xi(\tau) - \varphi(\tau,p,u) | \leq \beta( | \xi(0) - p |, u).
-\end{IEEEeqnarray}
-Here, $|x|$ for $x\in\R^n$, denotes the component-wise absolute value.
-A growth bound can be obtained essentially by bounding
-the Jacobian of $f$. Let
-$L \colon U' \to \mathbb{R}^{n \times n}$ satisfy
-\begin{IEEEeqnarray}{c}\label{e:lipschitz}
-L_{i,j}(u)
-\geq
-\begin{cases}
-D_j f_i(x,u)& \text{if $i=j$,}\\
-| D_j f_i(x,u) |& \text{otherwise}
-\end{cases}
-\end{IEEEeqnarray}
-for all $x\in K'\subseteq \R^n$ and $u\in U'\subseteq U$. Then 
-\begin{IEEEeqnarray}{c}
-\label{e:GrowthBoundComputation}
-\beta(r,u)
-=
-e^{L(u)\tau}
-r
-+
-\int_0^\tau
-e^{L(u)s}
-w
-\;\mathrm{d}s,
-\end{IEEEeqnarray}
-is a growth bound on $\intcc{0,\tau}$, $K$, $U'$
-associated with \eqref{e:System:c-time}. The domain $K'$ on
-which~\eqref{e:lipschitz} needs to hold, is assumed to be convex and contain any
-solution $\xi$ on $\intcc{0,\tau}$ of~\eqref{e:System:c-time} with $u\in U'$ and
-$\xi(0)\in K$,
-see~\cite[Thm.~VIII.5]{ReissigWeberRungger15}. 
-
-In order to use {\tt SCOTS}, the user needs to provide a growth bound, which for
-nonlinear control systems can be provided in terms of the parameterized matrix
-$L(u)$ whose entries satisfy~\eqref{e:lipschitz}.
-
-%of $S_1$, i.e., a simple system which is related via \emph{feedback refinement
-%relation} $Q\subseteq X_1\times X_2$. 
-%
-%The controller synthesis algorithms implemented in {\tt SCOTS} are based on
-%certain finite representations, often termed 
-%\cite{MoorRaisch99}, of
-% continuous control systems. {\tt SCOTS} supports the computation of symbolic
-%models of the $\tau$-sampled behavior of perturbed, 
-
-\subsection{Closed Loop} 
-
-The \emph{solution} of a control problem $(S,\Sigma)$ is a \emph{system}  $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
-$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, so that 
-\begin{IEEEeqnarray*}{c}
-  \mathcal{B}(C\times S)\subseteq \Sigma.
-\end{IEEEeqnarray*}
-Here $\mathcal{B}(C\times S)$ denotes the \emph{behavior} of the closed
-loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}. 
-The main statement enabling the symbolic synthesis approach reads as
-follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}.
-
-\emph{Consider two control problems $(S_i,\Sigma_i)$, $i\in\{1,2\}$. Suppose that $Q$
-is a feedback refinement relation from $S_1$ to $S_2$ and $\Sigma_2$ is an
-abstract specification of $\Sigma_1$. If $C$ solves the control problem $(S_2,\Sigma_2)$, then $C\circ
-Q$ solves the control problem $(S_1,\Sigma_1)$.}
-
-The controller $C\circ Q$ for $S_1$ is given by the serial composition of the quantizer
-$Q:X_1\rightrightarrows X_2$ with the controller $C$. 
-The closed loop resulting from a simple system $\Sigma_1$ which represents the $\tau$-sampled
-behavior of~\eqref{e:System:c-time} and a controller $C\circ Q$ is illustrated
-in Fig.~\ref{f:closedloop}. At each $k\in\Z_{\ge0}$ sampling
-time $\tau>0$, the plant state $x_1=\xi(k\tau)$ is measured and fed to the
-quantizer $Q$, which is used to determine a cell $x_2\in X_2$ that contains
-$x_1\in x_2$. Then $x_2$ is feed to the controller $C$ to pick the input $u\in
-U_2\subseteq U_1$ which is applied to~\eqref{e:System:c-time}.
-\begin{figure}[h]
-  \centering
-  \begin{tikzpicture}
-    [
-    mynode/.style={draw,
-                   thick,
-                   inner sep=.3cm,
-                   minimum width=1cm},
-    %
-    to/.style={->,
-               >=stealth',
-               shorten >=1pt,
-               thick},
-    ]
-
-    \node [mynode] (sys) at (0,0) {$\dot \xi(t)\in f(\xi(t),u)+\segcc{-w,w}$};
-    \node [mynode] (con) at (0,-2.5) {$C$};
-    \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
-
-    %\node [mynode] (dist) at (4,0) {$P$};
-    \node [mynode] (quant) at (4,-1) {$Q$};
-
-    \node at (2.75,0.25) {$\tau$};
-
-
-    \draw [to]  (zoh.north) |-  (sys.west);
-    \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
-
-    \draw[to] (3.5,0) -| node[right] {$x_1$} (quant.north);
-    \draw[to] (quant.south) |- node[above, near end] {$x_1\in x_2$} (con.east);
-
-    \draw[thick] (sys.east) -- (2.75,0);
-    \draw[thick] (2.75,0) -- (3.5,.5);
-    \draw[dashed,thick,bend left,->] (3.1,.5) to (3.1,-.5);
-
-  \end{tikzpicture}
-\caption{Sample-and-hold implementation of a controller synthesized with {\tt SCOTS}.}\label{f:closedloop}
-\end{figure}
-
-%In case that
-%$\Sigma_1$ is an invariance or a reachability specification, the solution $C$ is
-%a \emph{static} system, which means that the state alphabet is a singleton, i.e.,
-%$X_c=\{x_c\}$. The output function 
-%
-%In the simplest
-%case, $C$ is a \emph{static} system, which means $X_c$
-
-Additionally to the perturbations on the right-hand-side
-of~\eqref{e:System:c-time}, it is possible to account for measurement errors
-modeled by a set-valued map $P \colon \mathbb{R}^n \rightrightarrows
-\mathbb{R}^n$ given by
-\begin{IEEEeqnarray}{c't'c}\label{e:perturbation}
-  P(x):=x+\segcc{-z,z} & with & z\in\R_+^n.
-\end{IEEEeqnarray}
-Please see~\cite[Sec.~VI.B]{ReissigWeberRungger15} and~\cite{RunggerZamani16}
-for some background theory.
-The closed loop with measurement errors is illustrated
-in~Fig.~\ref{f:closedloop:pert}.
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}
-  [
-  mynode/.style={draw,
-                 thick,
-                 inner sep=.3cm,
-                 minimum width=1cm},
-  %
-  to/.style={->,
-             >=stealth',
-             shorten >=1pt,
-             thick},
-  ]
-
-  \node [mynode] (sys) at (0,0) {$\dot \xi\in f(\xi,u)+\segcc{-w,w}$};
-  \node [mynode] (con) at (0,-2.5) {$C$};
-
-  \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
-
-  \node [mynode] (dist) at (4,0) {$P$};
-  \node [mynode] (quant) at (4,-1.5) {$Q$};
-
-  \node at (2.25,0.25) {$\tau$};
-
-
-  \draw[thick] (sys.east) -- (2.25,0);
-  \draw[thick] (2.25,0) -- (2.75,.25);
-  \draw[dashed,thick,bend left,->] (2.5,.3) to (2.5,-.3);
-  \draw[thick] (2.75,0) -- (3,0);
-
-  \draw[to] (3,0) -- node[above] {$x_1$} (dist.west);
-  \draw[to] (dist.south) -- node[right] {$x_1'$} (quant.north);
-
-
-  \draw [to]  (zoh.north) |-  (sys.west);
-  \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
-
-  \draw[to] (quant.south) |- node[above, near end] {$x'_1\in x_2$} (con.east);
-
-\end{tikzpicture}
-\caption{Closed loop with measurement errors modeled by the set-valued map $x'_1 \in P(x_1)$.}\label{f:closedloop:pert}
-\end{figure}
-
-
-\subsection{Synthesis via Fixed Point Computations}
-\label{ss:fixedpoint}
-For the synthesis of controllers $C$ to enforce reachability, respectively,
-invariance specifications,
-\texttt{SCOTS} provides two fixed point algorithms.
-
-
-Consider $S_2=(X_2,U_2,F_2)$ with $X_2$ finite and $I_2\in X_2$, $Z_2\subseteq
-X_2\times U_2$. For $Y\subseteq X_2\times U_2$, we 
-define the map 
-\begin{IEEEeqnarray}{c}\label{e:pre}
-  \pre(Y):=\{(x_2,u)\in X_2\times U_2\mid  F_2(x_2,u)\neq \emptyset \land
-  F_2(x_2,u)\subseteq\pi_{X_2}(Y)\}.
-\end{IEEEeqnarray}
-where $\pi_{X_2}(Y)$ denotes the projection of $Y$ onto $X_2$.
-
-We compute a controller to enforce a reachability specification $\Sigma_2$
-associated with $I_2,Z_2$, by computing the minimal fixed point of the map
-$Y\mapsto \pre(Y)\cup Z_2$, which we denote by using the usual $\mu$ calculus
-notation~\cite{ArnoldNiwinski01} as
-\begin{IEEEeqnarray*}{c}
-  \mu Y. \pre(Y)\cup Z_2.
-\end{IEEEeqnarray*}
-In order to extract a controller, we introduce the function $j:X_2\to\N\cup\{\infty\}$ by
-\begin{IEEEeqnarray*}{c}
-j(x)=\inf\{i\in \N\mid x\in \pi_{X_2}(Y_i)\}
-\end{IEEEeqnarray*}
-where the sets $Y_i$ are recursively given by
-\begin{IEEEeqnarray*}{rCl}
-	Y_0&=&\emptyset\\
-	Y_{i+1}&=&\pre(Y_i)\cup Z_2.
-\end{IEEEeqnarray*}
-Of course we have $Y_i=Y_{i+1}$ implies $Y_i=\mu Y. \pre(Y)\cup Z_2$. Let use define the map
-\begin{IEEEeqnarray}{rCl}\label{e:con:reach}
-	H'_c(x_2)=\big\{u\in U\mid (x_2,u)\in Z_2 \vee ( F_2(x_2,u)\neq \emptyset \land F_2(x_2,u)\subseteq \pi_{X_2}(Y_{j(x_2)-1}))\big\}
-\end{IEEEeqnarray}
-which is non-empty for all $x_2\in \mu Y.\pre(Y)\cup Z_2$.
-We derive a controller as a system
-according to~\cite[Def.~III.1]{ReissigWeberRungger15} (ver.~2) by $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ with 
-\begin{IEEEeqnarray*}{rCl}
-H_c(q,x_2)&=&
-\begin{cases}
-H'_c(x_2)\times \{x_2\} & \text{if } x_2\in \mu Y. \pre(Y)\cup Z_2\\
-U_2\times\{x_2\} & \text{otherwise}
-\end{cases}\\
-F_c(q,x_2)&=&
-\begin{cases}
-\{q\} & \text{if } x_2\in \mu Y. \pre(Y)\cup Z_2\\
-\emptyset &  \text{otherwise}
-\end{cases}
-\end{IEEEeqnarray*}
-
-
-Similarly, if
-$\Sigma_2$ is an invariance specification associated with $I_2,Z_2$, we compute the maximal fixed point of $Y\mapsto \pre(Y)\cap Z_2$, which is denoted by
-\begin{IEEEeqnarray*}{c}
-  \nu Y. \pre(Y)\cap Z_2.
-\end{IEEEeqnarray*}
-Given $\nu Y. \pre(Y)\cap Z_2$ we define the map
-\begin{IEEEeqnarray}{rCl}\label{e:con:inv}
-	H'_c(x_2)=\big\{u\in U\mid F_2(x_2,u)\neq \emptyset \land F_2(x_2,u)\subseteq \pi_{X_2}(\nu Y. \pre(Y)\cap Z_2)\big\}.
-\end{IEEEeqnarray}
-and the controller 
-according to~\cite[Def.~III.1]{ReissigWeberRungger15} (ver.~2) follows again by
-\begin{IEEEeqnarray*}{rCl}
-H_c(q,x_2)&=&
-\begin{cases}
-H'_c(x_2)\times \{x_2\} & \text{if } x_2\in \nu Y. \pre(Y)\cap Z_2\\
-U_2\times\{x_2\} & \text{otherwise}
-\end{cases}\\
-F_c(q,x_2)&=&
-\begin{cases}
-\{q\} & \text{if } x_2\in \nu Y. \pre(Y)\cap Z_2\\
-\emptyset &  \text{otherwise}
-\end{cases}
-\end{IEEEeqnarray*}
-In either case, it is well known~\cite{Tabuada09} that $C$ solves the control problem
-$(S_2,\Sigma_2)$ with $\Sigma_2$ being a reachability (invariance)
-specification iff $I_2\subseteq \pi_{X_2}(\mu Y.\pre(Y)\cup Z_2)$  ($I_2\subseteq \pi_{X_2}(\nu Y.\pre(Y)\cap Z_2)$).
-Also for both types of specifications the controller is \emph{memoryless} or
-\emph{static}, i.e., the output is independent of the state.
-
-
-
+\subsection{A Priori Enclosure and Growth Bound}
+The directory 
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+./examples/aircraft/helper        	
+\end{lstlisting}
+contains various programs that 
+use the interval-arithmetic based ODE solver {\tt vnodelp} to obtain: {\bf a)} high
+confidence ODE solver parameters; {\bf b)} an a priori enclosure and {\bf c)} a growth
+bound.
 
 
 \newpage
-\section{Source Code Organization}
-
-
-\begin{lstlisting}[basicstyle=\small\ttfamily]
-
-./bdd  									/* the source code of the BDD based implementation */ 
-./doc                   /* the C++ class documentation created with NaturalDocs */
-./examples             	/* directory containing various examples */ 
-./examples/hscc16      	/* examples presented at HSCC16 using the BDD impl. */ 
-./license.txt						/* the license file */
-./manual 								/* directory containing this manual */
-./mfiles 								/* the MATLAB files */
-./mfiles/mexfiles 			/* mex files to access the controller from MATLAB */
-./readme.txt           	/* a quick description pointing to this manual */
-./sparse								/* the source code of the sparse matrix implementation */
-./utils 								/* some helper code */
-
-\end{lstlisting}
-
-\section{Installation}
+\section{Installation Notes}
 \label{s:req}
 
-In general, {\tt SCOTS} is implemented in ``header-only'' style and you only
-need a working \Cpp developer environment. However, the BDD based
-implementation uses the {\tt CUDD} library by Fabio Somenzi, which can be downloaded at
-  \url{http://vlsi.colorado.edu/~fabio/}. 
-Moreover, for the illustration of atomic propositions as well as for the closed
-loop simulation a MATLAB interface and, hence, a working installation of MATLAB is needed.  
-
-The requirements are summarized as follows:
-
+{\tt SCOTS} is implemented in ``header-only'' style and you only
+need a working \Cpp developer environment with \Cpp{\tt11} support to use the
+most basic functionality that allows you to
 \begin{enumerate}
-  \item A working C/\Cpp{} development environment
-    \begin{itemize}
-      \item Mac OS X: You should install Xcode.app including the command line tools
-      \item Linux: Most linux OS include the necessary tools already
-      \item Windows: We haven't tested the code with Windows
-    \end{itemize}
+  \item compute abstractions
+  \item synthesize controllers with respect to invariance and reachability specifications 
+  \item simulate the closed loop in \Cpp
+\end{enumerate}
+For various reasons, you might consider to use additional software in combination with {\tt SCOTS}.
 
-  \item A working installation of the {\tt CUDD} library with 
+
+\subsection{Additional software} 
+\begin{enumerate}
+
+
+  \item {\tt CUDD}: {\bf  a)} to combine {\tt SCOTS} with {\tt slugs}; {\bf  b)}
+  to write customized synthesis algorithms; {\bf c)} to save atomic propositions
+  and transition relations as BDD to file.\\
+  {\tt SCOTS} uses {\tt CUDD} with the following configuration options:
      \begin{itemize}
       \item the \Cpp{} object-oriented wrapper
       \item the dddmp library and
       \item the shared library 
     \end{itemize}
-   option enabled. The package follows the usual {\tt \small configure}, {\tt
+   The package (available at \url{http://vlsi.colorado.edu/~fabio/})
+ follows the usual {\tt \small configure}, {\tt
    \small make} and
    {\tt \small make install} installation routine. We use {\tt \small cudd-3.0.0}, with the
    configuration
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-  $ ./configure --enable-shared --enable-obj --enable-dddmp --prefix=/opt/local/
-\end{lstlisting}
-You should test the BDD installation by compiling a dummy
-programm, e.g. {\tt \small test.cc} 
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-#include<iostream>
-#include "cuddObj.hh"
-#include "dddmp.h"
-int main () {
-  Cudd mgr(0,0);
-  BDD x = mgr.bddVar();
-}
-\end{lstlisting}
-should be compiled by
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-  $ g++ test.cc -I/opt/local/include -L/opt/local/lib -lcudd
-\end{lstlisting}
-On some linux machines we experienced that the header files {\tt \small util.h} and
-{\tt \small config.h} were missing in {\tt \small /opt/local} and we manually
-copied them to {\tt \small /opt/local/include}.
-
-  \item A recent version of MATLAB. We conducted
-  the experiments with version {\tt \small R2015b (8.6.0.232648) 64-bit (maci64)}.
-  To compile the mex files:
-  \begin{enumerate}
-    \item open MATLAB and setup the mex compiler by
   \begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-     >> mex -setup C++
+  ./configure --enable-shared --enable-obj --enable-dddmp --prefix=CUDDPATH
   \end{lstlisting}
-      \item edit the {\tt \small Makefile}  and adjust the variables
-      \begin{itemize}
-        \item {\tt \small MATLABROOT} and {\tt \small CUDDPATH}
-      \end{itemize}
-    \item in a terminal run
-      {\tt \small \$ make}
-  \end{enumerate}
+  where {\tt CUDDPATH} is the desired installation directory, e.g., {\tt ./external/cudd}.
+
+  On some linux machines we experienced that the header files {\tt \small util.h} and
+  {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
+  copied them to {\tt \small CUDDPATH/include}.
+
+
+  \item MATLAB: For closed loop simulation and visualization options.\\
+	See \url{http://www.mathworks.com} for installation instructions.
+
+	If you want to access the BDD files from the MATLAB workspace you need to compile 
+	the {\tt mexSymbolicSet.mex} file:
+	\begin{enumerate}
+ 	\item setup the mex compiler with the MATLAB command
+	\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
+	>> mex -setup C++
+	\end{lstlisting}
+	\item In a terminal, navigate to {\tt\small ./mfiles/mexfiles}:
+	\begin{itemize}
+		\item edit the {\tt makefile} and adjust the {\tt MATLABPATH} and {\tt CUDDPATH}
+		\item run  {\tt make}
+	 \end{itemize}
+ \end{enumerate}
+
+
+  \item {\tt slugs}: for GR(1) synthesis. 
+  
+  Please visit \url{https://github.com/VerifiableRobotics/slugs} for
+  installation notes.
+
+  \item {\tt vnodelp/Profil}: to obtain high-confidence ODE solver parameters
+  and to compute a priori enclosures as well as growth bounds.
+
+  Please see {\tt ./examples/aircraft/helper/readme} for 
+  installation notes.
+
+
 \end{enumerate}
+
+
+
+
 	
 
-\part{BDD BASED IMPLEMENTATION}
-  
+\newpage
 
 
-\section{Quickstart}
+\part{USAGE}
 
-For a quickstart 
-\begin{enumerate}
-	\item go to one of the examples in
-	\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-	./examples/hscc16/dcdc      			/* invariance specification */ 
-	./examples/hscc16/vehicle2      	/* reachability specification */ 
-  ./examples/bdd/dcdc2      				/* reach-and-stay specification */ 
-  ./examples/bdd/boostsolver 		   	/* using an ODE solver form the BOOST lib */ 
-	\end{lstlisting}
-	\item read the readme file (if the directory contains one)
-	\item edit the {\tt \small Makefile} 
-	\begin{enumerate}
-		\item adjust the compiler
-		\item adjust the directories of the CUDD library 
- \end{enumerate}
-	\item compile and run the executable, for example in  {\tt \small ./examples/hscc16/dcdc} run
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-	$ make
-	$ ./dcdc 
-\end{lstlisting}
-  \item open MATLAB (here we assume that you have already compiled the mex files)
-    and add {\tt \small ./mfiles} to the MATLAB path 
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-  >> addpath(genpath('../../../mfiles')) 
-\end{lstlisting}
-  \item run the m file, for example in  {\tt \small ./examples/hscc16/dcdc} run
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-	>> dcdc
-\end{lstlisting}
-\item modify the example to your needs
-\end{enumerate}
+\section{Computation of Symbolic Models}
+\label{s:usage:abs}
+
+\begin{itemize}
+  \item ordinary differential equation 
+  \item growth bound
+  \item abstract state alphabet 
+  \item abstract input alphabet 
+\end{itemize}
 
 
+\section{Invariance and Reachability Specifications}
 
+%\section{Closed Loop Simulation}
 
-\section{Work Flow Overview}
+\section{Writing To and Reading From Hard Disk}
 
-A short description of the general work flow is given by
-\begin{enumerate}
-  \item Use the class {\tt\small SymbolicSet} to specify 
-    \begin{itemize}
-      \item the real quantizer symbols $\bar X_2$ 
-      \item the input alphabet $U_2$ 
-    \end{itemize}
-  \item Use the class {\tt\small SymbolicModelGrowthBound} to compute 
-the transition function $F_2$. You
-need to provide 
-    \begin{itemize}
-      \item the solution of the right-hand-side~\eqref{e:System:c-time} at time $\tau$
-      \item and the growth bound~\eqref{e:growthbound} (directly or in terms of $L(u)$
-    see~\eqref{e:lipschitz})
-    \end{itemize}
-  \item Use { \tt\small SymbolicSet} to specify the atomic propositions
-    in the specification
-  \item Use { \tt \small FixedPoint} to solve the auxiliary control problem $(S_2,\Sigma_2)$ 
-  \item Use { \tt\small SymbolicSet}  to write the result to a file
-  \item Optional: Simulate the closed loop in MATLAB by accessing the
-    controller saved in the file
-\end{enumerate}
+\section{MATLAB Interface}
 
-An overview of the usage is illustrated in Fig.~\ref{f:usage}. 
-
-\begin{figure}[th]
-\centering
-\begin{tikzpicture}
-[>=latex,
-ui/.style={draw=orange, thick, fill = orange!70!white, align=left, rounded corners, minimum height=.75cm, minimum width=2cm},
-thirdparty/.style={draw=gray, thick, fill = gray!70!white, align=left, rounded corners, minimum height=.75cm, minimum width=2cm},
-uic/.style={draw=orange}
-]
-\small
-%% state space start
-\node[draw,
-      thick,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (ss) at (0,0) {\texttt{SymbolicSet}};
-
-\node[ui, above = .5cm of ss] (uiss)  {$\eta,z\in \R_{+}^n$\\$\segcc{a,b}\subseteq \R^n$};
-
-\draw[uic,thick,->] (uiss.south) -- (ss.north);
-\node at ($(uiss.north)+(-0.3,.15)$) {{\scriptsize{\sf User Input:}}};
-%% state space ned
-
-%% input space start
-\node[draw,
-      thick,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (is) at (3,0) {\texttt{SymbolicSet}};
-
-\node[ui, above = .5cm of is] (uiis)  {$\mu\in \R_{+}^m$\\$\segcc{c,d}\subseteq \R^m$};
-
-\draw[uic,thick,->] (uiis.south) -- (is.north);
-\node at ($(uiis.north)+(-0.3,.15)$) {{\scriptsize{\sf User Input:}}};
-%% input space end
-
-%% symbolic model start
-\node[draw,
-      thick,
-      rounded corners,
-      align=left,
-      minimum height=1cm,
-      minimum width=5cm] (sm) at (1.5,-1.5) {\texttt{SymbolicModel}\\\texttt{SymbolicModelGrowthBound}};
-
-\node[thirdparty, left = .75cm of sm] (ode)  {\texttt{ode solver}};
-
-\draw[thick,->] (ode.east) -- (sm.west);
-
-\node[ui] at ($(uiss -| ode)+(0,-.15)$) (uism)  {$\tau>0$\\$\dot \xi=f(\xi,u)$\\$\dot \zeta=L(u)\zeta+w$};
-\node at ($(uism.north)+(-0.3,.15)$) {{\scriptsize{\sf User Input:}}};
-
-\draw[uic,thick,->] (uism.south) -- (ode.north);
-
-
-\draw[thick,->] (is.south) -- node[right] {$U_2$} (is |- sm.north);
-\draw[thick,->] (ss.south) -- node[right] {$\bar X_2$} (ss |- sm.north);
-%% symbolic model end
-
-%% fixed point start
-\node[draw,
-      thick,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (fpss) at (0,-3) {\texttt{SymbolicSet}};
-
-\node[draw,
-      thick,
-      align=left,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (uifp) at (fpss -| ode)  {$\eta,z\in \R_{+}^n$\\$\segcc{a,b}\subseteq \R^n$};
-\node at ($(uifp.north)+(-0.7,.15)$) {{\scriptsize{\sf Init:}}};
-
-
-\draw[thick,->] (uifp.east) -- (fpss.west);
-
-\node[draw,
-      thick,
-      rounded corners,
-      align=left,
-      minimum height=.75cm,
-      minimum width=5cm] (fp) at (1.5,-4.5) {\texttt{FixedPoint}};
-
-\draw[thick,<-] (fp.north) -- node[right] {$F_2\subseteq \bar X_2\times U_2\times \bar X_2$} (fp |- sm.south);
-\draw[thick,->] (fpss.south) -- node[right] {$Z_2\subseteq \bar X_2$} (fpss |- fp.north);
-%% fixed point end
-
-%% fixed point output start
-\node[draw,
-      thick,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (con) at (0,-6) {\texttt{SymbolicSet}};
-
-\draw[thick,<-] (con.north) -- node[right] {$H_c'\subseteq \bar X_2\times U_2$} (con |- fp.south);
-
-\node[draw=ForestGreen,
-      thick,
-      right = of con,
-      fill=ForestGreen!40,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (out) {\textsf{controller.bdd}};
-\node at ($(out.north)+(-0.2,.15)$) {{\scriptsize{\tt writeToFile}}};
-
-\draw[thick,draw=ForestGreen,->] (con) -- (out) ;
-
-
-\node[draw,
-      thick,
-      align=left,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (ic) at (uifp |- con)  {$(\eta,\mu)\in \R_{+}^{n+m}$\\$\segcc{a,b}\times \segcc{c,d}$};
-\node at ($(ic.north)+(-0.7,.15)$) {{\scriptsize{\sf Init:}}};
-\draw[thick,->] (ic) --  (con);
-
-\node[draw=,
-      thick,
-      align=left,
-      rounded corners,
-      minimum height=.75cm,
-      minimum width=2cm] (ic) at (uifp |- con)  {$(\eta,\mu)\in \R_{+}^{n+m}$\\$\segcc{a,b}\times \segcc{c,d}$};
-
-%% fixed point output end
-
-
-%%%% cudd box start
-%%\node[draw=green!20!black,
-%%      thick,
-%%      fill=green!20!white,
-%%      rounded corners,
-%%      minimum height=.75cm,
-%%      minimum width=1cm] (cudd) at (uism |- uiss)  {\texttt{Cudd}};
-%%%% cudd box 
-\end{tikzpicture}%
-\caption{The work flow in \texttt{SCOTS}.}
-\label{f:usage}
-\end{figure}
+\section{Customized Synthesis Algorithms}
 
 
 \newpage
-\section{Usage and Implementation Details}
 
 
 
@@ -1799,495 +1258,502 @@ we specify that $0.7$ and $0.75$ correspond to the third, respectively, first co
 %\subsection{Fixed Point Computations}
 
 \newpage
+\part{THEORY BACKGROUND}
 
-\part{SPARSE MATRICES BASED IMPLEMENTATION}
-~ \\
-%\section{To be continued...}
-\begin{comment}  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- this section currently is not required 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Symbolic Controller Synthesis Basics}
+For a detailed description, please see~\cite{ReissigWeberRungger15}. 
+\subsection{Control Problems} 
+{\tt SCOTS} supports the computation of
+controllers for  
+nonlinear control systems of the form
+\begin{IEEEeqnarray}{c}\label{e:System:c-time}
+\dot \xi(t) \in f(\xi(t),u) + \segcc{-w,w}
+\end{IEEEeqnarray}
+where $f$ is given by \mbox{$f:\mathbb{R}^n\times U\to \mathbb{R}^n$} and
+$U\subseteq \R^m$. The vector $w=\intcc{w_1,\ldots,w_n}\in \mathbb{R}_+^n$ is a perturbation
+bound and $\segcc{-w,w}$ denotes the hyper-interval
+$\intcc{-w_1,w_1}\times\ldots\times \intcc{-w_n,w_n}$. Given a  time horizon $\tau>0$, we define a \emph{solution
+of~\eqref{e:System:c-time} on $\intcc{0,\tau}$ under (constant) input
+\mbox{$u\in U$}} 
+as an absolutely continuous function \mbox{$\xi \colon \intcc{0,\tau}
+\to \mathbb{R}^n$} that satisfies
+\eqref{e:System:c-time} for almost every (a.e.) \mbox{$t \in
+\intcc{0,\tau}$}.
 
-\section{Back ground}
-~ \\
-Sparse Matrix is the Matrix in that most of its elements are zero. See Fig.  ~\ref{f:sparse matrix} as an example of a sparse matrix.
-Its structure gives the advantage of using special algorithm to store and manipulate them. Unlike normal matrices which should be stored in the format of $n \times m$ ; for sparse matrices other methods e.g. Dictionary of keys (DIK), List of lists (LIL) and etc. could be used and in hence prevent wasting memory and processing time.
 
-\begin{figure}[h]
-\centering
-	\includegraphics[width=06cm]{figures/Finite_element_sparse_matrix.png}
-\caption{A sparse matrix obtained when solving a finite element problem in two dimensions. The non-zero elements are shown in black.}\label{f:sparse matrix}
-
-\end{figure}
-
- It was initially implemented for 2D matrices but it can be extended to upper dimension too. We will use this matrices for storing the and manipulating of the transition function post or pre elements: 
+The desired behavior of the closed loop is defined with respect to the
+$\tau$-sampled behavior of the continuous-time systems~\eqref{e:System:c-time}.
+To this end, the sampled behavior of~\eqref{e:System:c-time} is casted as
+\emph{simple system}~\cite{ReissigWeberRungger15} 
+\begin{IEEEeqnarray}{c}
+  S_1:=(X_1,U_1,F_1)
+\end{IEEEeqnarray}
+with the \emph{state alphabet} $X_1:=\R^n$, \emph{input alphabet} $U_1:=U$ and
+the \emph{transition function} $F_1:X_1 \times U_1\rightrightarrows X_1$ defined
+by 
 \begin{IEEEeqnarray*}{c}
-F:X \times U\rightrightarrows X
+  F_1(x,u):=\{x'\mid \exists_{ \text{$\xi$ is a solution of~\eqref{e:System:c-time} on
+  $\intcc{0,\tau}$ under $u$}}: \xi(0)=x \land \xi(\tau)=x'\}.
 \end{IEEEeqnarray*}
+A \emph{specification} $\Sigma_1$ for a simple system $S_1=(X_1,U_1,F_1)$ is
+simply a set 
+\begin{IEEEeqnarray}{c}
+  \Sigma_1
+	\subseteq
+  \bigcup_{T\in \Z_{\ge0}\cup \{\infty\}}
+  (U_1\times X_1)^{\intco{0;T}} =: (U_1\times X_1)^\infty
+\end{IEEEeqnarray}
+of possibly finite and infinite input-state sequences.
+A simple system $S_1$ together with a specification $\Sigma_1$ constitute an
+\emph{control problem} $(S_1,\Sigma_1)$.
 
-{ \color{red} Also overflow states will be considered as zeros and are not taken into account.}
-~ \\ 
-\end{comment}
-\section{Quickstart}
-~ \\
-For a quickstart 
-\begin{enumerate}
-	\item go to one of the examples in
-	\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-	./examples/unicycle      			/* reachability specification */ 
-	other examples  						/* will be added */
- 
-	\end{lstlisting}
-	\item read the readme file (if the directory contains one)
-	\item edit the {\tt \small Makefile} 
-	\begin{enumerate}
-		\item adjust the compiler
-		\item adjust the directory of the SCOTSROOT 
- \end{enumerate}
-	\item compile and run the executable, for example in  {\tt \small ./examples/unicycle} run
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-	$ make
-	\end{lstlisting}
-	
-after  "make"  finished successfully; then run 
-	
-	\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-	$ ./unicycle
-\end{lstlisting}
-
-  \item open MATLAB (here we assume that you have already compiled the mex files; in detail you set up the mex compiler in MATLAB as described in Sec.~\ref{s:req}. Also after editing of the make file which is in mfiles folder with concern of MATLAB path you should run this make full too)
-
-    and finally add {\tt \small ./mfiles} to the MATLAB path 
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-  >> addpath(genpath('../../../mfiles')) 
-\end{lstlisting}
-  \item run the m file, for example in  {\tt \small ./examples/unicycle} run
-\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-	>> unicycle.m
-\end{lstlisting}
-\item modify the example to your needs
-\end{enumerate}
-~ \\
-\section{Work Flow Overview- Sparse Matrices}
-~ \\
-Sparse Matrix is the Matrix in that most of its elements are zero. Its structure gives the advantage of using special algorithm to store and manipulate them. We will use this matrices for storing the and manipulating of the transition function post or pre elements: 
-\begin{IEEEeqnarray*}{c}
-F:X \times U\rightrightarrows X
-\end{IEEEeqnarray*}
-Also overflow states will be considered as zeros and are not taken into account.
-
-A short description of the general work flow is given by
-\begin{enumerate}
-  \item Use the class {\tt\small UniformGrid} to specify 
-    \begin{itemize}
-      \item the real quantizer symbols $\bar X_2$ 
-      \item the input alphabet $U_2$ 
-    \end{itemize}
-  \item Use the classes {\tt\small AbstractionGB} and {\tt\small TransitionSystem} to compute the transition function $F_2$. You
-need to provide 
-    \begin{itemize}
-      \item the solution of the right-hand-side~\eqref{e:System:c-time} at time $\tau$
-      \item and the growth bound~\eqref{e:growthbound} (directly or in terms of $L(u)$
-    see~\eqref{e:lipschitz})
-    \end{itemize}
-  \item Use user defined functions to specify the atomic propositions
-    in the specification
-  \item Use {\tt \small Game}, and/or {\tt \small ReachabilityGame}, and/or  {\tt \small SafetyGame} to solve the auxiliary control problem $(S_2,\Sigma_2)$ . Other combination of mentioned classes are possible.
-  \item Use {\tt\small IO}  to write the result to a file
-  \item Optional: Simulate the closed loop in MATLAB by accessing the
-    controller saved in the file
-\end{enumerate}
-
-
-
-% maybe a graph ?
-
-\section{Usage and Implementation Details}
-
-
-\subsection{Uniform Grid}
-\label{ss:Uniform Grid}
-~ \\
-The source code of the class {\tt\small UniformGrid} is located in {\tt\small ./src/sparse}. For creating, manipulating, and storing of the subsets of grid points this class will be used. It contains a \emph{domain} $\segcc{a,b}\subseteq \R^n$ and a \emph{grid parameter} $\eta\in \R_{>0}^n$. So the domain of the uniform grid is defined by a hyper interval and each grid point $x\in D$ where $D$ :
-\begin{IEEEeqnarray*}{c}
-  D:=(\intcc{a_1,b_1}\times \cdots\times \intcc{a_n,b_n} )\cap  \eta\Z^n.
-\end{IEEEeqnarray*}
-
-
-is identified with a cell $x+\segcc{-\eta/2,\eta/2}$.
-By considering the measurement error bound $z$; the radius of the hyper interval with center of the grid point will be presented as : $ \eta/2 + z$
- 
-Each grid point is associated with an index. For example by using the domain $\segcc{a,b}\subseteq \R^n$ and grid parameter
-    $\eta\in\R^n_{>0}$. For example, to encode a set of grid points in $\intcc{0,2}\times \intcc{0,3} \times \cap  
-	(0.5,0.5) \Z^3 $, we can use the following code.
-    
-    
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-#include <array>
-#include <iostream>
-#include "UniformGrid.hh"
-int main() 
-{
-#define sDIM 2						 /* defining the state space  dimension */
-typedef std::array<double,2> state_type; /* defining the state type */
-
-
-/* construct grid for the state space : */
-/* setup the workspace of the synthesis problem and the uniform grid:  */
-state_type lb={{0,0}};  	/* lower bounds of the hyper rectangle */ 
-state_type ub={{2,3}};    /* upper bounds of the hyper rectangle */
-state_type eta={{.5,.5}};   		 /* grid node distance diameter */
-scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);              
-return 1;
-}
-\end{lstlisting}
-
-Figure ~\ref{f:2D-uniformgrid} shows the created grid points which is drawn by help of Matlab interface.
-
-\begin{figure}[h]
-\centering
-	\includegraphics[width=06cm]{figures/manualp1.pdf}
-\caption{2D state space example grid point, ilusttrated by help of matlab}\label{f:2D-uniformgrid}
-
-\end{figure}
-
-It is worth to mention that for {\tt\small state\_type} the {\tt\small std::array} has been chosen by user. It is up to user to choose {\tt\small std::array} , {\tt\small std::vector} or other type definition.
-
-
-Each grid point in SCOTS has an index, Figure  ~\ref{f:index} shows the indexes associated with pre mentioned state space.
-
-\begin{figure}[h]
-\centering
-	\includegraphics[width=06cm]{figures/manualp2.pdf}
-\caption{indexes of 2D state space example grid point}\label{f:index}
-
-\end{figure}
-
-To compute the index {\tt\small idx} associated with a grid point {\tt\small x} we use 
-{\tt\small xtoi} and in contrast; to compute the coordinated of the grid point {\tt\small x} associated with the index {\tt\small idx}, {\tt\small itox} will be used. (to memorizing read {\tt\small xtoi} as x to index  and {\tt\small itox}  vice versa).
-As an example; assume adding following lines to previous example to gain those data.
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
- ss.itox(idx,x);
- ss.xtoi(idx,x);
-\end{lstlisting} 
- 
- 
- 
- 
- 
-
-For more complex example, to encode a set of grid points in $\intcc{0,10}\times \intcc{0,10}\times \intcc{\pi-0.4,\pi+0.4} \cap
-    (0.2,0.2,0.1)\Z^3$, we can use the following code. This is an example for creating symbolic input grid points with measurement error $z$.
-    
-    
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-#include <array>
-#include <iostream>
-#include "UniformGrid.hh"
-int main() 
-{
-#define sDIM 3 						 /* defining the state space  dimension */
-typedef std::array<double,3> state_type; /* defining the state type */
-
-
-/* construct grid for the state space : */
-/* setup the workspace of the synthesis problem and the uniform grid:  */
-state_type lb={{0,0,-M_PI-0.4}};  	/* lower bounds of the hyper rectangle */ 
-state_type ub={{10,10,M_PI+0.4}};    /* upper bounds of the hyper rectangle */
-state_type eta={{.2,.2,.1}};   		    /* grid node distance diameter */
-state_type z={{.1,.1,0}};   		    /* grid node measurement error bound */
-scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta,z);              
-return 1;
-}
-\end{lstlisting}
-This is the standard instantiation method to create the symbolic state alphabet $\bar X_2$ with considering $z$. Similar method can be used to create the symbolic input alphabet $U_2$.
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
-\end{lstlisting}
-where this is an example for creating symbolic input grid points without measurement error{\tt\small z}. It is considered that ({\tt\small iDIM,ilb,iub,ieta }) are defined beforehand.
-
-
-
-By using the copy constructor, the Uniform Grid variables of original {\tt\small UniformGrid} instance are used for the new one.
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-  scots::UniformGrid Nss(ss);  /* Nss and ss have the same abstract domain */
-\end{lstlisting}
-This option can be used to create atomic propositions to formulate the specification. Also suppose {\tt\small ss} represents $\bar X_2$, then we use the following similar code to create a {\tt\small UniformGrid} to represent a subset of $\bar X_2$
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-  scots::UniformGrid subset(ss);   /* subset and ss have the same abstract domain */
-\end{lstlisting}
-
-
-It is possible to create a projection of the grid points in an abstract set onto the specified dimension (so called: [ {\tt\small projectDimension: 1,2,3 ... dim\_ }])
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-std::vector<size_t> projectDimension={1,2};
-scots::UniformGrid ProjectSet(projectDimension);
-
-\end{lstlisting}
-
-This is beneficial when dimension of the project is more than three and user likes to show specific dimensions on a 2D or 3D diagram.
-
-Similarly, It is possible to create a projection of the grid points in an abstract set which is specified by the argument {\tt\small idxSet} onto the specified dimensions ({\tt\small projectDimension}).
-
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-std::vector<size_t> projectDimension={1,2};
-std::vector<size_t> idxSet={1,2,3,5,10,15};
-scots::UniformGrid ProjectSet(idxSet, projectDimension);
-
-\end{lstlisting}
-
-
-Following manipulation are supported in SCOTS.
-
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-UniformGrid::addGridPoints()
-/* add all grid points x to the abstract set
- for which the function set(x) == true */
-UniformGrid::remGridPoints()	
-/* remove all grid points from the abstract set
- for which the function set(x) == true */
-UniformGrid::addIndices()
-/* add all indices i to the abstract set
- for which the function set(i) == true */
-UniformGrid::remIndices() 
-/* remove all indices i from the abstract set
-for which the function set(i) == true */
-UniformGrid::fillAbstractSet() 
-/* add all grid points to the abstract set */
-UniformGrid::clearAbstractSet() 
-/* remove all grid points from the abstract set */
-    
-\end{lstlisting}
-
-As an example first assume we declared the {\tt\small overflow} grid points before; which this is later used in following code:
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
- ss.addGridPoints(overflow);
-\end{lstlisting}
-then we can add them into the grid points and later consider them as obstacles and write them into a file using {\tt\small IO} see  example unicycle for more detail.
-
-In another example assume after declaration of the {\tt\small Uniformgrid} and all about {\tt\small AbstractSet}, you can use {\tt\small FillAbstractSet} and then write them to the file as problem domain. you will see more about writing to files later.
-
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
- ss.fillAbstractSet();
- scots::IO::writeToFile(&ss,"problemdomain.scs"); 
-\end{lstlisting}
-
-
-Some information related to the Uniform Grid could be accessed by {\tt\small printInfo}. as an example adding 
-
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-ss.printInfo()
-\end{lstlisting}
-will produce: 
+\subsection{Supported Specifications}
+{\tt SCOTS} natively supports 
 \begin{itemize}
-\item Grid node distance $\eta$ in each dimension
-\item First grid point
-\item Number of grid points in each dimension
-\item Number of grid points
+\item invariance (often referred to as safety) specifications;
+\item reachability specifications; 
+\item reach-avoid specifications.
 \end{itemize}
-
-
-\subsection{TransitionSystem}
- ~\\
-The {\tt\small scots} class {\tt\small TransitionSystem}  is stored in the file  {\tt\small ./src/sparse/TransitionSystem.hh} and contains the transition relation of a transition system. are used to compute 
-the transition function $F_2:\bar X_2\times U_2\rightrightarrows \bar X_2$, of
-the symbolic model $S_2=(X_2,U_2,F_2)$, see Sec.~\ref{ss:symbolicmodel}.
-The transition function can also be considered as relation
-$F_2\subseteq \bar X_2\times U_2\times \bar X_2$. ~\cite{RunggerZamani16} The data structure is particularly tailored to be used in the minimal and maximal fixed point computations.
-As an example following code will compute the transition System
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-scots::TransitionSystem ts;   /* transition system to be computed */
-\end{lstlisting}
-which is representing
+The specifications are defined as follows.
+Consider two sets $I_1\subseteq X_1$ and $Z_1\subseteq X_1$.
+An \emph{invariance} specification associated with $I_1,Z_1$ follows by 
 \begin{IEEEeqnarray*}{c}
-F_2\subseteq \bar X_2\times U_2\times \bar X_2
+\Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid x(0)\in I_1\implies \forall_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
 \end{IEEEeqnarray*}
+A \emph{reachability} specification associated
+with $I_1,Z_1$ is defined by
+\begin{IEEEeqnarray*}{c}
+  \Sigma_1:=\{(u,x)\in (U_1\times X_1)^\infty
+  \mid  x(0)\in I_1\implies \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
+\end{IEEEeqnarray*}
+A \emph{reach-avoid} specification associated
+with $I_1,A_1,Z_1$ with $A_1\subseteq X_1$ is defined by
+\begin{IEEEeqnarray*}{c}
+  \Sigma_1:=\big\{(u,x)\in (U_1\times X_1)^\infty
+  \mid  x(0)\in I_1\implies 
+  (
+    \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1
+  \wedge
+    \forall_{t'\in\intco{0;t}}: x(t')\not\in A_1
+  )
+  \big\}.
+\end{IEEEeqnarray*}
+In this context, the sets $I_1$, $A_1$ and $Z_1$ are referred to as \emph{atomic
+propositions}.
+\texttt{SCOTS} allows to define arbitrary sets as atomic propositions. 
+
+\subsection{Auxiliary Control Problems}
+\label{ss:symbolicmodel}
+
+Given a simple system $S_1=(X_1,U_1,F_1)$ representing the $\tau$-sampled
+behavior of~\eqref{e:System:c-time} and a specification $\Sigma_1$ for $S_1$,
+the control problem $(S_1,\Sigma_1)$ is not solved directly, but an auxiliary,
+finite control problem $(S_2,\Sigma_2)$ is used in the synthesis process. Here, 
+$S_2=(X_2,U_2,F_2)$ is a  \emph{symbolic model} or (discrete)
+\emph{abstraction} of $S_1$ and $\Sigma_2$ is an abstract specification.
+
+The state alphabet of $X_2$ is a cover of $X_1$ and the input alphabet $U_2$ is
+a subset of $U_1$. The set $X_2$ contains a subset $\bar X_2$, representing the ``real'' quantizer symbols,
+while the remaining symbols $X_2\smallsetminus \bar X_2$ are interpreted as
+``overflow'' symbols. The set of real quantizer symbols $\bar X_2$ are given by
+congruent hyper-rectangles aligned on a uniform grid 
+\begin{IEEEeqnarray}{c}
+\label{e:grid}
+  \eta\Z^n=\{c\in \R^n\mid \exists_{k\in\Z^n}\forall_{i\in\intcc{1;n}}\; c_i=k_i\eta_i\}
+\end{IEEEeqnarray}
+with \emph{grid parameter} $\eta\in(\R_+\smallsetminus\{0\})^n$, i.e., 
+\begin{IEEEeqnarray}{c}\label{e:abs:ss}
+  x_2\in \bar X_2\implies \exists_{c\in \eta\Z^n}\;x_2=c+\segcc{-\eta/2,\eta/2}.
+\end{IEEEeqnarray}
+{\tt SCOTS} computes symbolic models that are related via feedback
+refinement relations with the plant. A \emph{feedback refinement relation} from
+$S_1$ to $S_2$ is a strict relation $Q\subseteq X_1\times X_2$ that satisfies
+for all $(x_1,x_2)\in Q$ and for all $u\in U_2$ with $F_2(x_2,u)\neq\emptyset$
+the conditions
+\begin{enumerate}
+  \item $F_1(x_1,u)\neq \emptyset$ and
+  \item $Q(F_1(x_1,u))\subseteq F_2(x_2,u)$.
+\end{enumerate}
+In {\tt SCOTS}, the feedback refinement relation $Q$ is given by the set-membership
+relation
+\begin{IEEEeqnarray}{c}
+  Q:=\{ (x_1,x_2) \mid x_1 \in x_2\}.
+\end{IEEEeqnarray}
+Given an invariance (reachability) specification $\Sigma_1$ for $S_1$ associated
+with $I_1,Z_1$, then an \emph{abstract specification} is given by the
+invariance (reachability) specification for $S_2$ associated with 
+\begin{IEEEeqnarray}{c't'c}\label{e:abs:spec}
+  I_2=\{ x_2 \in X_2\mid x_2\cap I_1\neq\emptyset\} & and & Z_2=\{ x_2 \in
+X_2\mid x_2\subseteq  Z_1\}.
+\end{IEEEeqnarray}
+An abstract reach-avoid specification from $I_1,A_1,Z_1$ for $S_2$ follows by
+\begin{IEEEeqnarray}{c't'c}
+  A_2=\{ x_2 \in X_2\mid x_2\cap A_1\neq\emptyset\}
+\end{IEEEeqnarray}
+and $I_2$ and $Z_2$ as defined in~\eqref{e:abs:spec}.
+The algorithms to solve the control problems $(S_2,\Sigma_2)$ implemented in
+{\tt SCOTS} are outlined in Section~\ref{s:theory:alg}.
 
 
+\subsection{Closed Loop} 
 
-\begin{figure} [th]
+The \emph{solution} of a control problem $(S,\Sigma)$ is a \emph{system}  $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
+$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, so that 
+\begin{IEEEeqnarray*}{c}
+  \mathcal{B}(C\times S)\subseteq \Sigma.
+\end{IEEEeqnarray*}
+Here $\mathcal{B}(C\times S)$ denotes the \emph{behavior} of the closed
+loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}. 
+The main statement enabling the symbolic synthesis approach reads as
+follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}.
+
+\emph{Consider two control problems $(S_i,\Sigma_i)$, $i\in\{1,2\}$. Suppose that $Q$
+is a feedback refinement relation from $S_1$ to $S_2$ and $\Sigma_2$ is an
+abstract specification of $\Sigma_1$. If $C$ solves the control problem $(S_2,\Sigma_2)$, then $C\circ
+Q$ solves the control problem $(S_1,\Sigma_1)$.}
+
+The controller $C\circ Q$ for $S_1$ is given by the serial composition of the quantizer
+$Q:X_1\rightrightarrows X_2$ with the controller $C$. 
+The closed loop resulting from a simple system $\Sigma_1$ which represents the $\tau$-sampled
+behavior of~\eqref{e:System:c-time} and a controller $C\circ Q$ is illustrated
+in Fig.~\ref{f:closedloop}. At each $k\in\Z_{\ge0}$ sampling
+time $\tau>0$, the plant state $x_1=\xi(k\tau)$ is measured and fed to the
+quantizer $Q$, which is used to determine a cell $x_2\in X_2$ that contains
+$x_1\in x_2$. Then $x_2$ is fed to the controller $C$ to pick the input $u\in
+U_2\subseteq U_1$ which is applied to~\eqref{e:System:c-time}.
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    [
+    mynode/.style={draw,
+                   thick,
+                   inner sep=.3cm,
+                   minimum width=1cm},
+    %
+    to/.style={->,
+               >=stealth',
+               shorten >=1pt,
+               thick},
+    ]
+
+    \node [mynode] (sys) at (0,0) {$\dot \xi(t)\in f(\xi(t),u)+\segcc{-w,w}$};
+    \node [mynode] (con) at (0,-2.5) {$C$};
+    \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
+
+    %\node [mynode] (dist) at (4,0) {$P$};
+    \node [mynode] (quant) at (4,-1) {$Q$};
+
+    \node at (2.75,0.25) {$\tau$};
+
+
+    \draw [to]  (zoh.north) |-  (sys.west);
+    \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
+
+    \draw[to] (3.5,0) -| node[right] {$x_1$} (quant.north);
+    \draw[to] (quant.south) |- node[above, near end] {$x_1\in x_2$} (con.east);
+
+    \draw[thick] (sys.east) -- (2.75,0);
+    \draw[thick] (2.75,0) -- (3.5,.5);
+    \draw[dashed,thick,bend left,->] (3.1,.5) to (3.1,-.5);
+
+  \end{tikzpicture}
+\caption{Sample-and-hold implementation of a controller synthesized with {\tt SCOTS}.}\label{f:closedloop}
+\end{figure}
+
+%In case that
+%$\Sigma_1$ is an invariance or a reachability specification, the solution $C$ is
+%a \emph{static} system, which means that the state alphabet is a singleton, i.e.,
+%$X_c=\{x_c\}$. The output function 
+%
+%In the simplest
+%case, $C$ is a \emph{static} system, which means $X_c$
+
+Additionally to the perturbations on the right-hand-side
+of~\eqref{e:System:c-time}, it is possible to account for measurement errors
+modeled by a set-valued map $P \colon \mathbb{R}^n \rightrightarrows
+\mathbb{R}^n$ given by
+\begin{IEEEeqnarray}{c't'c}\label{e:perturbation}
+  P(x):=x+\segcc{-z,z} & with & z\in\R_+^n.
+\end{IEEEeqnarray}
+Please see~\cite[Sec.~VI.B]{ReissigWeberRungger15} and~\cite{RunggerZamani16}
+for some background theory.
+The closed loop with measurement errors is illustrated
+in~Fig.~\ref{f:closedloop:pert}.
+\begin{figure}[h]
 \centering
-\begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
-  
+\begin{tikzpicture}
+  [
+  mynode/.style={draw,
+                 thick,
+                 inner sep=.3cm,
+                 minimum width=1cm},
+  %
+  to/.style={->,
+             >=stealth',
+             shorten >=1pt,
+             thick},
+  ]
 
-  \node[state] (1) {1};
-  \node[state,draw=none] (d1) [left of=1] {};
-  \node[state] (2) [right of=1] {2};
-  \node[state] (3) [below of=1] {3};
-  \node[state] (4) [below of=2] {4};
- 
-  \path[->]
-    (d1) edge [swap] node[auto] {} (1)
-    (1) edge [bend left=30] node {a} (2)
-    (2) edge [bend left=30] node {b} (4)
-    (3) edge [bend right=30] node  {b} (2)
-    (4) edge [loop right] node {b} (4)    
-    (1) edge [bend right=30] node {b} (3)
-    (3) edge [bend right=30] node {a} (4);
+  \node [mynode] (sys) at (0,0) {$\dot \xi\in f(\xi,u)+\segcc{-w,w}$};
+  \node [mynode] (con) at (0,-2.5) {$C$};
+
+  \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
+
+  \node [mynode] (dist) at (4,0) {$P$};
+  \node [mynode] (quant) at (4,-1.5) {$Q$};
+
+  \node at (2.25,0.25) {$\tau$};
+
+
+  \draw[thick] (sys.east) -- (2.25,0);
+  \draw[thick] (2.25,0) -- (2.75,.25);
+  \draw[dashed,thick,bend left,->] (2.5,.3) to (2.5,-.3);
+  \draw[thick] (2.75,0) -- (3,0);
+
+  \draw[to] (3,0) -- node[above] {$x_1$} (dist.west);
+  \draw[to] (dist.south) -- node[right] {$x_1'$} (quant.north);
+
+
+  \draw [to]  (zoh.north) |-  (sys.west);
+  \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
+
+  \draw[to] (quant.south) |- node[above, near end] {$x'_1\in x_2$} (con.east);
+
 \end{tikzpicture}
-\caption{example for transition system}\label{f:4s2i}
+\caption{Closed loop with measurement errors modeled by the set-valued map $x'_1 \in P(x_1)$.}\label{f:closedloop:pert}
 \end{figure}
 
-{\color{red} I will explain about the figure example for transition system (figure ~\ref{f:4s2i}) and explain the lists and pre and posts.
+\section{Symbolic Models}
 
-.
+\subsection{Growth Bound and A Priori Enclosure}
+\label{ss:GB} 
 
-.
-}
-Transition system {\tt\small F} regarding the system shown in Figure ~\ref{f:4s2i} will be as 
+The construction of a symbolic model $S_2$ of $S_1$
+is based on the over-approxima\-tion of
+attainable sets. To this end, we use the notion of a growth bound
+introduced in~\cite{ReissigWeberRungger15}.
+A \emph{growth bound} of~\eqref{e:System:c-time} is a function $\beta \colon
+\mathbb{R}_{+}^n \times U' \to \mathbb{R}_{+}^n$, which is defined with respect to a sampling time
+$\tau>0$, a set $K\subseteq \mathbb{R}^n$ and a set $U'\subseteq U$.
+Basically, it provides an upper bound on the deviation of solutions $\xi$
+of~\eqref{e:System:c-time} from \emph{nominal
+solutions}\footnote{A nominal solution $\varphi(\cdot,p,u)$ of
+\eqref{e:System:c-time} is defined as solution of the initial value problem $\dot x=f(x,u)$,
+$x(0)=p$.} $\varphi$ of~\eqref{e:System:c-time}, i.e., for every solution $\xi$ of \eqref{e:System:c-time} on $\intcc{0,\tau}$ with input $u \in U'$ and $\xi(0),p \in K$,
+we have
+\begin{IEEEeqnarray}{c}
+\label{e:growthbound}
+| \xi(\tau) - \varphi(\tau,p,u) | \leq \beta( | \xi(0) - p |, u).
+\end{IEEEeqnarray}
+Here, $|x|$ for $x\in\R^n$, denotes the component-wise absolute value.
+A growth bound can be obtained essentially by bounding
+the Jacobian of $f$. Let
+$L \colon U' \to \mathbb{R}^{n \times n}$ satisfy
+\begin{IEEEeqnarray}{c}\label{e:lipschitz}
+L_{i,j}(u)
+\geq
+\begin{cases}
+D_j f_i(x,u)& \text{if $i=j$,}\\
+| D_j f_i(x,u) |& \text{otherwise}
+\end{cases}
+\end{IEEEeqnarray}
+for all $x\in K'\subseteq \R^n$ and $u\in U'\subseteq U$. Then 
+\begin{IEEEeqnarray}{c}
+\label{e:GrowthBoundComputation}
+\beta(r,u)
+=
+e^{L(u)\tau}
+r
++
+\int_0^\tau
+e^{L(u)s}
+w
+\;\mathrm{d}s,
+\end{IEEEeqnarray}
+is a growth bound on $\intcc{0,\tau}$, $K$, $U'$
+associated with \eqref{e:System:c-time}. The set $K'$ on
+which~\eqref{e:lipschitz} needs to hold, is a so-called \emph{a priori
+enclosure}, i.e., $K'$  is assumed to be convex and contain any
+solution $\xi$ on $\intcc{0,\tau}$ of~\eqref{e:System:c-time} with $u\in U'$ and
+$\xi(0)\in K$,
+see~\cite[Thm.~VIII.5]{ReissigWeberRungger15}. 
+
+In order to use {\tt SCOTS}, the user needs to provide a growth bound, which for
+nonlinear control systems can be provided in terms of the parameterized matrix
+$L(u)$ whose entries satisfy~\eqref{e:lipschitz}. A priori enclosures as well
+as growth bounds can be computed automatically using interval arithmetic based
+ODE solvers. See also Section~\ref{s:usage:abs} for more details on how to
+automatically obtain a priori enclosures and growth bounds.
+%An implementation of such computations using the interval ODE
+%solver {\tt vnodelp} for the aircraft example can be found in the directory
+%\begin{lstlisting}[basicstyle=\small\ttfamily]
+%./examples/aircraft/helper        	
+%\end{lstlisting}
+
+
+\subsection{The Transition Function}
+
+Recall that the state alphabet $X_2$ of the symbolic model $S_2=(X_2,U_2,F_2)$
+is composed of the real quantizer symbols $\bar X_2$, which are cells aligned on a
+uniform grid, and the overflow symbols $X_2\smallsetminus \bar X_2$. For $x_2\in
+X_2\smallsetminus \bar X_2$ the transition function is defined for all $u\in
+U_2$ by
+\begin{IEEEeqnarray}{c}
+  F_2(x_2,u):=\emptyset.
+\end{IEEEeqnarray}
+In order to determine the successors $x_2'\in F_2(x_2,u)$ for 
+$x_2=c+\segcc{-\eta/2,\eta/2}\in \bar X_2$ and $u\in U_2$, we first compute the
+hyper-interval 
+\begin{IEEEeqnarray}{c}\label{e:theory:attainableset}
+  R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2,u),\beta(\eta/2,u)}
+\end{IEEEeqnarray}
+which is an over-approximation of the attainable set of~\eqref{e:System:c-time}
+with respect to the set $c+\segcc{-\eta/2,\eta/2}$ and input $u$.
+If $P$ is not covered by the real quantizer symbols, i.e.,  $R\not\subseteq
+\cup_{x_2\in \bar X_2} x_2$, then we set again 
+\begin{IEEEeqnarray}{c}
+  F_2(x_2,u):=\emptyset.
+\end{IEEEeqnarray}
+Otherwise, we define the successor cells function by
+\begin{IEEEeqnarray}{c}
+x_2'\in F_2(x_2,u):\iff x_2'\cap R\neq\emptyset.
+\end{IEEEeqnarray}
+Using similar arguments as in~\cite[Thm.~VIII.4]{ReissigWeberRungger15}, it is
+straightforward to show that $Q$ is a feedback refinement relation from $S_1$ to
+$S_2$.
+
+If we would like to be robust against measurement errors $P(x)=x+\segcc{-z,z}$,
+we require $Q\circ P$ to be a feedback refinement relation from $S_1$ to $S_2$.
+That is simply achieved by computing $R$ according to
+\begin{IEEEeqnarray}{c}
+  R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2+z,u),\beta(\eta/2+z,u)}
+\end{IEEEeqnarray}
+and defining
+\begin{IEEEeqnarray}{c}
+x_2'\in F_2(x_2,u):\iff (x_2'+\segcc{-z,z})\cap R\neq\emptyset.
+\end{IEEEeqnarray}
+See Section~\ref{s:usage:abs} on how to account for
+measurement errors in {\tt SCOTS} and~\cite[Thm.~III.5]{WeberRunggerReissig17}
+for the theoretical background.
+
+In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver
+to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\tau,u)$,
+see Section~\ref{s:usage:abs} for details.
+
+%of $S_1$, i.e., a simple system which is related via \emph{feedback refinement
+%relation} $Q\subseteq X_1\times X_2$. 
+%
+%The controller synthesis algorithms implemented in {\tt SCOTS} are based on
+%certain finite representations, often termed 
+%\cite{MoorRaisch99}, of
+% continuous control systems. {\tt SCOTS} supports the computation of symbolic
+%models of the $\tau$-sampled behavior of perturbed, 
+
+\section{Synthesis Algorithms}
+\label{s:theory:alg}
+
+\subsection{Invariance}
+
+\subsection{Reachability and Reach-Avoid}
+
+\subsection{Synthesis via Fixed Point Computations}
+\label{ss:fixedpoint}
+For the synthesis of controllers $C$ to enforce reachability, respectively,
+invariance specifications,
+\texttt{SCOTS} provides two fixed point algorithms.
+
+
+Consider $S_2=(X_2,U_2,F_2)$ with $X_2$ finite and $I_2\in X_2$, $Z_2\subseteq
+X_2\times U_2$. For $Y\subseteq X_2\times U_2$, we 
+define the map 
+\begin{IEEEeqnarray}{c}\label{e:pre}
+  \pre(Y):=\{(x_2,u)\in X_2\times U_2\mid  F_2(x_2,u)\neq \emptyset \land
+  F_2(x_2,u)\subseteq\pi_{X_2}(Y)\}.
+\end{IEEEeqnarray}
+where $\pi_{X_2}(Y)$ denotes the projection of $Y$ onto $X_2$.
+
+We compute a controller to enforce a reachability specification $\Sigma_2$
+associated with $I_2,Z_2$, by computing the minimal fixed point of the map
+$Y\mapsto \pre(Y)\cup Z_2$, which we denote by using the usual $\mu$ calculus
+notation~\cite{ArnoldNiwinski01} as
 \begin{IEEEeqnarray*}{c}
-F_2\subseteq \bar X_2\times U_2\times \bar X_2 \\
-F_2 : {(1,a,2),(a,b,3),(2,b,4),(3,b,2),(3,a,4),(4,b,4)}
+  \mu Y. \pre(Y)\cup Z_2.
+\end{IEEEeqnarray*}
+In order to extract a controller, we introduce the function $j:X_2\to\N\cup\{\infty\}$ by
+\begin{IEEEeqnarray*}{c}
+j(x)=\inf\{i\in \N\mid x\in \pi_{X_2}(Y_i)\}
+\end{IEEEeqnarray*}
+where the sets $Y_i$ are recursively given by
+\begin{IEEEeqnarray*}{rCl}
+	Y_0&=&\emptyset\\
+	Y_{i+1}&=&\pre(Y_i)\cup Z_2.
+\end{IEEEeqnarray*}
+Of course we have $Y_i=Y_{i+1}$ implies $Y_i=\mu Y. \pre(Y)\cup Z_2$. Let use define the map
+\begin{IEEEeqnarray}{rCl}\label{e:con:reach}
+	H'_c(x_2)=\big\{u\in U\mid (x_2,u)\in Z_2 \vee ( F_2(x_2,u)\neq \emptyset \land F_2(x_2,u)\subseteq \pi_{X_2}(Y_{j(x_2)-1}))\big\}
+\end{IEEEeqnarray}
+which is non-empty for all $x_2\in \mu Y.\pre(Y)\cup Z_2$.
+We derive a controller as a system
+according to~\cite[Def.~III.1]{ReissigWeberRungger15} (ver.~2) by $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ with 
+\begin{IEEEeqnarray*}{rCl}
+H_c(q,x_2)&=&
+\begin{cases}
+H'_c(x_2)\times \{x_2\} & \text{if } x_2\in \mu Y. \pre(Y)\cup Z_2\\
+U_2\times\{x_2\} & \text{otherwise}
+\end{cases}\\
+F_c(q,x_2)&=&
+\begin{cases}
+\{q\} & \text{if } x_2\in \mu Y. \pre(Y)\cup Z_2\\
+\emptyset &  \text{otherwise}
+\end{cases}
 \end{IEEEeqnarray*}
 
 
-............
-
-.....\\
-Further calculation will be done with help of {\tt\small AbstractionGB} class where the class {\tt\small Transitionsystem} will be used.
-~ \\
-
-
-\subsection{Abstraction Growth Bound}
-~\\
-The class {\tt\small AbstractionGB} which is stored in the file 
-{\tt\small ./src/sparse/AbstractionGB.hh} is mainly implemented to calculate the Abstraction Growth Bound. This class contains the information of the symbolic model $S_2=(X_2,U_2,F_2)$, means basically 
-\begin{itemize}
-\item State Space
-\item Input Space
-\item Transition Function 
-\end{itemize}
-As first step after computing the Transition System and storing it into {\tt\small ts}, then we can produce abstraction by
-
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-scots::AbstractionGB<state_type,input_type> abs(&ss,&is,&ts);
-\end{lstlisting}
-
-{\tt\small ss} and {\tt\small is} has been defined before in subsection ~\ref{ss:Uniform Grid}.
-Then we would continue to compute the Transition Relation by using the function {\tt \small computeTransitionRelation} which is implemented as 
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-template<class F1, class F2, class F3>
-void computeTransitionRelation
-	(	F1 &system_post, F2 &radius_post, F3 &overflow, char* cmd="default")
-
-\end{lstlisting}
- as an practical example for unicycle  example; this function will be used in form of: 
- \begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
- abs.computeTransitionRelation(unicycle_post, radius_post,overflow,"preOnly");
- \end{lstlisting}
- 
-In fact to use the function {\tt\small computeTransitionRelation} you should provide:
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-system_post(x,u) 
-/* computes the center of the hyper rectangle that containes the attainable set */
-radius_post(x,u,z) 
-/* computes the radius of the hyper rectangle containing the attainable set */ 
-overflow(x,r,z)
-/* check if the hyper rectangle with center x, 
-and radius r+z intersects with an overflow symbol */
-\end{lstlisting}
-this could be done with help of ode solver function and providing $\beta$ and $\varphi$ by user. See sections ~\ref{ss:symbolicmodelhh} and ~\ref{ss:GB} for more theoretical detail. {\color{red} here algorithm 1 can be repeated or atleast this part can be explained more}
-
-To get into the detail more; the example of unicycle (available in the path : {\tt\small ./examples/unicycle}) and implementing of ode solver in the scots will be presented in the following:
-
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-/* data types for the state space elements and input space
- * elements used in uniform grid and ode solvers 
- */
-typedef std::array<double,3> state_type;
-typedef std::array<double,2> input_type;
-
-/* forward declaration of the ode solver */
-template<class F>
-void ode_solver(F rhs, state_type &x, input_type &u, size_t nint, double h);
-
-/* we integrate the unicycle ode by 0.3 sec (the result is stored in x)  */
-auto  unicycle_post = [](state_type &x, input_type &u) -> void {
-
-  /* the ode describing the unicycle */
-  auto rhs =[](state_type& xx,  const state_type &x, input_type &u) -> void {
-      xx[0] = u[0]*std::cos(x[2]);
-      xx[1] = u[0]*std::sin(x[2]);
-      xx[2] = u[1];
-  };
-
-  size_t nint=5; /* number of intermediate step size */
-  double h=0.06; /* h* nint = sampling time */
-  ode_solver(rhs,x,u,nint,h);
-};
-
-/* computation of the growth bound (the result is stored in r)  */
-auto radius_post = [](state_type &r, input_type &u) -> void {
-    r[0] = r[0]+r[2]*std::abs(u[0])*0.3;
-    r[1] = r[1]+r[2]*std::abs(u[0])*0.3;
-};
-\end{lstlisting}
-as you see in the code 
-{\tt\small radius\underline{\hspace{.07in}}post } and {\tt\small unicycle\underline{\hspace{.07in}}post } has been implemented by help of ode solver and previously in section  ~\ref{ss:Uniform Grid} the {\tt\small overflow} has been defined; therefore it is possible now to compute the Abstraction Growth Bound and Transition Relations.
-{\color{red} more description is required and should be added}
-~ \\
-\subsection{Input Output I/O}
-~ \\
-{\color{red} I will explain following functions and principle of {\tt\small IO} class . or maybe just briefly}
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-/* function:  readDimensionFromFile
-   * a function to read the dimension of the uniform grid from file */
-  /* function:  readMembersFromFile
-   * a function to read the uniform grid data from file */
-    /* parameters are only read from lines that start with
-     * '#key' */
-     /* function: writeToFile()
-   * ts: TransitionSystem
-  /* function: writeToFile()
-   * gs: UniformGrid */
-    /* function: writeControllerToFile()  (only save the graph)
-   * gg: Game
-   * filename: name of file */
-    /* function: writeControllerToFile()  (save the graph and grid points)
-   * ss,is: UniformGrid
-   * gg: Game
-   * filename: name of file */
-     /* function: readFromFile()
-   * ts: TransitionSystem
-   * filename: name of file */
-     /* read the dimension  from file */
-    /* read others (controller and ...)  from file */
-\end{lstlisting}
+Similarly, if
+$\Sigma_2$ is an invariance specification associated with $I_2,Z_2$, we compute the maximal fixed point of $Y\mapsto \pre(Y)\cap Z_2$, which is denoted by
+\begin{IEEEeqnarray*}{c}
+  \nu Y. \pre(Y)\cap Z_2.
+\end{IEEEeqnarray*}
+Given $\nu Y. \pre(Y)\cap Z_2$ we define the map
+\begin{IEEEeqnarray}{rCl}\label{e:con:inv}
+	H'_c(x_2)=\big\{u\in U\mid F_2(x_2,u)\neq \emptyset \land F_2(x_2,u)\subseteq \pi_{X_2}(\nu Y. \pre(Y)\cap Z_2)\big\}.
+\end{IEEEeqnarray}
+and the controller 
+according to~\cite[Def.~III.1]{ReissigWeberRungger15} (ver.~2) follows again by
+\begin{IEEEeqnarray*}{rCl}
+H_c(q,x_2)&=&
+\begin{cases}
+H'_c(x_2)\times \{x_2\} & \text{if } x_2\in \nu Y. \pre(Y)\cap Z_2\\
+U_2\times\{x_2\} & \text{otherwise}
+\end{cases}\\
+F_c(q,x_2)&=&
+\begin{cases}
+\{q\} & \text{if } x_2\in \nu Y. \pre(Y)\cap Z_2\\
+\emptyset &  \text{otherwise}
+\end{cases}
+\end{IEEEeqnarray*}
+In either case, it is well known~\cite{Tabuada09} that $C$ solves the control problem
+$(S_2,\Sigma_2)$ with $\Sigma_2$ being a reachability (invariance)
+specification iff $I_2\subseteq \pi_{X_2}(\mu Y.\pre(Y)\cup Z_2)$  ($I_2\subseteq \pi_{X_2}(\nu Y.\pre(Y)\cap Z_2)$).
+Also for both types of specifications the controller is \emph{memoryless} or
+\emph{static}, i.e., the output is independent of the state.
 
 
 
-\subsection{Other Classes}
-~ \\
-{\tt\small TicToc} is a class to measure elapsed time based on {\tt\small std::chrono} library. Following code shows an example how to use them.
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
-TicToc tt;
-tt.tic();   /* start */
-/* desired process code */
-tt.toc();   /* stop */
-
-\end{lstlisting}
-
-
-
-
-
-
-
-
-
-
-
-{\color{red} It is going on :P }
-
-%\part{THEORETICAL BACKGROUND}
-%
-%\section{Systems, Composition, Closed Loop}
-%
-%\section{}
 
 
 \newpage
+\part{DATA STRUCTURES AND IMPLEMENTATION}
 
+\section{TransitionSystem.hh}
+
+\section{AbstractionGB.hh}
+
+\section{MultDimIndexSet.hh}
+
+\newpage
+
+\addtocontents{toc}{\setcounter{tocdepth}{0}}
 \printbibliography
 
 \end{document}
