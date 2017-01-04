@@ -26,6 +26,14 @@
 /* time profiling */
 #include "TicToc.hh"
 
+/* memory profiling */
+#include <sys/time.h>
+#include <sys/resource.h>
+
+struct rusage usage;
+
+
+
 /* ode solver */
 #include "RungeKutta4.hh"
 
@@ -134,8 +142,14 @@ int main() {
 
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
   tt.toc();
+
+  if(0 == getrusage(RUSAGE_SELF, &usage))
+    std::cout << "rusage: " << usage.ru_maxrss << std::endl;
+
+
   /* define target set */
-  auto target = [&](const size_t idx)->bool {
+  state_type x;
+  auto target = [&](const size_t idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
     if(  63 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 75 &&
@@ -147,7 +161,6 @@ int main() {
     return false;
   };
 
-  return 0;
 
   tt.tic();
 

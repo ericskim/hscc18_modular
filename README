@@ -1,0 +1,42 @@
+
+Welcome to SCOTS - an open source software tool to compute discrete abstractions
+and symbolic controllers!
+
+Please consult the manual in ./manual/manual.pdf for installation instructions,
+usage description and background information.
+
+
+REQUIREMENTS:
+
+- The basic implementation of SCOTS is header only. Hence, only a working C++ compiler
+  with C++11 support is needed.
+
+  Have a look in for some examples and compiler options:
+
+  ./examples/dcdc/readme
+  ./examples/vehicle/readme
+
+
+OPTIONAL:
+
+- MATLAB: For closed loop simulation and visualization options
+
+  To compile the mex files, first setup the mex compiler with the MATLAB command
+
+  >> mex -setup C++
+
+  Then, in a terminal, navigate to ./mfiles/mexfiles
+  
+  - for the compilation of mexStaticController.mex 
+
+    1) edit the MATLABPATH in the makefile 
+    2) run in the terminal
+
+    $ make controller
+
+  - for the compilation of mexSymbolicSet.mex you need to 
+  - on a terminal naviaget to ./  file, navigate to 
+
+- MATLAB 
+  For closed loop simulation and visualization options
+

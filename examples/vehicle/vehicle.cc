@@ -38,14 +38,25 @@ const int input_dim=2;
 /* sampling time */
 const double tau = 0.3;
 
+/* memory profiling */
+#include <sys/time.h>
+#include <sys/resource.h>
+
+struct rusage usage;
+
+// resident size is in t_info.resident_size;
+// virtual size is in t_info.virtual_size;
 
 /*
  * data types for the state space elements and input space
  * elements used in uniform grid and ode solvers
  *
  */
-typedef std::array<double,state_dim> state_type;
-typedef std::array<double,input_dim> input_type;
+using state_type = std::array<double,state_dim>;
+using input_type = std::array<double,input_dim>;
+
+using abs_type = scots::abs_type;
+
 
 /* we integrate the vehicle ode by 0.3 sec (the result is stored in x)  */
 auto  vehicle_post = [](state_type &x, const input_type &u) {
@@ -63,8 +74,8 @@ auto  vehicle_post = [](state_type &x, const input_type &u) {
 /* we integrate the growth bound by 0.3 sec (the result is stored in r)  */
 auto radius_post = [](state_type &r, const state_type &, const input_type &u) {
   double c = std::abs(u[0])*std::sqrt(std::tan(u[1])*std::tan(u[1])/4.0+1);
-  r[0] = r[0]+c*r[2]*tau+1e-16;
-  r[1] = r[1]+c*r[2]*tau+1e-16;
+  r[0] = r[0]+c*r[2]*tau;
+  r[1] = r[1]+c*r[2]*tau;
 };
 
 int main() {
@@ -81,7 +92,7 @@ int main() {
   /* upper bounds of the hyper rectangle */
   state_type ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
-  state_type eta={{.1,.1,.2}};
+  state_type eta={{.2,.2,.2}};
   scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.printInfo(1);
@@ -120,9 +131,8 @@ int main() {
 
   /* overflow function returns 1 if x \in overflow symbol  */
   state_type x;
-  //auto overflow = [&](const size_t idx) {
-  auto overflow = [&](const state_type &x) {
-    //ss.itox(idx,x);
+  auto overflow = [&](const size_t idx) {
+    ss.itox(idx,x);
     double c1= eta[0]/2.0;
     double c2= eta[1]/2.0;
     for(size_t i=0; i<15; i++) {
@@ -135,13 +145,19 @@ int main() {
   /* transition system to be computed */
   scots::TransitionSystem ts;
 
+
+  std::cout << "\nComputing the abstraction: " << std::endl;
   tt.tic();
   scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
 
   abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
+ // abs.computeTransitionRelation(vehicle_post, radius_post);
 
   std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
   tt.toc();
+
+  if(!getrusage(RUSAGE_SELF, &usage))
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)ts.getNoTransitions() << std::endl;
 
   /* define target set */
   auto target = [&](size_t idx) {
@@ -153,12 +169,12 @@ int main() {
     return false;
   };
 
+  std::cout << "\nController synthesis: " << std::endl;
   scots::ReachabilityGame reach(ts);
   tt.tic();
-  std::cout << "Solve game " << std::endl;
   reach.solve(target);
   tt.toc();
-  std::cout << "Size: " << reach.size() << std::endl;
+  std::cout << "Domain size: " << reach.size() << std::endl;
 
   return 1;
 }

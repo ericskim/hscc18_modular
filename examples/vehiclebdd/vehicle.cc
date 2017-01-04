@@ -20,6 +20,11 @@
 
 /* time profiling */
 #include "TicToc.hh"
+/* memory profiling */
+#include <sys/time.h>
+#include <sys/resource.h>
+
+
 
 /* ode solver */
 #include "RungeKutta4.hh"
@@ -72,6 +77,8 @@ void vehicleCreateObstacles(scots::SymbolicSet &obs);
 
 
 int main() {
+  /* to measure memory usage */
+  struct rusage usage;
   /* to measure time */
   TicToc tt;
   /* there is one unique manager to organize the bdd variables */
@@ -122,12 +129,18 @@ int main() {
   /* instantiate the SymbolicModel */
   scots::SymbolicModelGrowthBound<state_type,input_type> abstraction(&ss, &is, &sspost);
   /* compute the transition relation */
+  std::cout << "\nComputing the abstraction: " << std::endl;
   tt.tic();
   abstraction.computeTransitionRelation(vehicle_post, radius_post);
   std::cout << std::endl;
-  tt.toc();
   /* get the number of elements in the transition relation */
-  std::cout << std::endl << "Number of elements in the transition relation: " << abstraction.getSize() << std::endl;
+  std::cout << std::endl << "Number of transitions: " << abstraction.getSize() << std::endl;
+  tt.toc();
+
+  if(!getrusage(RUSAGE_SELF, &usage))
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)abstraction.getSize() << std::endl;
+
+
 
   /****************************************************************************/
   /* we continue with the controller synthesis */

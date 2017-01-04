@@ -55,7 +55,7 @@ private:
    * the binary decision diagram manager */
 	Cudd *ddmgr_;
   /* var: dim_ 
-   * dimension of the real space */
+   * dimension of the Eucledian space */
   size_t dim_;
   /* var: eta_
    * dim_-dimensional vector containing the grid node distances */

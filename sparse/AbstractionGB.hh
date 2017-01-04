@@ -58,7 +58,7 @@ AbstractionGB(const UniformGrid<state_type>& stateSpace,
  */
 template<class F1, class F2>
 void computeTransitionRelation(F1& system_post, F2& radius_post) {
-  computeTransitionRelation(system_post, radius_post, [](const state_type&, const state_type&) noexcept {return false;});
+  computeTransitionRelation(system_post, radius_post, [](const abs_type&) noexcept {return false;});
 }
 
 template<class F1, class F2, class F3>
@@ -111,18 +111,17 @@ void computeTransitionRelation(F1& system_post, F2& radius_post, F3&& overflow) 
     /* loop over all inputs */
     for(size_t j=0; j<M; j++) {
       outOfDomain[i*M+j]=false;
-      /* cell radius (including measurement errors) */
-      for(int k=0; k<dim; k++)
-        r[k]=eta[k]/2.0+z[k];
-      /* get center x of cell */
-      stateSpace_.itox(i,x);
-      /* is x an element of the overflow symbols ? */
-      if(!j & overflow(x)) {
-      //if(!j & overflow(i)) {
+      /* is i an element of the overflow symbols ? */
+      if(!j & overflow(i)) {
         for(size_t j=0; j<M; j++)
           outOfDomain[i*M+j]=true;
         break;
       }
+      /* get center x of cell */
+      stateSpace_.itox(i,x);
+      /* cell radius (including measurement errors) */
+      for(int k=0; k<dim; k++)
+        r[k]=eta[k]/2.0+z[k];
       /* current input */
       inputSpace_.itox(j,u);
       /* integrate system and radius growth bound */

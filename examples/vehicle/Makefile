@@ -3,7 +3,7 @@
 #
 #CC        = g++
 CC       	  = clang++
-CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3  
+CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3 
 CXXDEBUG		= -g -Wall -Wextra -std=c++11
 
 
@@ -28,4 +28,4 @@ debug:
 
 
 clean:
-	rm vehicle  *.o
+	rm vehicle 
