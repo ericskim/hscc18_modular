@@ -26,15 +26,12 @@ VNODELPLIB = -L$(SCOTSROOT)/external/vnodelp/lib \
 
 LIBS = -lvnode -lProfil -lBias -llr
 
-TARGET = comp_enclosure comp_enclosure_per_input test
+TARGET = comp_enclosure comp_enclosure_per_input 
 
 all: $(TARGET)
 
 %.o: %.cc
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(VNODELPINC) -c -o $@ $<
-
-test:  test.o
-	$(CC) $(LDFLAGS) -o test  test.o $(VNODELPLIB) $(LIBS) 
 
 comp_enclosure:  comp_enclosure.o
 	$(CC) $(LDFLAGS) -o comp_enclosure  comp_enclosure.o $(VNODELPLIB) $(LIBS) 

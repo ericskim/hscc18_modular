@@ -97,34 +97,30 @@ void solve(F &safe) {
         }
       }
     }
-    if(!no_val_in[i] && !added[i]) {
+    if(!no_val_in[i]) {
       fifo.push(i);
       added[i]=true;
     }
   }
   while(!fifo.empty()) {
-    abs_type length=fifo.size();
-    /* loop over all the unsafe states found in the previous loop */
-    for(abs_type count=0; count<length; count++) {
-      abs_type k=fifo.front();
-      fifo.pop();
-      /* loop over all inputs */
-      for(abs_type j=0; j<M_; j++) {
-        /* loop over all pre states of (k,j) */
-        for(abs_type p=0; p<ts_.noPre_[k*M_+j]; p++) {
-          /* (i,j,k) is a transition */
-          abs_type i=ts_.pre_[ts_.prePointer_[k*M_+j]+p];
-          /* check if input j at state i is considered safe */
-          if(domain_[i*M_+j]) {
-            /* set source states i with label j as unsafe pair */
-            domain_[i*M_+j]=false;
-            no_val_in[i]--;
-          }
-          /* add to unsafe set if state i has no more valid inputs */
-          if(!no_val_in[i] && !added[i]) {
-            fifo.push(i);
-            added[i]=true;
-          }
+    abs_type k=fifo.front();
+    fifo.pop();
+    /* loop over all inputs */
+    for(abs_type j=0; j<M_; j++) {
+      /* loop over all pre states of (k,j) */
+      for(abs_type p=0; p<ts_.noPre_[k*M_+j]; p++) {
+        /* (i,j,k) is a transition */
+        abs_type i=ts_.pre_[ts_.prePointer_[k*M_+j]+p];
+        /* check if input j at state i is considered safe */
+        if(domain_[i*M_+j]) {
+          /* set source states i with label j as unsafe pair */
+          domain_[i*M_+j]=false;
+          no_val_in[i]--;
+        }
+        /* add to unsafe set if state i has no more valid inputs */
+        if(!no_val_in[i] && !added[i]) {
+          fifo.push(i);
+          added[i]=true;
         }
       }
     }

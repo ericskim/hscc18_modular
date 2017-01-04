@@ -276,6 +276,7 @@ For various reasons, you might consider to use additional software in combinatio
 
 
 \subsection{Additional software} 
+\label{s:installation:cudd}
 \begin{enumerate}
 
 
@@ -303,7 +304,7 @@ For various reasons, you might consider to use additional software in combinatio
   copied them to {\tt \small CUDDPATH/include}.
 
 
-  \item MATLAB: For closed loop simulation and visualization options.\\
+  \item MATLAB: for closed loop simulation and visualization options.\\
 	See \url{http://www.mathworks.com} for installation instructions.
 
 	If you want to access the BDD files from the MATLAB workspace you need to compile 
@@ -437,8 +438,7 @@ int main() {
     In this case, even though, {\tt\small nset} and {\tt\small sset} have the
     same domain $\segcc{a,b}\subseteq\R^n$ and grid parameter
     $\eta\in\R^n_{>0}$, the {\tt\small BDD} variable {\tt\small id}s are
-    different and therefore, both instances {\tt\small nset} and {\tt\small
-    sset} have a different abstract domain. 
+    different and therefore, both instances {\tt\small nset} and {\tt\small sset} have a different abstract domain. 
     This instantiation method, is useful
     when it comes to the computation of the symbolic model, see
     Sec.~\ref{ss:symbolicmodelhh}.
@@ -1258,9 +1258,9 @@ we specify that $0.7$ and $0.75$ correspond to the third, respectively, first co
 %\subsection{Fixed Point Computations}
 
 \newpage
-\part{THEORY BACKGROUND}
+\part{THEORY BASICS}
 
-\section{Symbolic Controller Synthesis Basics}
+\section{The Symbolic Approach to Controller Synthesis}
 For a detailed description, please see~\cite{ReissigWeberRungger15}. 
 \subsection{Control Problems} 
 {\tt SCOTS} supports the computation of
@@ -1282,7 +1282,7 @@ as an absolutely continuous function \mbox{$\xi \colon \intcc{0,\tau}
 
 
 The desired behavior of the closed loop is defined with respect to the
-$\tau$-sampled behavior of the continuous-time systems~\eqref{e:System:c-time}.
+$\tau$-samp\-led behavior of the continuous-time systems~\eqref{e:System:c-time}.
 To this end, the sampled behavior of~\eqref{e:System:c-time} is casted as
 \emph{simple system}~\cite{ReissigWeberRungger15} 
 \begin{IEEEeqnarray}{c}
@@ -1306,6 +1306,17 @@ simply a set
 of possibly finite and infinite input-state sequences.
 A simple system $S_1$ together with a specification $\Sigma_1$ constitute an
 \emph{control problem} $(S_1,\Sigma_1)$.
+
+The \emph{solution} of a control problem $(S_1,\Sigma_1)$ is a \emph{system}  $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
+$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, so that 
+\begin{IEEEeqnarray*}{c}
+  \mathcal{B}(C\times S_1)\subseteq \Sigma_1.
+\end{IEEEeqnarray*}
+Here $\mathcal{B}(C\times S_1)$ denotes the \emph{behavior} of the closed
+loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}. A block diagram
+of the feedback composition of a controller synthesized with {\tt SCOTS} and the
+system $S_1$ is illustrated in Fig.~\ref{f:closedloop}.
+
 
 \subsection{Supported Specifications}
 {\tt SCOTS} natively supports 
@@ -1395,17 +1406,8 @@ The algorithms to solve the control problems $(S_2,\Sigma_2)$ implemented in
 {\tt SCOTS} are outlined in Section~\ref{s:theory:alg}.
 
 
-\subsection{Closed Loop} 
-
-The \emph{solution} of a control problem $(S,\Sigma)$ is a \emph{system}  $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
-$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, so that 
-\begin{IEEEeqnarray*}{c}
-  \mathcal{B}(C\times S)\subseteq \Sigma.
-\end{IEEEeqnarray*}
-Here $\mathcal{B}(C\times S)$ denotes the \emph{behavior} of the closed
-loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}. 
-The main statement enabling the symbolic synthesis approach reads as
-follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}.
+\subsection{Closed Loop} The main statement enabling the symbolic synthesis approach reads as
+follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}:
 
 \emph{Consider two control problems $(S_i,\Sigma_i)$, $i\in\{1,2\}$. Suppose that $Q$
 is a feedback refinement relation from $S_1$ to $S_2$ and $\Sigma_2$ is an
@@ -1523,15 +1525,15 @@ in~Fig.~\ref{f:closedloop:pert}.
 \caption{Closed loop with measurement errors modeled by the set-valued map $x'_1 \in P(x_1)$.}\label{f:closedloop:pert}
 \end{figure}
 
-\section{Symbolic Models}
+\section{Construction of Symbolic Models}
 
 \subsection{Growth Bound and A Priori Enclosure}
 \label{ss:GB} 
 
 The construction of a symbolic model $S_2$ of $S_1$
 is based on the over-approxima\-tion of
-attainable sets. To this end, we use the notion of a growth bound
-introduced in~\cite{ReissigWeberRungger15}.
+attainable sets. In {\tt SCOTS}, the over-approximation of the attainable sets
+is based on a so-called growth bound~\cite{ReissigWeberRungger15}.
 A \emph{growth bound} of~\eqref{e:System:c-time} is a function $\beta \colon
 \mathbb{R}_{+}^n \times U' \to \mathbb{R}_{+}^n$, which is defined with respect to a sampling time
 $\tau>0$, a set $K\subseteq \mathbb{R}^n$ and a set $U'\subseteq U$.
@@ -1582,7 +1584,7 @@ In order to use {\tt SCOTS}, the user needs to provide a growth bound, which for
 nonlinear control systems can be provided in terms of the parameterized matrix
 $L(u)$ whose entries satisfy~\eqref{e:lipschitz}. A priori enclosures as well
 as growth bounds can be computed automatically using interval arithmetic based
-ODE solvers. See also Section~\ref{s:usage:abs} for more details on how to
+ODE solvers. See Section~\ref{s:usage:abs} for more details on how to
 automatically obtain a priori enclosures and growth bounds.
 %An implementation of such computations using the interval ODE
 %solver {\tt vnodelp} for the aircraft example can be found in the directory
@@ -1610,35 +1612,35 @@ hyper-interval
 which is an over-approximation of the attainable set of~\eqref{e:System:c-time}
 with respect to the set $c+\segcc{-\eta/2,\eta/2}$ and input $u$.
 If $P$ is not covered by the real quantizer symbols, i.e.,  $R\not\subseteq
-\cup_{x_2\in \bar X_2} x_2$, then we set again 
+\cup_{x_2\in \bar X_2} x_2$, then we define
 \begin{IEEEeqnarray}{c}
   F_2(x_2,u):=\emptyset.
 \end{IEEEeqnarray}
 Otherwise, we define the successor cells function by
-\begin{IEEEeqnarray}{c}
+\begin{IEEEeqnarray}{c}\label{e:theory:tf3}
 x_2'\in F_2(x_2,u):\iff x_2'\cap R\neq\emptyset.
 \end{IEEEeqnarray}
 Using similar arguments as in~\cite[Thm.~VIII.4]{ReissigWeberRungger15}, it is
 straightforward to show that $Q$ is a feedback refinement relation from $S_1$ to
 $S_2$.
 
-If we would like to be robust against measurement errors $P(x)=x+\segcc{-z,z}$,
-we require $Q\circ P$ to be a feedback refinement relation from $S_1$ to $S_2$.
-That is simply achieved by computing $R$ according to
+If we need to be robust against measurement errors $P(x)=x+\segcc{-z,z}$, we
+slightly modify the computation of $R$ to 
 \begin{IEEEeqnarray}{c}
   R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2+z,u),\beta(\eta/2+z,u)}
 \end{IEEEeqnarray}
-and defining
+and define the transition function to (instead of~\ref{e:theory:tf3})
 \begin{IEEEeqnarray}{c}
 x_2'\in F_2(x_2,u):\iff (x_2'+\segcc{-z,z})\cap R\neq\emptyset.
 \end{IEEEeqnarray}
-See Section~\ref{s:usage:abs} on how to account for
-measurement errors in {\tt SCOTS} and~\cite[Thm.~III.5]{WeberRunggerReissig17}
-for the theoretical background.
+As a result we obtain that $Q\circ P$ is a feedback refinement relation from
+$S_1$ to $S_2$, see~\cite[Thm.~III.5]{WeberRunggerReissig17}, which enables the
+correct controller refinement under measurement errors~\cite[Sec.~VI.B]{ReissigWeberRungger15}. The use of the
+perturbation parameter $z\in\R_{>0}^n$ in {\tt SCOTS} is explained in detail in 
+Section~\ref{s:usage:abs}.
 
 In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver
-to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\tau,u)$,
-see Section~\ref{s:usage:abs} for details.
+to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 
 %of $S_1$, i.e., a simple system which is related via \emph{feedback refinement
 %relation} $Q\subseteq X_1\times X_2$. 
@@ -1649,10 +1651,79 @@ see Section~\ref{s:usage:abs} for details.
 % continuous control systems. {\tt SCOTS} supports the computation of symbolic
 %models of the $\tau$-sampled behavior of perturbed, 
 
-\section{Synthesis Algorithms}
+\section{Controller Synthesis}
 \label{s:theory:alg}
 
 \subsection{Invariance}
+
+Let $\Sigma_2$ be an invariance specification associated with $I_2$ and $Z_2$. 
+We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
+solveInvarianceGame} in the file {\tt GameSolver.hh}, to synthesize a controller
+that solves the control problem $(S_2,\Sigma_2)$.  In the algorithm we use 
+\begin{IEEEeqnarray}{c}
+U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}
+\end{IEEEeqnarray}
+to denote the set of \emph{admissible controls} at $x_2$. The
+projection of a set
+$D\subseteq X_2\times U_2$ onto $X_2$ is denoted by $\pi_{X_2}(D)$.
+
+\begin{algorithm}[h]
+\caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
+  \begin{algorithmic}[1]
+    \Require{$Z_2$, $S_2=(X_2,U_2,F_2)$}
+    \State $Q:=\emptyset$ \Comment{\small active queue of bad states} 
+    \State $E:=\emptyset$ \Comment{\small bookkeeping of the added states} 
+    \State $D:=\emptyset$ \Comment{\small safe state-input pairs/domain of controller}
+    \ForAll{$x_2\in \bar X_2$}
+    \If{$x_2\not\in Z_2$ or $U_2(x_2)=\emptyset$}
+    \Comment{\small initially mark all states outside of $Z_2$ or blocking states as bad}
+    \State $Q:=Q\cup \{x_2\}$
+    \Else 
+    \State $D:=D\cup (\{x_2\}\times U_2(x_2))$ 
+    \EndIf
+    \EndFor
+    \State $E:=Q$
+    \While{ $Q\neq\emptyset$ }
+    \State $x'_2:\in Q$
+    \State $Q:=Q\smallsetminus \{x_2'\}$
+    \ForAll{$(x_2,u)\in D \cap F_2^{-1}(x_2')$}
+    \State $D:=D\smallsetminus \{(x_2,u)\}$
+    \Comment{\small remove state-input pairs that lead to bad states}
+    \If{$x_2\in \pi_{X_2}(D)$ and $x_2\not\in E$}
+    \Comment{\small no valid input left and not already marked bad}
+    \State $Q:=Q\cup\{x_2\}$
+    \Comment{\small add to queue of bad}
+    \State $E:=E\cup\{x_2\}$
+    \EndIf
+    \EndFor
+    \EndWhile
+  \end{algorithmic}
+
+\end{algorithm}
+
+Let $D\subseteq X_2\times U_2$ be the set of state-input pairs computed in
+Alg.~\ref{a:safety}. One can show that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $I_2\subseteq \pi_{X_2}(D)$. Moreover, since each state is added to the queue
+  of bad states $Q$ at most once, it is easy to see that the algorithm runs in
+  $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
+  triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$.
+
+Suppose that $I_2\subseteq \pi_{X_2}(D)$ holds. 
+Let $D(x_2):=\{u\in U_2\mid (x_2,u)\in D$, then we obtain a controller
+$C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
+that solves $(S_2,\Sigma_2)$ by  
+\begin{IEEEeqnarray*}{rCl}
+H_c(q,x_2)&=&
+\begin{cases}
+D(x_2)\times \{x_2\} & \text{if } x_2\in \pi_{X_2}(D)\\
+U_2\times\{x_2\} & \text{otherwise}
+\end{cases}\\
+F_c(q,x_2)&=&
+\begin{cases}
+\{q\} & \text{if } x_2\in \pi_{X_2}(D)\\
+\emptyset &  \text{otherwise}
+\end{cases}
+\end{IEEEeqnarray*}
 
 \subsection{Reachability and Reach-Avoid}
 
