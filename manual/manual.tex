@@ -2,6 +2,7 @@
 
 \usepackage{a4wide} %A4 paper border
 
+
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 
@@ -125,6 +126,16 @@ backend=biber
 \addbibresource{refs.bib}
 %\renewcommand*{\bibfont}{\small}
 
+%\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{fact}{Fact}
+\newtheorem{proposition}{Proposition}
+
 
 
 %% custom commands 
@@ -152,6 +163,7 @@ backend=biber
 \newcommand{\pre}{{\mathrm{pre}}}
 \newcommand{\co}{{\mathrm{co}}}
 \renewcommand{\emptyset}{{\varnothing}}
+\DeclareMathOperator*{\argmin}{argmin} 
 %% end: some math stuff
 
 
@@ -365,7 +377,21 @@ For various reasons, you might consider to use additional software in combinatio
 
 \section{Invariance and Reachability Specifications}
 
-%\section{Closed Loop Simulation}
+\section{Closed Loop Simulation}
+\label{s:usage:simulation}
+The
+function {\tt StaticController::control} takes as input a state $x_1\in X_1$ and
+rounds it to the nearest grid point in $\eta\Z$ in order to determine a
+symbolic state $x_2\in Q(x_1)$. If there does not exist a valid input $u\in U_2$
+associated with $x_2$, i.e., $x_2\not\in \pi_{X_2}(D)$, then the
+$F_c(q,x_2)=\emptyset$ and function returns the error message
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+scots::StaticController::control: no progress possible at state <values> 
+\end{lstlisting}
+Otherwise, {\tt StaticController::control} returns the set of valid control
+inputs.
+
+
 
 \section{Writing To and Reading From Hard Disk}
 
@@ -1266,8 +1292,13 @@ we specify that $0.7$ and $0.75$ correspond to the third, respectively, first co
 \newpage
 \part{THEORY BASICS}
 
-\section{The Symbolic Approach to Controller Synthesis}
-For a detailed description, please see~\cite{ReissigWeberRungger15}. 
+\section{The Symbolic Approach}
+A detailed description of \emph{the symbolic approach to controller synthesis}
+that is implemented in {\tt SCOTS} is presented in~\cite{ReissigWeberRungger15}.
+The article~\cite{ReissigWeberRungger15} contains also a detailed explanation of
+the notation that we use in the following text.
+
+
 \subsection{Control Problems} 
 {\tt SCOTS} supports the computation of
 controllers for  
@@ -1306,20 +1337,27 @@ simply a set
 \begin{IEEEeqnarray}{c}
   \Sigma_1
 	\subseteq
-  \bigcup_{T\in \Z_{\ge0}\cup \{\infty\}}
-  (U_1\times X_1)^{\intco{0;T}} =: (U_1\times X_1)^\infty
+  (U_1\times X_1)^\infty 
+  :=
+  \bigcup_{T\in \Z_{\ge0}\cup \{\infty\}} (U_1\times X_1)^{\intco{0;T}} 
 \end{IEEEeqnarray}
 of possibly finite and infinite input-state sequences.
 A simple system $S_1$ together with a specification $\Sigma_1$ constitute an
 \emph{control problem} $(S_1,\Sigma_1)$.
 
-The \emph{solution} of a control problem $(S_1,\Sigma_1)$ is a \emph{system}  $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
-$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, so that 
+The \emph{solution} of a control problem $(S_1,\Sigma_1)$ is a \emph{system} $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
+$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, and satisfies
 \begin{IEEEeqnarray*}{c}
   \mathcal{B}(C\times S_1)\subseteq \Sigma_1.
 \end{IEEEeqnarray*}
-Here $\mathcal{B}(C\times S_1)$ denotes the \emph{behavior} of the closed
-loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}. A block diagram
+In this context $C$ and $C\times S_1$ are usually referred to as
+\emph{controller}, respectively, \emph{closed loop}.
+The symbol $\mathcal{B}(C\times S_1)$ denotes the \emph{behavior} of the closed
+loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}.
+We say that a control problem $(S_1,\Sigma_1)$ is \emph{solvable} iff there
+exists a system $C$ that solves $(S_1,\Sigma_1)$.
+
+A block diagram
 of the feedback composition of a controller synthesized with {\tt SCOTS} and the
 system $S_1$ is illustrated in Fig.~\ref{f:closedloop}.
 
@@ -1412,7 +1450,8 @@ The algorithms to solve the control problems $(S_2,\Sigma_2)$ implemented in
 {\tt SCOTS} are outlined in Section~\ref{s:theory:alg}.
 
 
-\subsection{Closed Loop} The main statement enabling the symbolic synthesis approach reads as
+\subsection{Closed Loop} The main statement facilitating the use of an auxiliary
+control problem reads as
 follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}:
 
 \emph{Consider two control problems $(S_i,\Sigma_i)$, $i\in\{1,2\}$. Suppose that $Q$
@@ -1660,29 +1699,37 @@ to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 \section{Controller Synthesis}
 \label{s:theory:alg}
 
+We discuss the algorithms that are implemented in {\tt SCOTS} to
+solve synthesis problems for the finite symbolic model $S_2=(X_2,U_2,F_2)$. 
+We need the following notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
+\begin{IEEEeqnarray}{c}
+U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
+\end{IEEEeqnarray}
+We use the Weierstrass symbol $\wp$ to denote the power set and introduce $\pre:\wp(X_2)\to \wp(X_2)$ by
+\begin{IEEEeqnarray}{c}\label{e:pre}
+  \pre(Y):=\{x_2\in X_2\mid  \exists_{u\in U_{S_2}(x_2)}:\;F_2(x_2,u)\subseteq Y\}.
+\end{IEEEeqnarray}
+
 \subsection{Invariance}
 
 Let $\Sigma_2$ be an invariance specification associated with $I_2$ and $Z_2$. 
 We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
 solveInvarianceGame} in the file {\tt GameSolver.hh}, to synthesize a controller
-that solves the control problem $(S_2,\Sigma_2)$.  We use the following
-notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
-\begin{IEEEeqnarray}{c}
-U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
-\end{IEEEeqnarray}
-The projection of a set
-$D\subseteq X_2\times U_2$ onto $X_2$ is denoted by $\pi_{X_2}(D)$.
+that solves the control problem $(S_2,\Sigma_2)$.  
+Alg.~\ref{a:safety} runs in $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
+triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$, since each state is added to the queue
+of bad states $Q$ at most once.
 
 \begin{algorithm}[h]
 \caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
   \begin{algorithmic}[1]
     \Input{$Z_2$, $S_2=(X_2,U_2,F_2)$}
-    \State $Q:=\emptyset$ \Comment{\small active queue of bad states} 
-    \State $E:=\emptyset$ \Comment{\small bookkeeping of the added states} 
-    \State $D:=\emptyset$ \Comment{\small safe state-input pairs/domain of controller}
+    \State $Q:=\emptyset$ \Comment{ FIFO queue of bad states} 
+    \State $E:=\emptyset$ \Comment{ bookkeeping of the bad states} 
+    \State $D:=\emptyset$ \Comment{ valid state-input pairs}
     \ForAll{$x_2\in \bar X_2$}
     \If{$x_2\not\in Z_2$ or $U_2(x_2)=\emptyset$}
-    \Comment{\small initially mark all states outside of $Z_2$ or blocking states as bad}
+    \Comment{ mark all states outside $Z_2$ or blocking states as bad}
     \State $Q:=Q\cup \{x_2\}$
     \Else 
     \State $D:=D\cup (\{x_2\}\times U_2(x_2))$ 
@@ -1690,16 +1737,16 @@ $D\subseteq X_2\times U_2$ onto $X_2$ is denoted by $\pi_{X_2}(D)$.
     \EndFor
     \State $E:=Q$
     \While{ $Q\neq\emptyset$ }
-    \State $x'_2:\in Q$
-    \State $Q:=Q\smallsetminus \{x_2'\}$
-    \ForAll{$(x_2,u)\in D \cap F_2^{-1}(x_2')$}
-    \State $D:=D\smallsetminus \{(x_2,u)\}$
-    \Comment{\small remove state-input pairs that lead to bad states}
-    \If{$x_2\in \pi_{X_2}(D)$ and $x_2\not\in E$}
-    \Comment{\small no valid input left and not already marked bad}
-    \State $Q:=Q\cup\{x_2\}$
-    \Comment{\small add to queue of bad}
-    \State $E:=E\cup\{x_2\}$
+    \State $x'_2:\in Q$ \Comment{remove oldest element}\label{a:safety:beginwhile}
+    \State $Q:=Q\smallsetminus \{x_2'\}$\label{a:safety:remQ}
+    \ForAll{$(x_2,u)\in F_2^{-1}(x_2')$}
+    \State $D:=D\smallsetminus \{(x_2,u)\}$\label{a:safety:remove}
+    \Comment{ remove state-input pairs that lead to bad states}
+    \If{$x_2\not \in D^{-1}(U_2)$ and $x_2\not\in E$}
+    \Comment{ no valid input left and not already marked bad}
+    \State $Q:=Q\cup\{x_2\}$\label{a:safety:addQ}
+    \Comment{ add to queue of bad states}
+    \State $E:=E\cup\{x_2\}$\label{a:safety:addE}
     \EndIf
     \EndFor
     \EndWhile
@@ -1709,35 +1756,204 @@ $D\subseteq X_2\times U_2$ onto $X_2$ is denoted by $\pi_{X_2}(D)$.
 \end{algorithm}
 
 Let $D\subseteq X_2\times U_2$ be the set of state-input pairs computed in
-Alg.~\ref{a:safety}. One can show that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
-if $I_2\subseteq \pi_{X_2}(D)$. Moreover, since each state is added to the queue
-  of bad states $Q$ at most once, it is easy to see that the algorithm runs in
-  $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
-  triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$.
+Alg.~\ref{a:safety}. One can show that $D^{-1}(U_2)$ is the \emph{maximal fixed
+point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
+\begin{IEEEeqnarray}{c}\label{e:theory:fp:safety}
+  G(Y):=Z_2\cap\pre(Y).
+\end{IEEEeqnarray}
+It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $I_2\subseteq D^{-1}(U_2)$. 
 
-Suppose that $I_2\subseteq \pi_{X_2}(D)$ holds. 
-Let $D(x_2):=\{u\in U_2\mid (x_2,u)\in D\}$, then we obtain a controller
+%\begin{lemma}
+%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system and let $D$ be the output of
+%Alg.~\ref{a:safety}. Then $Y_\infty:=D^{-1}(U_2)$ is the maximal fixed point
+%of~\eqref{e:theory:fp:safety}.
+%\end{lemma}
+%\begin{proof}
+%Let $D_i$, $E_i$ and $Q_i$ denote the sets $D$, $E$ and $Q$
+%manipulated in Alg.~\ref{a:safety} at the beginning of the while loop in
+%line~\ref{a:safety:beginwhile} of iteration $i\in \Z_{\ge0}$. For example for
+%$i=0$ we have $D_0=\{(x,u) \mid x\in Z_2\wedge u\in U_{S_2}(x)\}$ and $D_{i+1}$
+%results from $D_i$ by removing the elements in line~\ref{a:safety:remove}.
+%Similarly, $E_0=Q_0$ and $E_{i+1}$ results from $E_i$ by adding elements in
+%line~\ref{a:safety:addE} and $Q_{i+1}$ results from $Q_i$ by adding and removing
+%elements in line~\ref{a:safety:addQ} and line~\ref{a:safety:remQ}, respectively.
+%Parallel to $D_i$ we introduce $Y_i:=D_i^{-1}(U_2)$.  Let us point out that for
+%all $i\ge0$ we have $Q_i\subseteq E_i$, $E_i=\cup_{i'\in\intcc{0;i}} Q_{i'}$ and the sets 
+%$E_i$ and $Y_i$ are disjoint and satisfy $\bar X_2=E_i\cup Y_i$. Also $Y_{i+1}\subseteq Y_i\subseteq \cdots
+%\subseteq Z_2$ and there exists $i^*\in \Z_{\ge0}$ so that $Y_{i^*}=Y_\infty$.
+%
+%Let us first show that $Y_\infty=G(Y_\infty)$. Let $Y_\infty
+%=Y_{i^*}$ and $x\in Y_{i^*}$. Since $Y_{i^*}\subseteq Z_2$ we have $x\in Z_2$
+%and it remains to show that $x\in \pre(Y_{i^*})$. Let
+%$u\in U_{S_2}(x)$ be such that $(x,u)\in D_{i^*}$. As $(x,u)\in D_{i^*}$ we
+%conclude $F(x,u)\cap Q_i=\emptyset$ for all $i\in\intcc{0;i^*}$ (otherwise
+%$(x,u)$ would have been removed in line~\ref{a:safety:remove}). We obtain
+%$F(x,u)\cap E_{i^*}=\emptyset$. Since $F_2(x,u)\subseteq \bar X_2$ and $\bar
+%X_2=E_{i^*}\cup Y_{i^*}$ it follows that $F_2(x,u)\subseteq Y_{i^*}$ and $x\in
+%\pre(Y_{i^*})$ follows.  Now let $x\in G(Y_{i^*})=Z_2\cap \pre(Y_{i^*})$ and
+%assume for the sake of contradiction that $x\not\in Y_{i^*}$.
+%Let $u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq Y_{i^*}$. Since
+% $x\in Z_2$ we see that $(x,u)\in D_0$. Hence, if $x\not\in Y_{i^*}$ all pairs $(\bar x,\bar u)$
+%with $\bar x=x$ (including the pair $(x,u)$) need to have been removed from $D_0$ along the iteration
+%$i\in\intcc{0;i^*}$. However, from $F_2(x,u)\subseteq Y_{i^*}$ follows that
+%$F_2(x,u)\cap E_{i^*}=\emptyset$. Moreover, 
+%for all $i\in\intcc{0;i^*}$ holds $Q_i\subseteq E_{i^*}$ and we obtain $F_2(x,u)\cap
+%  Q_{i}=\emptyset$ for all $i\in\intcc{0;i^*}$ so that we arrive at a contradiction
+%  since $(x,u)$ cannot have been removed from $D_0$ in line~\ref{a:safety:remove}.
+%
+%Let $\bar Y\subseteq X_2$. We show that $\bar Y \subseteq G(\bar Y)$ implies
+%$\bar Y\subseteq Y_\infty$ by induction over  $i\ge 0$.
+%Let $i=0$ and $x\in \bar Y$. Since
+%$\bar Y\subseteq G(\bar Y)$ we have $x\in Z_2$ and $U_{S_2}(x)\neq\emptyset$,
+%which shows that $x\in Y_0$. Now suppose that $\bar Y\subseteq Y_i$ but $\bar
+%Y\not\subseteq Y_{i+1}$, i.e., there exist $x\in (Y_i\smallsetminus Y_{i+1})\cap
+%\bar Y$. That means all pairs $(\bar x,\bar u)$ with $\bar x=x$ in $D_i$ have been removed in line~\ref{a:safety:remove}. 
+%However, there exists at least one $u\in U_{S_2(x)}$ with
+%$F_2(x, u)\cap Q_i=\emptyset$. That follows from
+%the fact that $x\in G(\bar Y)$, $\bar Y\subseteq Y_i$ and $Q_i\cap Y_i\neq
+%\emptyset$. Hence,
+%we obtain a contradiction and $\bar Y\subseteq Y_{i+1}$ follows. As this holds
+%for all $i\ge0$ we conclude that $\bar Y\subseteq Y_{\infty}$ and the assertion follows.
+%\end{proof}
+
+
+Suppose that $I_2\subseteq D^{-1}(U_2)$ holds, then we obtain a controller
 $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
 that solves $(S_2,\Sigma_2)$ by  
-\begin{IEEEeqnarray*}{rCl}
+\begin{IEEEeqnarray}{rCl}\label{e:controller}
+\begin{IEEEeqnarraybox}[][c]{rCl}
 H_c(q,x_2)&=&
 \begin{cases}
-D(x_2)\times \{x_2\} & \text{if } x_2\in \pi_{X_2}(D)\\
+D(x_2)\times \{x_2\} & \text{if } x_2\in D^{-1}(U_2)\\
 U_2\times\{x_2\} & \text{otherwise}
 \end{cases}\\
 F_c(q,x_2)&=&
 \begin{cases}
-\{q\} & \text{if } x_2\in \pi_{X_2}(D)\\
+\{q\} & \text{if } x_2\in D^{-1}(U_2)\\
 \emptyset &  \text{otherwise.}
 \end{cases}
-\end{IEEEeqnarray*}
-The refined controller $C':=C\circ Q$ that is feedback composable with $S_1$
-differs from $C$ only in its output function $H'_c$ given by
-\begin{IEEEeqnarray*}{c}
-H'_c(q,x_1):= H_c(q,Q(x_1)).
-\end{IEEEeqnarray*}
+\end{IEEEeqnarraybox}
+\end{IEEEeqnarray}
+The refined controller $C\circ Q$ that is feedback composed with $S_1$ is
+implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
+explained in Section~\ref{s:usage:simulation}.
 
-\subsection{Reachability and Reach-Avoid}
+
+\subsection{Reachability}
+
+Let $\Sigma_2$ be a reachability specification associated with $I_2$ and
+$Z_2\subseteq \bar X_2$. 
+We use Alg.~\ref{a:reach}, which is implemented in the function 
+{\tt solveReachabilityGame} in the file {\tt GameSolver.hh}, to synthesize a controller
+that solves the control problem $(S_2,\Sigma_2)$. The algorithm is a variant of
+Dijkstra's shortest path algorithm for hyper-graphs taken
+from~\cite{GalloLongoPallotinoNguyen93}. It runs in $O(m)$ time, where $m$ is
+the number of transitions, i.e., the number of elements in $X_2\times U_2\times
+X_2$ that satisfy $x_2'\in F_2(x_2,u)$.
+
+\begin{algorithm}[h]
+  \caption{Controller synthesis for reachability specs associated with $I_2$ and $Z_2$}
+  \label{a:reach}
+  \begin{algorithmic}[1]
+    \Input{ $Z_2$, $S_2=(X_2,U_2,F_2)$}
+    \State {$V := \infty$}\Comment{value function}
+    \State $M:=0$ \Comment{intermediate values} 
+    \State {$Q := Z_2$ \Comment{FIFO queue}}
+    \State {$E := \emptyset$ \Comment{bookkeeping of processed states}}
+    \ForAll {$x_2 \in\bar X_2$}
+      \State {$D(x_2) := \emptyset$}\Comment{keep track of optimal input}
+      \If{$x_2\in Z_2$}
+        \State {$V(x_2) := 0$}\Comment{cost at target are zero} 
+      \EndIf
+    \EndFor
+    \While {$Q \not= \emptyset$}
+      \State {$x_2' :\in  Q $} \Comment{remove oldest element}
+      \State {$Q := Q \smallsetminus \{ x_2' \}$}
+      \State {$E := E \cup \{ x_2' \}$}
+      \ForAll {$(x_2,u) \in F_2^{-1}(x_2')$}
+        \State $M(x_2,u):=\max\{M(x_2,u),V(x_2')\}$
+        \If {$F_2(x_2,u) \subseteq E$ and $V(x_2) > 1+M(x_2,u)$} \Comment{if $u$ leads to better cost update input}
+          \State {$V(x_2) := M(x_2,u)$} 
+          \State {$Q := Q \cup \{ x_2 \}$} 
+          \State {$D(x_2) := \{ u \}$}
+        \EndIf
+      \EndFor
+    \EndWhile
+    \Output {$D$, $V$}
+  \end{algorithmic}
+\end{algorithm}
+
+Let $D$ be the output of Alg.~\ref{a:reach}.
+Similar to the case of the invariance specification, the set $D^{-1}(U_2)$ is
+the \emph{minimal fixed point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
+\begin{IEEEeqnarray}{c}\label{e:theory:fp:reach}
+  G(Y):=Z_2\cup\pre(Y).
+\end{IEEEeqnarray}
+It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $I_2\subseteq D^{-1}(U_2)$. 
+
+%\begin{lemma}
+%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system and let $D$ be the output of
+%Alg.~\ref{a:reach}. Then $Y_\infty:=D^{-1}(U_2)$ is the minimal fixed point
+%of~\eqref{e:theory:fp:reach}.
+%\end{lemma}
+%\begin{proof}
+%Let $D_i$, $E_i$ and $Q_i$ denote the sets $D$, $E$ and $Q$
+%manipulated in Alg.~\ref{a:safety} at the beginning of the while loop in
+%line~\ref{a:safety:beginwhile} of iteration $i\in \Z_{\ge0}$. For example for
+%$i=0$ we have $D_0=\{(x,u) \mid x\in Z_2\wedge u\in U_{S_2}(x)\}$ and $D_{i+1}$
+%results from $D_i$ by removing the elements in line~\ref{a:safety:remove}.
+%Similarly, $E_0=Q_0$ and $E_{i+1}$ results from $E_i$ by adding elements in
+%line~\ref{a:safety:addE} and $Q_{i+1}$ results from $Q_i$ by adding and removing
+%elements in line~\ref{a:safety:addQ} and line~\ref{a:safety:remQ}, respectively.
+%Parallel to $D_i$ we introduce $Y_i:=D_i^{-1}(U_2)$.  Let us point out that for
+%all $i\ge0$ we have $Q_i\subseteq E_i$, $E_i=\cup_{i'\in\intcc{0;i}} Q_{i'}$ and the sets 
+%$E_i$ and $Y_i$ are disjoint and satisfy $\bar X_2=E_i\cup Y_i$. Also $Y_{i+1}\subseteq Y_i\subseteq \cdots
+%\subseteq Z_2$ and there exists $i^*\in \Z_{\ge0}$ so that $Y_{i^*}=Y_\infty$.
+%
+%Let us first show that $Y_\infty=G(Y_\infty)$. Let $Y_\infty
+%=Y_{i^*}$ and $x\in Y_{i^*}$. Since $Y_{i^*}\subseteq Z_2$ we have $x\in Z_2$
+%and it remains to show that $x\in \pre(Y_{i^*})$. Let
+%$u\in U_{S_2}(x)$ be such that $(x,u)\in D_{i^*}$. As $(x,u)\in D_{i^*}$ we
+%conclude $F(x,u)\cap Q_i=\emptyset$ for all $i\in\intcc{0;i^*}$ (otherwise
+%$(x,u)$ would have been removed in line~\ref{a:safety:remove}). We obtain
+%$F(x,u)\cap E_{i^*}=\emptyset$. Since $F_2(x,u)\subseteq \bar X_2$ and $\bar
+%X_2=E_{i^*}\cup Y_{i^*}$ it follows that $F_2(x,u)\subseteq Y_{i^*}$ and $x\in
+%\pre(Y_{i^*})$ follows.  Now let $x\in G(Y_{i^*})=Z_2\cap \pre(Y_{i^*})$ and
+%assume for the sake of contradiction that $x\not\in Y_{i^*}$.
+%Let $u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq Y_{i^*}$. Since
+% $x\in Z_2$ we see that $(x,u)\in D_0$. Hence, if $x\not\in Y_{i^*}$ all pairs $(\bar x,\bar u)$
+%with $\bar x=x$ (including the pair $(x,u)$) need to have been removed from $D_0$ along the iteration
+%$i\in\intcc{0;i^*}$. However, from $F_2(x,u)\subseteq Y_{i^*}$ follows that
+%$F_2(x,u)\cap E_{i^*}=\emptyset$. Moreover, 
+%for all $i\in\intcc{0;i^*}$ holds $Q_i\subseteq E_{i^*}$ and we obtain $F_2(x,u)\cap
+%  Q_{i}=\emptyset$ for all $i\in\intcc{0;i^*}$ so that we arrive at a contradiction
+%  since $(x,u)$ cannot have been removed from $D_0$ in line~\ref{a:safety:remove}.
+%
+%Let $\bar Y\subseteq X_2$. We show that $\bar Y \subseteq G(\bar Y)$ implies
+%$\bar Y\subseteq Y_\infty$ by induction over  $i\ge 0$.
+%Let $i=0$ and $x\in \bar Y$. Since
+%$\bar Y\subseteq G(\bar Y)$ we have $x\in Z_2$ and $U_{S_2}(x)\neq\emptyset$,
+%which shows that $x\in Y_0$. Now suppose that $\bar Y\subseteq Y_i$ but $\bar
+%Y\not\subseteq Y_{i+1}$, i.e., there exist $x\in (Y_i\smallsetminus Y_{i+1})\cap
+%\bar Y$. That means all pairs $(\bar x,\bar u)$ with $\bar x=x$ in $D_i$ have been removed in line~\ref{a:safety:remove}. 
+%However, there exists at least one $u\in U_{S_2(x)}$ with
+%$F_2(x, u)\cap Q_i=\emptyset$. That follows from
+%the fact that $x\in G(\bar Y)$, $\bar Y\subseteq Y_i$ and $Q_i\cap Y_i\neq
+%\emptyset$. Hence,
+%we obtain a contradiction and $\bar Y\subseteq Y_{i+1}$ follows. As this holds
+%for all $i\ge0$ we conclude that $\bar Y\subseteq Y_{\infty}$ and the assertion follows.
+%\end{proof}
+
+Given that $I_2\subseteq D^{-1}(U_2)$ holds, a controller
+$C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ that solves $(S_2,\Sigma_2)$ is identical
+to the controller that solves the invariance problem, i.e., $F_c$ and $H_c$ are
+given by~\eqref{e:controller}.
+
+Again, the refined controller $C\circ Q$ that is feedback composed with $S_1$ is
+implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
+explained in Section~\ref{s:usage:simulation}.
 
 \subsection{Synthesis via Fixed Point Computations}
 \label{ss:fixedpoint}
