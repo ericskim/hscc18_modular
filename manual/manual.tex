@@ -5,6 +5,12 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+
+
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage[usenames, dvipsnames, pdftex]{xcolor}
@@ -1659,18 +1665,18 @@ to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 Let $\Sigma_2$ be an invariance specification associated with $I_2$ and $Z_2$. 
 We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
 solveInvarianceGame} in the file {\tt GameSolver.hh}, to synthesize a controller
-that solves the control problem $(S_2,\Sigma_2)$.  In the algorithm we use 
+that solves the control problem $(S_2,\Sigma_2)$.  We use the following
+notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
 \begin{IEEEeqnarray}{c}
-U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}
+U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
 \end{IEEEeqnarray}
-to denote the set of \emph{admissible controls} at $x_2$. The
-projection of a set
+The projection of a set
 $D\subseteq X_2\times U_2$ onto $X_2$ is denoted by $\pi_{X_2}(D)$.
 
 \begin{algorithm}[h]
 \caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
   \begin{algorithmic}[1]
-    \Require{$Z_2$, $S_2=(X_2,U_2,F_2)$}
+    \Input{$Z_2$, $S_2=(X_2,U_2,F_2)$}
     \State $Q:=\emptyset$ \Comment{\small active queue of bad states} 
     \State $E:=\emptyset$ \Comment{\small bookkeeping of the added states} 
     \State $D:=\emptyset$ \Comment{\small safe state-input pairs/domain of controller}
@@ -1697,6 +1703,7 @@ $D\subseteq X_2\times U_2$ onto $X_2$ is denoted by $\pi_{X_2}(D)$.
     \EndIf
     \EndFor
     \EndWhile
+    \Output $D$
   \end{algorithmic}
 
 \end{algorithm}
@@ -1709,7 +1716,7 @@ if $I_2\subseteq \pi_{X_2}(D)$. Moreover, since each state is added to the queue
   triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$.
 
 Suppose that $I_2\subseteq \pi_{X_2}(D)$ holds. 
-Let $D(x_2):=\{u\in U_2\mid (x_2,u)\in D$, then we obtain a controller
+Let $D(x_2):=\{u\in U_2\mid (x_2,u)\in D\}$, then we obtain a controller
 $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
 that solves $(S_2,\Sigma_2)$ by  
 \begin{IEEEeqnarray*}{rCl}
@@ -1721,8 +1728,13 @@ U_2\times\{x_2\} & \text{otherwise}
 F_c(q,x_2)&=&
 \begin{cases}
 \{q\} & \text{if } x_2\in \pi_{X_2}(D)\\
-\emptyset &  \text{otherwise}
+\emptyset &  \text{otherwise.}
 \end{cases}
+\end{IEEEeqnarray*}
+The refined controller $C':=C\circ Q$ that is feedback composable with $S_1$
+differs from $C$ only in its output function $H'_c$ given by
+\begin{IEEEeqnarray*}{c}
+H'_c(q,x_1):= H_c(q,Q(x_1)).
 \end{IEEEeqnarray*}
 
 \subsection{Reachability and Reach-Avoid}
