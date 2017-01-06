@@ -375,7 +375,8 @@ For various reasons, you might consider to use additional software in combinatio
 \end{itemize}
 
 
-\section{Invariance and Reachability Specifications}
+\section{Controller Synthesis}
+\label{s:usage:synthesis}
 
 \section{Closed Loop Simulation}
 \label{s:usage:simulation}
@@ -1371,17 +1372,17 @@ system $S_1$ is illustrated in Fig.~\ref{f:closedloop}.
 \end{itemize}
 The specifications are defined as follows.
 Consider two sets $I_1\subseteq X_1$ and $Z_1\subseteq X_1$.
-An \emph{invariance} specification associated with $I_1,Z_1$ follows by 
+An \emph{invariance} specification for $S_1$ associated with $I_1,Z_1$ follows by 
 \begin{IEEEeqnarray*}{c}
 \Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid x(0)\in I_1\implies \forall_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
 \end{IEEEeqnarray*}
-A \emph{reachability} specification associated
+A \emph{reachability} specification for $S_1$ associated
 with $I_1,Z_1$ is defined by
 \begin{IEEEeqnarray*}{c}
   \Sigma_1:=\{(u,x)\in (U_1\times X_1)^\infty
   \mid  x(0)\in I_1\implies \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
 \end{IEEEeqnarray*}
-A \emph{reach-avoid} specification associated
+A \emph{reach-avoid} specification for $S_1$ associated
 with $I_1,A_1,Z_1$ with $A_1\subseteq X_1$ is defined by
 \begin{IEEEeqnarray*}{c}
   \Sigma_1:=\big\{(u,x)\in (U_1\times X_1)^\infty
@@ -1687,25 +1688,16 @@ Section~\ref{s:usage:abs}.
 In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver
 to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 
-%of $S_1$, i.e., a simple system which is related via \emph{feedback refinement
-%relation} $Q\subseteq X_1\times X_2$. 
-%
-%The controller synthesis algorithms implemented in {\tt SCOTS} are based on
-%certain finite representations, often termed 
-%\cite{MoorRaisch99}, of
-% continuous control systems. {\tt SCOTS} supports the computation of symbolic
-%models of the $\tau$-sampled behavior of perturbed, 
-
 \section{Controller Synthesis}
 \label{s:theory:alg}
 
 We discuss the algorithms that are implemented in {\tt SCOTS} to
 solve synthesis problems for the finite symbolic model $S_2=(X_2,U_2,F_2)$. 
-We need the following notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
+We use the following notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
 \begin{IEEEeqnarray}{c}
 U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
 \end{IEEEeqnarray}
-We use the Weierstrass symbol $\wp$ to denote the power set and introduce $\pre:\wp(X_2)\to \wp(X_2)$ by
+We use the Weierstrass symbol $\wp$ to denote the power set and define $\pre:\wp(X_2)\to \wp(X_2)$ by
 \begin{IEEEeqnarray}{c}\label{e:pre}
   \pre(Y):=\{x_2\in X_2\mid  \exists_{u\in U_{S_2}(x_2)}:\;F_2(x_2,u)\subseteq Y\}.
 \end{IEEEeqnarray}
@@ -1724,6 +1716,7 @@ of bad states $Q$ at most once.
 \caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
   \begin{algorithmic}[1]
     \Input{$Z_2$, $S_2=(X_2,U_2,F_2)$}
+    \Require{$F_2(X_2,U_2)\subseteq \bar X_2$ and $Z_2\subseteq \bar X_2$}
     \State $Q:=\emptyset$ \Comment{ FIFO queue of bad states} 
     \State $E:=\emptyset$ \Comment{ bookkeeping of the bad states} 
     \State $D:=\emptyset$ \Comment{ valid state-input pairs}
@@ -1765,8 +1758,9 @@ It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
 if $I_2\subseteq D^{-1}(U_2)$. 
 
 %\begin{lemma}
-%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system and let $D$ be the output of
-%Alg.~\ref{a:safety}. Then $Y_\infty:=D^{-1}(U_2)$ is the maximal fixed point
+%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$
+%and $F_2(X_2,U_2)\subseteq \bar X_2$. Let $Z_2\subseteq \bar X_2$ and let $D$ be the output of
+%Alg.~\ref{a:safety}. The set $Y_\infty:=D^{-1}(U_2)$ is the maximal fixed point
 %of~\eqref{e:theory:fp:safety}.
 %\end{lemma}
 %\begin{proof}
@@ -1856,27 +1850,32 @@ X_2$ that satisfy $x_2'\in F_2(x_2,u)$.
   \caption{Controller synthesis for reachability specs associated with $I_2$ and $Z_2$}
   \label{a:reach}
   \begin{algorithmic}[1]
-    \Input{ $Z_2$, $S_2=(X_2,U_2,F_2)$}
-    \State {$V := \infty$}\Comment{value function}
-    \State $M:=0$ \Comment{intermediate values} 
+    \Input{ $Z_2$, $S_2=(X_2,U_2,F_2)$, $u_0\in U_2$}
+    \Require{ $Z_2\subseteq \bar X_2$}
     \State {$Q := Z_2$ \Comment{FIFO queue}}
+    \State {$V := \infty$}\Comment{value function}\label{a:reach:initV}
+    \State $M:=0$ \Comment{intermediate values} 
     \State {$E := \emptyset$ \Comment{bookkeeping of processed states}}
     \ForAll {$x_2 \in\bar X_2$}
       \State {$D(x_2) := \emptyset$}\Comment{keep track of optimal input}
       \If{$x_2\in Z_2$}
-        \State {$V(x_2) := 0$}\Comment{cost at target are zero} 
+        \State {$V(x_2) := 0$}\Comment{cost at target are zero}
+        \label{a:reach:setV}
+        \State {$D(x_2) := \{u_0\}$}\label{a:reach:initD}
+        \label{a:reach:initD}
       \EndIf
     \EndFor
     \While {$Q \not= \emptyset$}
-      \State {$x_2' :\in  Q $} \Comment{remove oldest element}
+      \State {$x_2' :\in  Q $} \Comment{remove oldest element} \label{a:reach:remove}
       \State {$Q := Q \smallsetminus \{ x_2' \}$}
-      \State {$E := E \cup \{ x_2' \}$}
+      \State {$E := E \cup \{ x_2' \}$}\label{a:reach:addE}
       \ForAll {$(x_2,u) \in F_2^{-1}(x_2')$}
         \State $M(x_2,u):=\max\{M(x_2,u),V(x_2')\}$
         \If {$F_2(x_2,u) \subseteq E$ and $V(x_2) > 1+M(x_2,u)$} \Comment{if $u$ leads to better cost update input}
-          \State {$V(x_2) := M(x_2,u)$} 
-          \State {$Q := Q \cup \{ x_2 \}$} 
-          \State {$D(x_2) := \{ u \}$}
+        \label{a:reach:conditions}
+          \State {$V(x_2) := 1+M(x_2,u)$} \label{a:reach:updateV}
+          \State {$Q := Q \cup \{ x_2 \}$}\label{a:reach:add}
+          \State {$D(x_2) := \{ u \}$}\label{a:reach:setD}
         \EndIf
       \EndFor
     \EndWhile
@@ -1894,56 +1893,51 @@ It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
 if $I_2\subseteq D^{-1}(U_2)$. 
 
 %\begin{lemma}
-%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system and let $D$ be the output of
+%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$,
+%let $Z_2\subseteq \bar X_2$  and let $D$ be the output of
 %Alg.~\ref{a:reach}. Then $Y_\infty:=D^{-1}(U_2)$ is the minimal fixed point
 %of~\eqref{e:theory:fp:reach}.
 %\end{lemma}
-%\begin{proof}
-%Let $D_i$, $E_i$ and $Q_i$ denote the sets $D$, $E$ and $Q$
-%manipulated in Alg.~\ref{a:safety} at the beginning of the while loop in
-%line~\ref{a:safety:beginwhile} of iteration $i\in \Z_{\ge0}$. For example for
-%$i=0$ we have $D_0=\{(x,u) \mid x\in Z_2\wedge u\in U_{S_2}(x)\}$ and $D_{i+1}$
-%results from $D_i$ by removing the elements in line~\ref{a:safety:remove}.
-%Similarly, $E_0=Q_0$ and $E_{i+1}$ results from $E_i$ by adding elements in
-%line~\ref{a:safety:addE} and $Q_{i+1}$ results from $Q_i$ by adding and removing
-%elements in line~\ref{a:safety:addQ} and line~\ref{a:safety:remQ}, respectively.
-%Parallel to $D_i$ we introduce $Y_i:=D_i^{-1}(U_2)$.  Let us point out that for
-%all $i\ge0$ we have $Q_i\subseteq E_i$, $E_i=\cup_{i'\in\intcc{0;i}} Q_{i'}$ and the sets 
-%$E_i$ and $Y_i$ are disjoint and satisfy $\bar X_2=E_i\cup Y_i$. Also $Y_{i+1}\subseteq Y_i\subseteq \cdots
-%\subseteq Z_2$ and there exists $i^*\in \Z_{\ge0}$ so that $Y_{i^*}=Y_\infty$.
+%\begin{proof}[Proof sketch]
+%Let $Q_i$ denote the set $Q$ that is processed Alg.~\ref{a:reach} at iteration
+%$i$ of the while loop in line~\ref{a:reach:remove}. For example $Q_0=Z_2$ and
+%$Q_{i+1}$ results from $Q_i$ by removing and adding elements in
+%line~\ref{a:reach:remove} and~\ref{a:reach:add}, respectively. Let $i^*$ denote
+%the iteration when the algorithm terminates, i.e., $Q_{i^*}=\emptyset$. Since
+%every element of $Q_i$ for all $i\in\intco{0;i^*}$ is added to $E$ in
+%line~\ref{a:reach:addE}, we have 
+%$E=\cup_{i\in\intcc{0;i^*}}Q_i$. Moreover, $D(x)\neq\emptyset$ holds iff 
+%$x\in Q_i$ for some $i\in\intco{0;i^*}$ and we see that $Y_\infty=E$.
+%Another invariant which is easy to check is: $x\in Q_i$ for some $i\in
+%\intco{0;i^*}$ implies $V(x)<\infty$. Hence $M(x,u)$ is finite for every
+%$(x,u)\in X_2\times U_2$ throughout the whole computation.
 %
-%Let us first show that $Y_\infty=G(Y_\infty)$. Let $Y_\infty
-%=Y_{i^*}$ and $x\in Y_{i^*}$. Since $Y_{i^*}\subseteq Z_2$ we have $x\in Z_2$
-%and it remains to show that $x\in \pre(Y_{i^*})$. Let
-%$u\in U_{S_2}(x)$ be such that $(x,u)\in D_{i^*}$. As $(x,u)\in D_{i^*}$ we
-%conclude $F(x,u)\cap Q_i=\emptyset$ for all $i\in\intcc{0;i^*}$ (otherwise
-%$(x,u)$ would have been removed in line~\ref{a:safety:remove}). We obtain
-%$F(x,u)\cap E_{i^*}=\emptyset$. Since $F_2(x,u)\subseteq \bar X_2$ and $\bar
-%X_2=E_{i^*}\cup Y_{i^*}$ it follows that $F_2(x,u)\subseteq Y_{i^*}$ and $x\in
-%\pre(Y_{i^*})$ follows.  Now let $x\in G(Y_{i^*})=Z_2\cap \pre(Y_{i^*})$ and
-%assume for the sake of contradiction that $x\not\in Y_{i^*}$.
-%Let $u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq Y_{i^*}$. Since
-% $x\in Z_2$ we see that $(x,u)\in D_0$. Hence, if $x\not\in Y_{i^*}$ all pairs $(\bar x,\bar u)$
-%with $\bar x=x$ (including the pair $(x,u)$) need to have been removed from $D_0$ along the iteration
-%$i\in\intcc{0;i^*}$. However, from $F_2(x,u)\subseteq Y_{i^*}$ follows that
-%$F_2(x,u)\cap E_{i^*}=\emptyset$. Moreover, 
-%for all $i\in\intcc{0;i^*}$ holds $Q_i\subseteq E_{i^*}$ and we obtain $F_2(x,u)\cap
-%  Q_{i}=\emptyset$ for all $i\in\intcc{0;i^*}$ so that we arrive at a contradiction
-%  since $(x,u)$ cannot have been removed from $D_0$ in line~\ref{a:safety:remove}.
+%Let us show that $Y_\infty$ is a fixed point of~\eqref{e:theory:fp:reach}.
+%Let $x\in Y_\infty$. If $x\in Z_2$ we immediately obtain $x\in G(Y_\infty)$.
+%For $x\not\in Z_2$ we see that $D(x)$ has been set in line~\ref{a:reach:setD}
+%and we obtain $F_2(x,D(x))\subseteq E=Y_\infty$. Now let $x\in G(Y_\infty)$. If
+%$x\in Z_2$ we use line~\ref{a:reach:initD} to infer $x\in Y_\infty$ and
+%subsequently we consider $x\in \pre(Y_\infty)$. Since $Y_\infty=E$, there exists
+%$u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq E$. Since $M(x,u)<\infty$ holds
+%throughout the computation and initially $V(x)=\infty$, we see that there must have been an iteration $i$ where
+%both conditions in line~\ref{a:reach:conditions} have been true for $(x,u)$ (in
+%place of $(x_2,u)$), so that
+%$D(x)\neq\emptyset$, which shows $x\in Y_\infty$.
 %
-%Let $\bar Y\subseteq X_2$. We show that $\bar Y \subseteq G(\bar Y)$ implies
-%$\bar Y\subseteq Y_\infty$ by induction over  $i\ge 0$.
-%Let $i=0$ and $x\in \bar Y$. Since
-%$\bar Y\subseteq G(\bar Y)$ we have $x\in Z_2$ and $U_{S_2}(x)\neq\emptyset$,
-%which shows that $x\in Y_0$. Now suppose that $\bar Y\subseteq Y_i$ but $\bar
-%Y\not\subseteq Y_{i+1}$, i.e., there exist $x\in (Y_i\smallsetminus Y_{i+1})\cap
-%\bar Y$. That means all pairs $(\bar x,\bar u)$ with $\bar x=x$ in $D_i$ have been removed in line~\ref{a:safety:remove}. 
-%However, there exists at least one $u\in U_{S_2(x)}$ with
-%$F_2(x, u)\cap Q_i=\emptyset$. That follows from
-%the fact that $x\in G(\bar Y)$, $\bar Y\subseteq Y_i$ and $Q_i\cap Y_i\neq
-%\emptyset$. Hence,
-%we obtain a contradiction and $\bar Y\subseteq Y_{i+1}$ follows. As this holds
-%for all $i\ge0$ we conclude that $\bar Y\subseteq Y_{\infty}$ and the assertion follows.
+%We continue to show that $Y_\infty$ is the minimal fixed point
+%of~\eqref{e:theory:fp:reach}.
+%Let $D_i$ denote the map $D$ computed in Alg.~\ref{a:reach} at
+%line~\ref{a:reach:remove}, i.e., $D_0$ is
+%computed in line~\ref{a:reach:initD} and $D_{i+1}$ results from $D_i$ by setting
+%the input in line~\ref{a:reach:setD}. Let $Y_i:=D_i^{-1}(U_2)$ and observe that
+%$Y_0=Z_2$ and $Y_i\subseteq Y_{i+1}$ holds for all $i\ge0$. One can also show
+%that $Y_{i+1}\subseteq G(Y_i)$.
+%Moreover, one can show that $G$ is monotone, i.e., for  $Y,Y'\subseteq \bar X_2$ the inclusion
+%$Y\subseteq Y'$ implies $G(Y)\subseteq G(Y')$. Given this fact it is easy to see
+%that $G(\bar Y)\subseteq \bar Y$ implies $Y_{i}\subseteq \bar Y$ for all $i\ge0$, since we
+%have $Y_0=Z_2\subseteq \bar Y$ and $Y_{i+1}\subseteq G(Y_i)\subseteq G(\bar
+%Y)\subseteq \bar Y$. Given that the algorithm terminates there exists $i^*$ with
+%$Y_\infty=Y_{i^*}$ and $Y_\infty\subseteq \bar Y$ follows.
 %\end{proof}
 
 Given that $I_2\subseteq D^{-1}(U_2)$ holds, a controller
@@ -1955,100 +1949,66 @@ Again, the refined controller $C\circ Q$ that is feedback composed with $S_1$ is
 implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
 explained in Section~\ref{s:usage:simulation}.
 
-\subsection{Synthesis via Fixed Point Computations}
-\label{ss:fixedpoint}
-For the synthesis of controllers $C$ to enforce reachability, respectively,
-invariance specifications,
-\texttt{SCOTS} provides two fixed point algorithms.
-
-
-Consider $S_2=(X_2,U_2,F_2)$ with $X_2$ finite and $I_2\in X_2$, $Z_2\subseteq
-X_2\times U_2$. For $Y\subseteq X_2\times U_2$, we 
-define the map 
-\begin{IEEEeqnarray}{c}\label{e:pre}
-  \pre(Y):=\{(x_2,u)\in X_2\times U_2\mid  F_2(x_2,u)\neq \emptyset \land
-  F_2(x_2,u)\subseteq\pi_{X_2}(Y)\}.
+\subsection{Reach-Avoid}
+Let $\Sigma_2$ be a reach-avoid specification associated with $I_2$ and $A_2,Z_2\subseteq \bar X_2$. 
+{\tt SCOTS} provides two alternatives on how to synthesize controller to enforce
+reach-avoid specifications. In the first method, the avoid set $A_2$ is
+accounted for in the transition function, i.e.,
+\begin{IEEEeqnarray}{c'c}\label{e:theory:tf:avoid}
+  \forall_{x_2\in A_2}:& F_2(x_2,u):=\emptyset.
 \end{IEEEeqnarray}
-where $\pi_{X_2}(Y)$ denotes the projection of $Y$ onto $X_2$.
+In this way we can reduce a reach-avoid problem to a reachability problem. 
+Given that the transition function satisfies \eqref{e:theory:tf:avoid}, any
+controller that solves the control problem $(S_2,\Sigma_2')$, where $\Sigma_2'$
+is the reachability specification associated with $I_2$ and $Z_2$, also solves the
+control problem $(S_2,\Sigma_2)$. In order to enforce the
+equation~\eqref{e:theory:tf:avoid} in the computation of the transition function
+$F_2$ the user can optionally supply the avoid set to the function {\tt
+AbstractionGB::computeTransitionRelation}, see Section~\ref{s:usage:abs}.
 
-We compute a controller to enforce a reachability specification $\Sigma_2$
-associated with $I_2,Z_2$, by computing the minimal fixed point of the map
-$Y\mapsto \pre(Y)\cup Z_2$, which we denote by using the usual $\mu$ calculus
-notation~\cite{ArnoldNiwinski01} as
-\begin{IEEEeqnarray*}{c}
-  \mu Y. \pre(Y)\cup Z_2.
-\end{IEEEeqnarray*}
-In order to extract a controller, we introduce the function $j:X_2\to\N\cup\{\infty\}$ by
-\begin{IEEEeqnarray*}{c}
-j(x)=\inf\{i\in \N\mid x\in \pi_{X_2}(Y_i)\}
-\end{IEEEeqnarray*}
-where the sets $Y_i$ are recursively given by
-\begin{IEEEeqnarray*}{rCl}
-	Y_0&=&\emptyset\\
-	Y_{i+1}&=&\pre(Y_i)\cup Z_2.
-\end{IEEEeqnarray*}
-Of course we have $Y_i=Y_{i+1}$ implies $Y_i=\mu Y. \pre(Y)\cup Z_2$. Let use define the map
-\begin{IEEEeqnarray}{rCl}\label{e:con:reach}
-	H'_c(x_2)=\big\{u\in U\mid (x_2,u)\in Z_2 \vee ( F_2(x_2,u)\neq \emptyset \land F_2(x_2,u)\subseteq \pi_{X_2}(Y_{j(x_2)-1}))\big\}
+For the second method, the computation of the transition function is left
+unchanged, but Alg.~\ref{a:reach} is modified to account for the avoid set. To
+this end the condition in line~\ref{a:reach:conditions} in Alg.~\ref{a:reach} is modified to 
+\begin{IEEEeqnarray}{c't'c't'c}\label{a:avoid}
+ F_2(x_2,u) \subseteq E& and &V(x_2) > 1+M(x_2,u)& and & x_2\not\in A_2.
 \end{IEEEeqnarray}
-which is non-empty for all $x_2\in \mu Y.\pre(Y)\cup Z_2$.
-We derive a controller as a system
-according to~\cite[Def.~III.1]{ReissigWeberRungger15} (ver.~2) by $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ with 
-\begin{IEEEeqnarray*}{rCl}
-H_c(q,x_2)&=&
-\begin{cases}
-H'_c(x_2)\times \{x_2\} & \text{if } x_2\in \mu Y. \pre(Y)\cup Z_2\\
-U_2\times\{x_2\} & \text{otherwise}
-\end{cases}\\
-F_c(q,x_2)&=&
-\begin{cases}
-\{q\} & \text{if } x_2\in \mu Y. \pre(Y)\cup Z_2\\
-\emptyset &  \text{otherwise}
-\end{cases}
-\end{IEEEeqnarray*}
+Again the user can optionally supply the avoid set to the function {\tt
+solveReachabilityGame}, see Section~\ref{s:usage:synthesis}.
 
 
-Similarly, if
-$\Sigma_2$ is an invariance specification associated with $I_2,Z_2$, we compute the maximal fixed point of $Y\mapsto \pre(Y)\cap Z_2$, which is denoted by
+\subsection{Customized Synthesis Algorithms}
+\label{s:theory:customized}
+
+Even though {\tt SCOTS} natively supports only invariance and reachability
+specification, an advanced user has the possibility to write customized
+synthesis algorithms. We demonstrate such a customization for persistence and
+recurrence specifications. 
+
+Let $S=(X,U,F)$ be a finite simple
+system with and consider the sets $I, Z, T_i\subseteq X$, $i\in\intcc{1;p}$,
+$p\in\N$. The \emph{persistence} specification $\Sigma$ for $S$ associated with $I$ and $Z$ is given by
 \begin{IEEEeqnarray*}{c}
-  \nu Y. \pre(Y)\cap Z_2.
+  \Sigma:=\big\{(u,x)\in (U\times X)^\infty
+  \mid  x(0)\in I\implies 
+    \exists_{t\in\intco{0;\infty}}\forall_{t'\in\intcc{t;\infty}}: x(t')\in Z
+  \big\}.
 \end{IEEEeqnarray*}
-Given $\nu Y. \pre(Y)\cap Z_2$ we define the map
-\begin{IEEEeqnarray}{rCl}\label{e:con:inv}
-	H'_c(x_2)=\big\{u\in U\mid F_2(x_2,u)\neq \emptyset \land F_2(x_2,u)\subseteq \pi_{X_2}(\nu Y. \pre(Y)\cap Z_2)\big\}.
-\end{IEEEeqnarray}
-and the controller 
-according to~\cite[Def.~III.1]{ReissigWeberRungger15} (ver.~2) follows again by
-\begin{IEEEeqnarray*}{rCl}
-H_c(q,x_2)&=&
-\begin{cases}
-H'_c(x_2)\times \{x_2\} & \text{if } x_2\in \nu Y. \pre(Y)\cap Z_2\\
-U_2\times\{x_2\} & \text{otherwise}
-\end{cases}\\
-F_c(q,x_2)&=&
-\begin{cases}
-\{q\} & \text{if } x_2\in \nu Y. \pre(Y)\cap Z_2\\
-\emptyset &  \text{otherwise}
-\end{cases}
+The \emph{recurrence} specification $\Sigma$ for $S$ associated with $I$ and
+$T_i$, $i\in\intcc{1;p}$, $p\in\N$ is given by
+\begin{IEEEeqnarray*}{c}
+  \Sigma:=\big\{(u,x)\in (U\times X)^\infty
+  \mid  x(0)\in I\implies 
+    \forall_{t\in\intco{0;\infty}}\forall_{i\in\intcc{1;p}}\exists_{t'\in\intcc{t;\infty}}:
+    x(t')\in T_i
+  \big\}.
 \end{IEEEeqnarray*}
-In either case, it is well known~\cite{Tabuada09} that $C$ solves the control problem
-$(S_2,\Sigma_2)$ with $\Sigma_2$ being a reachability (invariance)
-specification iff $I_2\subseteq \pi_{X_2}(\mu Y.\pre(Y)\cup Z_2)$  ($I_2\subseteq \pi_{X_2}(\nu Y.\pre(Y)\cap Z_2)$).
-Also for both types of specifications the controller is \emph{memoryless} or
-\emph{static}, i.e., the output is independent of the state.
+%A fixed point characterization of the winning region
+%
+%
+%In case that the user is familiar with usual game formulation and fixed point
+%characterization of synthesis algorithms as for example described in~\cite{BloemJobstmannPitermanPnueliSaar12}, it is rather straightforward 
 
 
-
-
-
-\newpage
-\part{DATA STRUCTURES AND IMPLEMENTATION}
-
-\section{TransitionSystem.hh}
-
-\section{AbstractionGB.hh}
-
-\section{MultDimIndexSet.hh}
 
 \newpage
 
