@@ -2,6 +2,8 @@
 
 \usepackage{a4wide} %A4 paper border
 
+\usepackage[utf8]{inputenc}
+
 
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
@@ -11,18 +13,16 @@
 \algnewcommand\algorithmicoutput{\textbf{Output:}}
 \algnewcommand\Output{\item[\algorithmicoutput]}
 
-
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage[usenames, dvipsnames, pdftex]{xcolor}
 \usepackage[colorlinks=true,
-        raiselinks=true,
-        linkcolor=MidnightBlue,
-        citecolor=ForestGreen,
-        urlcolor=RoyalPurple,
-        plainpages=false]{hyperref}
+            raiselinks=true,
+            linkcolor=MidnightBlue,
+            citecolor=ForestGreen,
+            urlcolor=RoyalPurple,
+            plainpages=false]{hyperref}
 
-\usepackage{verbatim}
 %% code snippets
 \usepackage{listings}
 
@@ -34,30 +34,9 @@
 \definecolor{strings}{HTML}{702C51}
 
 \lstset{emph=[1]{%  
-  clear,
-  addByFunction,
-  getInputs,
-  getTransitionRelation,
-  writeToFile,
-  getSymbolicSet,
-  setSymbolicSet,
-  remPolytope,
-  printInfo,
-  mintermToElement,
-  addPolytope,
-  addEllipsoid,
-  remEllipsoid,
-  addGridPoints,
-  complement,
   computeTransitionRelation,
-  remGridPoints,
-  addIndices,
-  remIndices,
-  fillAbstractSet,
-  clearAbstractSet,
   xtoi,
   itox,
-  minimalFixedPoint%
   },emphstyle=[1]{\color{methods}}%
 }%
 
@@ -67,12 +46,6 @@
 }%
 
 \lstset{emph=[2]{%
-      INNER,
-      OUTER,
-      SymbolicSet, 
-      SymbolicModel, 
-      SymbolicModelGrowthBound,
-      FixedPoint,
       UniformGrid,
       AbstractionGB,
       TransitionSystem%
@@ -109,14 +82,13 @@
 
 % tikz
 \usepackage{tikz}
-\usetikzlibrary{arrows,automata}
-\usetikzlibrary{shapes,snakes}
-\usetikzlibrary{calc,positioning}
+\usetikzlibrary{arrows}
+%\usetikzlibrary{calc,positioning}
 
 
 %% bibliography bibtex %.aux
 \usepackage[
-bibencoding=latin1,
+bibencoding=utf8,
 sorting=none,
 style=numeric-comp,
 maxnames=3,
@@ -209,10 +181,13 @@ in \Cpp, but also provides a small MATLAB interface to access atomic proposition
 and the synthesized controllers from the MATLAB workspace.
 
 {\tt SCOTS} natively supports invariance and reachability
-specifications. To account for more general specifications, it is either
-possible to write a customized synthesis algorithm or use {\tt SCOTS} in
-combination with the GR(1) synthesizer {\tt slugs}, see 
-\url{https://github.com/VerifiableRobotics/slugs} and \cite{EhlersRaman16}.
+specifications. 
+\begin{color}{red}
+It can also be used in
+combination with the synthesis tool {\tt slugs}~\cite{EhlersRaman16} to account for
+general reactivity one (GR(1)) specifications. Moreover, expert users have the
+possibility to write customized synthesis algorithms.
+\end{color}
 
 {\tt SCOTS} is mainly intended to be used (and possibly extended) by researchers and
 lecturers in the area of formal methods for
@@ -224,6 +199,8 @@ Although, there are no compelling reasons, why {\tt SCOTS} should not work
 under Windows, we developed and tested the code only under Linux and macOS
 environments. As a result, the installation notes apply to
 Linux/macOS systems only. 
+
+Features should be addressed to \href{mailto:matthias.rungger@tum.de}{matthias.rungger@tum.de}. 
 
 \section{Quickstart}
 
@@ -249,15 +226,17 @@ The three most easy-to-compile examples are found in
 The examples can be run without any additional software and require only a
 \Cpp compiler with \Cpp{\tt11} support. 
 
-\subsection{Persistence and Recurrence} In the two examples in
+\begin{color}{red}
+\subsection{Persistence and Recurrence} In the examples in
 \begin{lstlisting}[basicstyle=\small\ttfamily]
 ./examples/dcdc_bdd        	/* reach-and-stay spec for a DCDC boost converter */ 
 ./examples/unicycle_bdd  	/* recurrence spec involving a unicycle dynamics */ 
 \end{lstlisting}
-we write our own synthesis algorithms using a binary decision diagram representation of the
-atomic propositions and transition relation. In order to run the examples, an
-installation of the 
-{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
+we write customized controller synthesis algorithms to enforce persistence and recurrence specifications.
+%using a binary decision diagram representation of the
+%atomic propositions and transition relation. In order to run the examples, an
+%installation of the 
+%{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
 
 \subsection{GR(1) specifications}
 An example that demonstrates the usage of {\tt SCOTS} in combination with {\tt
@@ -265,7 +244,7 @@ slugs} is provided in the directory
 \begin{lstlisting}[basicstyle=\small\ttfamily]
 ./examples/slugs        	/* the usage of SCOTS in combination with slugs  */ 
 \end{lstlisting}
-
+\end{color}
 
 \subsection{A Priori Enclosure and Growth Bound}
 The directory 
@@ -282,52 +261,38 @@ bound.
 \section{Installation Notes}
 \label{s:req}
 
-{\tt SCOTS} is implemented in ``header-only'' style and you only
-need a working \Cpp developer environment with \Cpp{\tt11} support to use the
-most basic functionality that allows you to
+{\tt SCOTS} is implemented in ``header-only'' style and  only a working \Cpp developer environment with \Cpp{\tt11} support
+is needed. In the basic variant it is possible to
 \begin{enumerate}
   \item compute abstractions
   \item synthesize controllers with respect to invariance and reachability specifications 
   \item simulate the closed loop in \Cpp
 \end{enumerate}
-For various reasons, you might consider to use additional software in combination with {\tt SCOTS}.
+For various reasons, one might consider to use additional software in combination with {\tt SCOTS}.
 
 
 \subsection{Additional software} 
 \label{s:installation:cudd}
 \begin{enumerate}
 
+  \item {\tt vnodelp}: to compute a priori enclosures as well as growth bounds.
 
-  \item {\tt CUDD}: {\bf  a)} to combine {\tt SCOTS} with {\tt slugs}; {\bf  b)}
-  to write customized synthesis algorithms; {\bf c)} to save atomic propositions
-  and transition relations as BDD to file.\\
-  {\tt SCOTS} uses {\tt CUDD} with the following configuration options:
-     \begin{itemize}
-      \item the \Cpp{} object-oriented wrapper
-      \item the dddmp library and
-      \item the shared library 
-    \end{itemize}
-   The package (available at \url{http://vlsi.colorado.edu/~fabio/})
- follows the usual {\tt \small configure}, {\tt
-   \small make} and
-   {\tt \small make install} installation routine. We use {\tt \small cudd-3.0.0}, with the
-   configuration
-  \begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-  ./configure --enable-shared --enable-obj --enable-dddmp --prefix=CUDDPATH
-  \end{lstlisting}
-  where {\tt CUDDPATH} is the desired installation directory, e.g., {\tt ./external/cudd}.
+  {\tt vnodelp} is an open source software tool to compute validated solutions
+  of initial value problems based on  interval arithmetic. It is available at
+  \url{http://www.cas.mcmaster.ca/~nedialk/vnodelp/}.
 
-  On some linux machines we experienced that the header files {\tt \small util.h} and
-  {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
-  copied them to {\tt \small CUDDPATH/include}.
+  Please see {\tt ./examples/aircraft/helper/readme} for 
+  installation notes.
+
 
 
   \item MATLAB: for closed loop simulation and visualization options.\\
 	See \url{http://www.mathworks.com} for installation instructions.
 
-	If you want to access the BDD files from the MATLAB workspace you need to compile 
-	the {\tt mexSymbolicSet.mex} file:
+	To access the BDD files produced by {\tt SCOTS} from the MATLAB workspace the
+  mex file {\tt mexSymbolicSet.mex} needs to be compiled:
 	\begin{enumerate}
+  \item install the {\tt CUDD} library (see item~\ref{i:cudd})
  	\item setup the mex compiler with the MATLAB command
 	\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
 	>> mex -setup C++
@@ -339,16 +304,36 @@ For various reasons, you might consider to use additional software in combinatio
 	 \end{itemize}
  \end{enumerate}
 
+  \item
+  \label{i:cudd}
+  {\tt CUDD}: {\bf  a)} to combine {\tt SCOTS} with {\tt slugs}, {\bf b)} to save atomic propositions
+  and transition relations as BDD to file and {\bf c)} to write customized
+  synthesis algorithms.\\
+  {\tt SCOTS} uses {\tt CUDD} with the following configuration options:
+     \begin{itemize}
+      \item the \Cpp{} object-oriented wrapper
+      \item the dddmp library and
+      \item the shared library 
+    \end{itemize}
+   The package (available at \url{http://vlsi.colorado.edu/~fabio/})
+ follows the usual installation routine of {\tt \small configure}, {\tt
+   \small make} and
+   {\tt \small make install}. We use {\tt \small cudd-3.0.0}, with the
+   configuration
+  \begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
+  ./configure --enable-shared --enable-obj --enable-dddmp --prefix=CUDDPATH
+  \end{lstlisting}
+  where {\tt CUDDPATH} is the desired installation directory, e.g., {\tt ./external/cudd}.
+
+  On some linux machines we experienced that the header files {\tt \small util.h} and
+  {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
+  copied them to {\tt \small CUDDPATH/include}.
+
+
 
   \item {\tt slugs}: for GR(1) synthesis. 
   
   Please visit \url{https://github.com/VerifiableRobotics/slugs} for
-  installation notes.
-
-  \item {\tt vnodelp/Profil}: to obtain high-confidence ODE solver parameters
-  and to compute a priori enclosures as well as growth bounds.
-
-  Please see {\tt ./examples/aircraft/helper/readme} for 
   installation notes.
 
 
@@ -358,6 +343,748 @@ For various reasons, you might consider to use additional software in combinatio
 
 
 	
+\newpage
+\part{THEORY BASICS}
+
+\section{The Symbolic Approach}
+A detailed description of \emph{the symbolic approach to controller synthesis}
+that is implemented in {\tt SCOTS} is presented in~\cite{ReissigWeberRungger15}.
+The article~\cite{ReissigWeberRungger15} contains also a detailed explanation of
+the notation that we use in the following text.
+
+
+\subsection{Control Problems} 
+\label{s:theory:control_problems}
+{\tt SCOTS} supports the computation of
+controllers for  
+nonlinear control systems of the form
+\begin{IEEEeqnarray}{c}\label{e:sys:ct}
+\dot \xi(t) \in f(\xi(t),u) + \segcc{-w,w}
+\end{IEEEeqnarray}
+where $f$ is given by \mbox{$f:\mathbb{R}^n\times U\to \mathbb{R}^n$} and
+$U\subseteq \R^m$. The vector $w=\intcc{w_1,\ldots,w_n}\in \mathbb{R}_+^n$ is a perturbation
+bound and $\segcc{-w,w}$ denotes the hyper-interval
+$\intcc{-w_1,w_1}\times\ldots\times \intcc{-w_n,w_n}$. Given a  time horizon $\tau>0$, we define a \emph{solution
+of~\eqref{e:sys:ct} on $\intcc{0,\tau}$ under (constant) input
+\mbox{$u\in U$}} 
+as an absolutely continuous function \mbox{$\xi \colon \intcc{0,\tau}
+\to \mathbb{R}^n$} that satisfies
+\eqref{e:sys:ct} for almost every (a.e.) \mbox{$t \in
+\intcc{0,\tau}$}.
+
+
+The desired behavior of the closed loop is defined with respect to the
+$\tau$-samp\-led behavior of the continuous-time systems~\eqref{e:sys:ct}.
+To this end, the sampled behavior of~\eqref{e:sys:ct} is casted as
+\emph{simple system}~\cite{ReissigWeberRungger15} 
+\begin{IEEEeqnarray}{c}
+  S_1:=(X_1,U_1,F_1)
+\end{IEEEeqnarray}
+with the \emph{state alphabet} $X_1:=\R^n$, \emph{input alphabet} $U_1:=U$ and
+the \emph{transition function} $F_1:X_1 \times U_1\rightrightarrows X_1$ defined
+by 
+\begin{IEEEeqnarray}{c}
+  F_1(x,u):=\{x'\mid \exists_{ \text{$\xi$ is a solution of~\eqref{e:sys:ct} on
+  $\intcc{0,\tau}$ under $u$}}: \xi(0)=x \land \xi(\tau)=x'\}.
+\end{IEEEeqnarray}
+A \emph{specification} $\Sigma_1$ for a simple system $S_1=(X_1,U_1,F_1)$ is
+simply a set 
+\begin{IEEEeqnarray}{c}
+  \Sigma_1
+	\subseteq
+  (U_1\times X_1)^\infty 
+  :=
+  \bigcup_{T\in \Z_{\ge0}\cup \{\infty\}} (U_1\times X_1)^{\intco{0;T}} 
+\end{IEEEeqnarray}
+of possibly finite and infinite input-state sequences.
+A simple system $S_1$ together with a specification $\Sigma_1$ constitute an
+\emph{control problem} $(S_1,\Sigma_1)$.
+
+The \emph{solution} of a control problem $(S_1,\Sigma_1)$ is a \emph{system} $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
+$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, and satisfies
+\begin{IEEEeqnarray*}{c}
+  \mathcal{B}(C\times S_1)\subseteq \Sigma_1.
+\end{IEEEeqnarray*}
+In this context $C$ and $C\times S_1$ are usually referred to as
+\emph{controller}, respectively, \emph{closed loop}.
+The symbol $\mathcal{B}(C\times S_1)$ denotes the \emph{behavior} of the closed
+loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}.
+We say that a control problem $(S_1,\Sigma_1)$ is \emph{solvable} iff there
+exists a system $C$ that solves $(S_1,\Sigma_1)$.
+
+A block diagram
+of the feedback composition of a controller synthesized with {\tt SCOTS} and the
+system $S_1$ is illustrated in Fig.~\ref{f:closedloop}.
+
+
+\subsection{Supported Specifications}
+{\tt SCOTS} natively supports 
+\begin{itemize}
+\item invariance (often referred to as safety) specifications;
+\item reachability specifications; 
+\item reach-avoid specifications.
+\end{itemize}
+The specifications are defined as follows.
+Consider two sets $I_1\subseteq X_1$ and $Z_1\subseteq X_1$
+An \emph{invariance} specification for $S_1$ associated with $I_1$ and $Z_1$ follows by 
+\begin{IEEEeqnarray*}{c}
+\Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid x(0)\in I_1\implies \forall_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
+\end{IEEEeqnarray*}
+A \emph{reachability} specification for $S_1$ associated
+with $I_1$ and $Z_1$ is defined by
+\begin{IEEEeqnarray*}{c}
+  \Sigma_1:=\{(u,x)\in (U_1\times X_1)^\infty
+  \mid  x(0)\in I_1\implies \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
+\end{IEEEeqnarray*}
+A \emph{reach-avoid} specification for $S_1$ associated
+with $I_1$, $A_1$ and $Z_1$, where $A_1\subseteq X_1$, is defined by
+\begin{IEEEeqnarray*}{c}
+  \Sigma_1:=\big\{(u,x)\in (U_1\times X_1)^\infty
+  \mid  x(0)\in I_1\implies 
+  (
+    \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1
+  \wedge
+    \forall_{t'\in\intco{0;t}}: x(t')\not\in A_1
+  )
+  \big\}.
+\end{IEEEeqnarray*}
+In context of Linear Temporal Logic, the sets $I_1$, $A_1$ and $Z_1$ are often
+identified with \emph{atomic propositions}. In this sense, \texttt{SCOTS} allows to define arbitrary sets as atomic propositions. 
+
+\subsection{Auxiliary Control Problems}
+\label{ss:symbolicmodel}
+
+Given a simple system $S_1=(X_1,U_1,F_1)$ representing the $\tau$-sampled
+behavior of~\eqref{e:sys:ct} and a specification $\Sigma_1$ for $S_1$,
+the control problem $(S_1,\Sigma_1)$ is not solved directly, but an auxiliary,
+finite control problem $(S_2,\Sigma_2)$ is used in the synthesis process. Here, 
+$S_2=(X_2,U_2,F_2)$ is a  \emph{symbolic model} or (discrete)
+\emph{abstraction} of $S_1$ and $\Sigma_2$ is an abstract specification.
+
+The state alphabet of $X_2$ is a cover of $X_1$ and the input alphabet $U_2$ is
+a subset of $U_1$. The set $X_2$ contains a subset $\bar X_2$, representing the ``real'' quantizer symbols,
+while the remaining symbols $X_2\smallsetminus \bar X_2$ are interpreted as
+``overflow'' symbols. The set of real quantizer symbols $\bar X_2$ are given by
+congruent hyper-rectangles aligned on a uniform grid 
+\begin{IEEEeqnarray}{c}
+\label{e:grid}
+  \eta\Z^n=\{c\in \R^n\mid \exists_{k\in\Z^n}\forall_{i\in\intcc{1;n}}\; c_i=k_i\eta_i\}
+\end{IEEEeqnarray}
+with \emph{grid parameter} $\eta\in(\R_+\smallsetminus\{0\})^n$. The real
+quantizer symbols are further parameterized by two
+vectors $a,b\in\R^n$ representing the lower-left and upper-right corners of the
+hyper-interval $\segcc{a,b}$ confining the set $\bar X_2$: 
+\begin{IEEEeqnarray}{c}\label{e:theory:ss}
+ \bar X_2:=\{x_2\mid \exists_{c\in (\eta\Z^n\cap
+ \segcc{a,b})}\;x_2=c+\segcc{-\eta/2,\eta/2}\}.
+\end{IEEEeqnarray}
+{\tt SCOTS} computes symbolic models that are related via feedback
+refinement relations with the plant. A \emph{feedback refinement relation} from
+$S_1$ to $S_2$ is a strict relation $Q\subseteq X_1\times X_2$ that satisfies
+for all $(x_1,x_2)\in Q$ and for all $u\in U_2$ with $F_2(x_2,u)\neq\emptyset$
+the conditions
+\begin{enumerate}
+  \item $F_1(x_1,u)\neq \emptyset$ and
+  \item $Q(F_1(x_1,u))\subseteq F_2(x_2,u)$.
+\end{enumerate}
+In {\tt SCOTS}, the feedback refinement relation $Q$ is given by the set-membership
+relation
+\begin{IEEEeqnarray}{c}\label{e:theory:quantizer}
+  Q:=\{ (x_1,x_2) \mid x_1 \in x_2\}.
+\end{IEEEeqnarray}
+Given an invariance (reachability) specification $\Sigma_1$ for $S_1$ associated
+with $I_1,Z_1$, then an \emph{abstract specification} is given by the
+invariance (reachability) specification for $S_2$ associated with 
+\begin{IEEEeqnarray}{c't'c}\label{e:abs:spec}
+  I_2=\{ x_2 \in X_2\mid x_2\cap I_1\neq\emptyset\} & and & Z_2=\{ x_2 \in
+X_2\mid x_2\subseteq  Z_1\}.
+\end{IEEEeqnarray}
+An abstract reach-avoid specification from $I_1,A_1,Z_1$ for $S_2$ follows by
+\begin{IEEEeqnarray}{c't'c}
+  A_2=\{ x_2 \in X_2\mid x_2\cap A_1\neq\emptyset\}
+\end{IEEEeqnarray}
+and $I_2$ and $Z_2$ as defined in~\eqref{e:abs:spec}.
+The algorithms to solve the control problems $(S_2,\Sigma_2)$ implemented in
+{\tt SCOTS} are outlined in Section~\ref{s:theory:alg}.
+
+
+\subsection{Closed Loop} The main statement facilitating the use of an auxiliary
+control problem reads as follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}:
+
+\emph{Consider two control problems $(S_i,\Sigma_i)$, $i\in\{1,2\}$. Suppose that $Q$
+is a feedback refinement relation from $S_1$ to $S_2$ and $\Sigma_2$ is an
+abstract specification of $\Sigma_1$. If $C$ solves the control problem $(S_2,\Sigma_2)$, then $C\circ
+Q$ solves the control problem $(S_1,\Sigma_1)$.}
+
+The controller $C\circ Q$ for $S_1$ is given by the serial composition of the quantizer
+$Q:X_1\rightrightarrows X_2$ with the controller $C$. 
+The closed loop resulting from a simple system $\Sigma_1$ which represents the $\tau$-sampled
+behavior of~\eqref{e:sys:ct} and a controller $C\circ Q$ is illustrated
+in Fig.~\ref{f:closedloop}. At each $k\in\Z_{\ge0}$ sampling
+time $\tau>0$, the plant state $x_1=\xi(k\tau)$ is measured and fed to the
+quantizer $Q$, which is used to determine a cell $x_2\in X_2$ that contains
+$x_1\in x_2$. Then $x_2$ is fed to the controller $C$ to pick the input $u\in
+U_2\subseteq U_1$ which is applied to~\eqref{e:sys:ct}.
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    [
+    mynode/.style={draw,
+                   thick,
+                   inner sep=.3cm,
+                   minimum width=1cm},
+    %
+    to/.style={->,
+               >=stealth',
+               shorten >=1pt,
+               thick},
+    ]
+
+    \node [mynode] (sys) at (0,0) {$\dot \xi(t)\in f(\xi(t),u)+\segcc{-w,w}$};
+    \node [mynode] (con) at (0,-2.5) {$C$};
+    \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
+
+    %\node [mynode] (dist) at (4,0) {$P$};
+    \node [mynode] (quant) at (4,-1) {$Q$};
+
+    \node at (2.75,0.25) {$\tau$};
+
+
+    \draw [to]  (zoh.north) |-  (sys.west);
+    \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
+
+    \draw[to] (3.5,0) -| node[right] {$x_1$} (quant.north);
+    \draw[to] (quant.south) |- node[above, near end] {$x_1\in x_2$} (con.east);
+
+    \draw[thick] (sys.east) -- (2.75,0);
+    \draw[thick] (2.75,0) -- (3.5,.5);
+    \draw[dashed,thick,bend left,->] (3.1,.5) to (3.1,-.5);
+
+  \end{tikzpicture}
+\caption{Sample-and-hold implementation of a controller synthesized with {\tt SCOTS}.}\label{f:closedloop}
+\end{figure}
+
+%In case that
+%$\Sigma_1$ is an invariance or a reachability specification, the solution $C$ is
+%a \emph{static} system, which means that the state alphabet is a singleton, i.e.,
+%$X_c=\{x_c\}$. The output function 
+%
+%In the simplest
+%case, $C$ is a \emph{static} system, which means $X_c$
+
+Additionally to the perturbations on the right-hand-side
+of~\eqref{e:sys:ct}, it is possible to account for measurement errors
+modeled by a set-valued map $P \colon \mathbb{R}^n \rightrightarrows
+\mathbb{R}^n$ given by
+\begin{IEEEeqnarray}{c't'c}\label{e:perturbation}
+  P(x):=x+\segcc{-z,z} & with & z\in\R_+^n.
+\end{IEEEeqnarray}
+Please see~\cite[Sec.~VI.B]{ReissigWeberRungger15} and~\cite{RunggerZamani16}
+for some background theory.
+The closed loop with measurement errors is illustrated
+in~Fig.~\ref{f:closedloop:pert}.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  [
+  mynode/.style={draw,
+                 thick,
+                 inner sep=.3cm,
+                 minimum width=1cm},
+  %
+  to/.style={->,
+             >=stealth',
+             shorten >=1pt,
+             thick},
+  ]
+
+  \node [mynode] (sys) at (0,0) {$\dot \xi\in f(\xi,u)+\segcc{-w,w}$};
+  \node [mynode] (con) at (0,-2.5) {$C$};
+
+  \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
+
+  \node [mynode] (dist) at (4,0) {$P$};
+  \node [mynode] (quant) at (4,-1.5) {$Q$};
+
+  \node at (2.25,0.25) {$\tau$};
+
+
+  \draw[thick] (sys.east) -- (2.25,0);
+  \draw[thick] (2.25,0) -- (2.75,.25);
+  \draw[dashed,thick,bend left,->] (2.5,.3) to (2.5,-.3);
+  \draw[thick] (2.75,0) -- (3,0);
+
+  \draw[to] (3,0) -- node[above] {$x_1$} (dist.west);
+  \draw[to] (dist.south) -- node[right] {$x_1'$} (quant.north);
+
+
+  \draw [to]  (zoh.north) |-  (sys.west);
+  \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
+
+  \draw[to] (quant.south) |- node[above, near end] {$x'_1\in x_2$} (con.east);
+
+\end{tikzpicture}
+\caption{Closed loop with measurement errors modeled by the set-valued map $x'_1 \in P(x_1)$.}\label{f:closedloop:pert}
+\end{figure}
+
+\section{Construction of Symbolic Models}
+
+\subsection{Growth Bound and A Priori Enclosure}
+\label{ss:GB} 
+
+The construction of a symbolic model $S_2$ of $S_1$
+is based on the over-approxima\-tion of
+attainable sets. In {\tt SCOTS}, the over-approximation of the attainable sets
+requires a so-called growth bound~\cite{ReissigWeberRungger15}.
+A \emph{growth bound} of~\eqref{e:sys:ct} is a function $\beta \colon
+\mathbb{R}_{+}^n \times U' \to \mathbb{R}_{+}^n$, which is defined with respect to a sampling time
+$\tau>0$, a set $K\subseteq \mathbb{R}^n$ and a set $U'\subseteq U$.
+Basically, it provides an upper bound on the deviation of solutions $\xi$
+of~\eqref{e:sys:ct} from \emph{nominal
+solutions}\footnote{A nominal solution $\varphi(\cdot,p,u)$ of
+\eqref{e:sys:ct} is defined as solution of the initial value problem $\dot x=f(x,u)$,
+$x(0)=p$.} $\varphi$ of~\eqref{e:sys:ct}, i.e., for every solution $\xi$ of \eqref{e:sys:ct} on $\intcc{0,\tau}$ with input $u \in U'$ and $\xi(0),p \in K$,
+we have
+\begin{IEEEeqnarray}{c}
+\label{e:growthbound}
+| \xi(\tau) - \varphi(\tau,p,u) | \leq \beta( | \xi(0) - p |, u).
+\end{IEEEeqnarray}
+Here, $|x|$ for $x\in\R^n$, denotes the component-wise absolute value.
+A growth bound can be obtained essentially by bounding
+the Jacobian of $f$. Let
+$L \colon U' \to \mathbb{R}^{n \times n}$ satisfy
+\begin{IEEEeqnarray}{c}\label{e:lipschitz}
+L_{i,j}(u)
+\geq
+\begin{cases}
+D_j f_i(x,u)& \text{if $i=j$,}\\
+| D_j f_i(x,u) |& \text{otherwise}
+\end{cases}
+\end{IEEEeqnarray}
+for all $x\in K'\subseteq \R^n$ and $u\in U'\subseteq U$. Then 
+\begin{IEEEeqnarray}{c}
+\label{e:GrowthBoundComputation}
+\beta(r,u)
+=
+e^{L(u)\tau}
+r
++
+\int_0^\tau
+e^{L(u)s}
+w
+\;\mathrm{d}s,
+\end{IEEEeqnarray}
+is a growth bound on $\intcc{0,\tau}$, $K$, $U'$
+associated with \eqref{e:sys:ct}. The set $K'$ on
+which~\eqref{e:lipschitz} needs to hold, is a so-called \emph{a priori
+enclosure}, i.e., $K'$  is assumed to be convex and contain any
+solution $\xi$ on $\intcc{0,\tau}$ of~\eqref{e:sys:ct} with $u\in U'$ and
+$\xi(0)\in K$,
+see~\cite[Thm.~VIII.5]{ReissigWeberRungger15}. 
+
+In order to use {\tt SCOTS}, the user needs to provide a growth bound, which for
+nonlinear control systems can be provided in terms of the parameterized matrix
+$L(u)$ whose entries satisfy~\eqref{e:lipschitz}. A priori enclosures as well
+as growth bounds can be computed automatically using interval arithmetic based
+ODE solvers. See Section~\ref{s:usage:abs} for more details on how to
+automatically obtain a priori enclosures and growth bounds.
+%An implementation of such computations using the interval ODE
+%solver {\tt vnodelp} for the aircraft example can be found in the directory
+%\begin{lstlisting}[basicstyle=\small\ttfamily]
+%./examples/aircraft/helper        	
+%\end{lstlisting}
+
+
+\subsection{The Transition Function}
+
+Recall that the state alphabet $X_2$ of the symbolic model $S_2=(X_2,U_2,F_2)$
+is composed of the real quantizer symbols $\bar X_2$, which are cells aligned on a
+uniform grid, and the overflow symbols $X_2\smallsetminus \bar X_2$. For $x_2\in
+X_2\smallsetminus \bar X_2$ the transition function is defined for all $u\in
+U_2$ by
+\begin{IEEEeqnarray}{c}
+  F_2(x_2,u):=\emptyset.
+\end{IEEEeqnarray}
+In order to determine the successors $x_2'\in F_2(x_2,u)$ for 
+$x_2=c+\segcc{-\eta/2,\eta/2}\in \bar X_2$ and $u\in U_2$, we first compute the
+hyper-interval 
+\begin{IEEEeqnarray}{c}\label{e:theory:attainableset}
+  R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2,u),\beta(\eta/2,u)}
+\end{IEEEeqnarray}
+which is an over-approximation of the attainable set of~\eqref{e:sys:ct}
+with respect to the set $c+\segcc{-\eta/2,\eta/2}$ and input $u$.
+If $P$ is not covered by the real quantizer symbols, i.e.,  $R\not\subseteq
+\cup_{x_2\in \bar X_2} x_2$, then we define
+\begin{IEEEeqnarray}{c}
+  F_2(x_2,u):=\emptyset.
+\end{IEEEeqnarray}
+Otherwise, we define the successor cells function by
+\begin{IEEEeqnarray}{c}\label{e:theory:tf3}
+x_2'\in F_2(x_2,u):\iff x_2'\cap R\neq\emptyset.
+\end{IEEEeqnarray}
+Using similar arguments as in~\cite[Thm.~VIII.4]{ReissigWeberRungger15}, it is
+straightforward to show that $Q$ is a feedback refinement relation from $S_1$ to
+$S_2$. Note that $F_2$ satisfies 
+\begin{IEEEeqnarray}{c}\label{e:theory:tf4}
+ F_2(x_2,u)\subseteq \bar X_2.
+\end{IEEEeqnarray}
+
+If we need to be robust against measurement errors $P(x)=x+\segcc{-z,z}$, we
+slightly modify the computation of $R$ to 
+\begin{IEEEeqnarray}{c}
+  R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2+z,u),\beta(\eta/2+z,u)}
+\end{IEEEeqnarray}
+and define the transition function to (instead of~\eqref{e:theory:tf3})
+\begin{IEEEeqnarray}{c}
+x_2'\in F_2(x_2,u):\iff (x_2'+\segcc{-z,z})\cap R\neq\emptyset.
+\end{IEEEeqnarray}
+As a result we obtain that $Q\circ P$ is a feedback refinement relation from
+$S_1$ to $S_2$, see~\cite[Thm.~III.5]{WeberRunggerReissig17}, which enables the
+correct controller refinement under measurement errors~\cite[Sec.~VI.B]{ReissigWeberRungger15}. The use of the
+perturbation parameter $z\in\R_{>0}^n$ in {\tt SCOTS} is explained in detail in 
+Section~\ref{s:usage:abs}.
+
+In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver
+to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
+
+\section{Controller Synthesis}
+\label{s:theory:alg}
+
+We discuss the algorithms that are implemented in {\tt SCOTS} to
+solve synthesis problems for the finite symbolic model $S_2=(X_2,U_2,F_2)$. 
+We use the following notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
+\begin{IEEEeqnarray}{c}
+U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
+\end{IEEEeqnarray}
+We use the Weierstrass symbol $\wp$ to denote the power set and define $\pre:\wp(X_2)\to \wp(X_2)$ by
+\begin{IEEEeqnarray}{c}\label{e:pre}
+  \pre(Y):=\{x_2\in X_2\mid  \exists_{u\in U_{S_2}(x_2)}:\;F_2(x_2,u)\subseteq Y\}.
+\end{IEEEeqnarray}
+
+Usually, synthesis algorithms are developed in the context of two-player games on graphs. The player associated with the controller tries to
+enforce the specification while the player associated with disturbances tries to
+violate the specification, e.g.~\cite{BloemJobstmannPitermanPnueliSaar12}.
+
+
+\subsection{Invariance}
+
+Let $\Sigma_2$ be an invariance specification associated with $I_2$ and $Z_2$. 
+We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
+solveInvarianceGame} in the file {\tt GameSolver.hh}, to synthesize a controller
+that solves the control problem $(S_2,\Sigma_2)$.  
+Alg.~\ref{a:safety} runs in $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
+triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$, since each state is added to the queue
+of bad states $Q$ at most once.
+
+\begin{algorithm}[h]
+\caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
+  \begin{algorithmic}[1]
+    \Input{$Z_2$, $S_2=(X_2,U_2,F_2)$}
+    \Require{$F_2(X_2,U_2)\subseteq \bar X_2$ and $Z_2\subseteq \bar X_2$}
+    \State $Q:=\emptyset$ \Comment{ FIFO queue of bad states} 
+    \State $E:=\emptyset$ \Comment{ bookkeeping of the bad states} 
+    \State $D:=\emptyset$ \Comment{ valid state-input pairs}
+    \ForAll{$x_2\in \bar X_2$}
+    \If{$x_2\not\in Z_2$ or $U_2(x_2)=\emptyset$}
+    \Comment{ mark all states outside $Z_2$ or blocking states as bad}
+    \State $Q:=Q\cup \{x_2\}$
+    \Else 
+    \State $D:=D\cup (\{x_2\}\times U_2(x_2))$ 
+    \EndIf
+    \EndFor
+    \State $E:=Q$
+    \While{ $Q\neq\emptyset$ }
+    \State $x'_2:\in Q$ \Comment{remove oldest element}\label{a:safety:beginwhile}
+    \State $Q:=Q\smallsetminus \{x_2'\}$\label{a:safety:remQ}
+    \ForAll{$(x_2,u)\in F_2^{-1}(x_2')$}
+    \State $D:=D\smallsetminus \{(x_2,u)\}$\label{a:safety:remove}
+    \Comment{ remove state-input pairs that lead to bad states}
+    \If{$x_2\not \in D^{-1}(U_2)$ and $x_2\not\in E$}
+    \Comment{ no valid input left and not already marked bad}
+    \State $Q:=Q\cup\{x_2\}$\label{a:safety:addQ}
+    \Comment{ add to queue of bad states}
+    \State $E:=E\cup\{x_2\}$\label{a:safety:addE}
+    \EndIf
+    \EndFor
+    \EndWhile
+    \Output $D$
+  \end{algorithmic}
+
+\end{algorithm}
+
+Let $D\subseteq X_2\times U_2$ be the set of state-input pairs computed in
+Alg.~\ref{a:safety}. One can show that $D^{-1}(U_2)$ is the \emph{maximal fixed
+point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
+\begin{IEEEeqnarray}{c}\label{e:theory:fp:safety}
+  G(Y):=Z_2\cap\pre(Y).
+\end{IEEEeqnarray}
+The maximal fixed point of~\eqref{e:theory:fp:safety}
+characterizes the largest set of initial states from which the invariance
+condition can be enforced and it follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $I_2\subseteq D^{-1}(U_2)$. 
+
+%\begin{lemma}
+%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$
+%and $F_2(X_2,U_2)\subseteq \bar X_2$. Let $Z_2\subseteq \bar X_2$ and let $D$ be the output of
+%Alg.~\ref{a:safety}. The set $Y_\infty:=D^{-1}(U_2)$ is the maximal fixed point
+%of~\eqref{e:theory:fp:safety}.
+%\end{lemma}
+%\begin{proof}
+%Let $D_i$, $E_i$ and $Q_i$ denote the sets $D$, $E$ and $Q$
+%manipulated in Alg.~\ref{a:safety} at the beginning of the while loop in
+%line~\ref{a:safety:beginwhile} of iteration $i\in \Z_{\ge0}$. For example for
+%$i=0$ we have $D_0=\{(x,u) \mid x\in Z_2\wedge u\in U_{S_2}(x)\}$ and $D_{i+1}$
+%results from $D_i$ by removing the elements in line~\ref{a:safety:remove}.
+%Similarly, $E_0=Q_0$ and $E_{i+1}$ results from $E_i$ by adding elements in
+%line~\ref{a:safety:addE} and $Q_{i+1}$ results from $Q_i$ by adding and removing
+%elements in line~\ref{a:safety:addQ} and line~\ref{a:safety:remQ}, respectively.
+%Parallel to $D_i$ we introduce $Y_i:=D_i^{-1}(U_2)$.  Let us point out that for
+%all $i\ge0$ we have $Q_i\subseteq E_i$, $E_i=\cup_{i'\in\intcc{0;i}} Q_{i'}$ and the sets 
+%$E_i$ and $Y_i$ are disjoint and satisfy $\bar X_2=E_i\cup Y_i$. Also $Y_{i+1}\subseteq Y_i\subseteq \cdots
+%\subseteq Z_2$ and there exists $i^*\in \Z_{\ge0}$ so that $Y_{i^*}=Y_\infty$.
+%
+%Let us first show that $Y_\infty=G(Y_\infty)$. Let $Y_\infty
+%=Y_{i^*}$ and $x\in Y_{i^*}$. Since $Y_{i^*}\subseteq Z_2$ we have $x\in Z_2$
+%and it remains to show that $x\in \pre(Y_{i^*})$. Let
+%$u\in U_{S_2}(x)$ be such that $(x,u)\in D_{i^*}$. As $(x,u)\in D_{i^*}$ we
+%conclude $F(x,u)\cap Q_i=\emptyset$ for all $i\in\intcc{0;i^*}$ (otherwise
+%$(x,u)$ would have been removed in line~\ref{a:safety:remove}). We obtain
+%$F(x,u)\cap E_{i^*}=\emptyset$. Since $F_2(x,u)\subseteq \bar X_2$ and $\bar
+%X_2=E_{i^*}\cup Y_{i^*}$ it follows that $F_2(x,u)\subseteq Y_{i^*}$ and $x\in
+%\pre(Y_{i^*})$ follows.  Now let $x\in G(Y_{i^*})=Z_2\cap \pre(Y_{i^*})$ and
+%assume for the sake of contradiction that $x\not\in Y_{i^*}$.
+%Let $u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq Y_{i^*}$. Since
+% $x\in Z_2$ we see that $(x,u)\in D_0$. Hence, if $x\not\in Y_{i^*}$ all pairs $(\bar x,\bar u)$
+%with $\bar x=x$ (including the pair $(x,u)$) need to have been removed from $D_0$ along the iteration
+%$i\in\intcc{0;i^*}$. However, from $F_2(x,u)\subseteq Y_{i^*}$ follows that
+%$F_2(x,u)\cap E_{i^*}=\emptyset$. Moreover, 
+%for all $i\in\intcc{0;i^*}$ holds $Q_i\subseteq E_{i^*}$ and we obtain $F_2(x,u)\cap
+%  Q_{i}=\emptyset$ for all $i\in\intcc{0;i^*}$ so that we arrive at a contradiction
+%  since $(x,u)$ cannot have been removed from $D_0$ in line~\ref{a:safety:remove}.
+%
+%Let $\bar Y\subseteq X_2$. We show that $\bar Y \subseteq G(\bar Y)$ implies
+%$\bar Y\subseteq Y_\infty$ by induction over  $i\ge 0$.
+%Let $i=0$ and $x\in \bar Y$. Since
+%$\bar Y\subseteq G(\bar Y)$ we have $x\in Z_2$ and $U_{S_2}(x)\neq\emptyset$,
+%which shows that $x\in Y_0$. Now suppose that $\bar Y\subseteq Y_i$ but $\bar
+%Y\not\subseteq Y_{i+1}$, i.e., there exist $x\in (Y_i\smallsetminus Y_{i+1})\cap
+%\bar Y$. That means all pairs $(\bar x,\bar u)$ with $\bar x=x$ in $D_i$ have been removed in line~\ref{a:safety:remove}. 
+%However, there exists at least one $u\in U_{S_2(x)}$ with
+%$F_2(x, u)\cap Q_i=\emptyset$. That follows from
+%the fact that $x\in G(\bar Y)$, $\bar Y\subseteq Y_i$ and $Q_i\cap Y_i\neq
+%\emptyset$. Hence,
+%we obtain a contradiction and $\bar Y\subseteq Y_{i+1}$ follows. As this holds
+%for all $i\ge0$ we conclude that $\bar Y\subseteq Y_{\infty}$ and the assertion follows.
+%\end{proof}
+
+
+Suppose that $I_2\subseteq D^{-1}(U_2)$ holds, then we obtain a controller
+$C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
+that solves $(S_2,\Sigma_2)$ by  
+\begin{IEEEeqnarray}{rCl}\label{e:controller}
+\begin{IEEEeqnarraybox}[][c]{rCl}
+H_c(q,x_2)&=&
+\begin{cases}
+D(x_2)\times \{x_2\} & \text{if } x_2\in D^{-1}(U_2)\\
+U_2\times\{x_2\} & \text{otherwise}
+\end{cases}\\
+F_c(q,x_2)&=&
+\begin{cases}
+\{q\} & \text{if } x_2\in D^{-1}(U_2)\\
+\emptyset &  \text{otherwise.}
+\end{cases}
+\end{IEEEeqnarraybox}
+\end{IEEEeqnarray}
+The refined controller $C\circ Q$ that is feedback composed with $S_1$ is
+implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
+explained in Section~\ref{s:usage:simulation}.
+
+
+\subsection{Reachability}
+
+Let $\Sigma_2$ be a reachability specification associated with $I_2$ and
+$Z_2\subseteq \bar X_2$. 
+We use Alg.~\ref{a:reach}, which is implemented in the function 
+{\tt solveReachabilityGame} in the file {\tt GameSolver.hh}, to synthesize a controller
+that solves the control problem $(S_2,\Sigma_2)$. The algorithm is a variant of
+Dijkstra's shortest path algorithm for hyper-graphs taken
+from~\cite{GalloLongoPallotinoNguyen93}. It runs in $O(m)$ time, where $m$ is
+the number of transitions, i.e., the number of elements in $X_2\times U_2\times
+X_2$ that satisfy $x_2'\in F_2(x_2,u)$.
+
+\begin{algorithm}[h]
+  \caption{Controller synthesis for reachability specs associated with $I_2$ and $Z_2$}
+  \label{a:reach}
+  \begin{algorithmic}[1]
+    \Input{ $Z_2$, $S_2=(X_2,U_2,F_2)$, $u_0\in U_2$}
+    \Require{ $Z_2\subseteq \bar X_2$}
+    \State {$Q := Z_2$ \Comment{FIFO queue}}
+    \State {$V := \infty$}\Comment{value function}\label{a:reach:initV}
+    \State $M:=0$ \Comment{intermediate values} 
+    \State {$E := \emptyset$ \Comment{bookkeeping of processed states}}
+    \ForAll {$x_2 \in\bar X_2$}
+      \State {$D(x_2) := \emptyset$}\Comment{keep track of optimal input}
+      \If{$x_2\in Z_2$}
+        \State {$V(x_2) := 0$}\Comment{cost at target are zero}
+        \label{a:reach:setV}
+        \State {$D(x_2) := \{u_0\}$}\label{a:reach:initD}
+        \label{a:reach:initD}
+      \EndIf
+    \EndFor
+    \While {$Q \not= \emptyset$}
+      \State {$x_2' :\in  Q $} \Comment{remove oldest element} \label{a:reach:remove}
+      \State {$Q := Q \smallsetminus \{ x_2' \}$}
+      \State {$E := E \cup \{ x_2' \}$}\label{a:reach:addE}
+      \ForAll {$(x_2,u) \in F_2^{-1}(x_2')$}
+        \State $M(x_2,u):=\max\{M(x_2,u),V(x_2')\}$
+        \If {$F_2(x_2,u) \subseteq E$ and $V(x_2) > 1+M(x_2,u)$} \Comment{if $u$ leads to better cost update input}
+        \label{a:reach:conditions}
+          \State {$V(x_2) := 1+M(x_2,u)$} \label{a:reach:updateV}
+          \State {$Q := Q \cup \{ x_2 \}$}\label{a:reach:add}
+          \State {$D(x_2) := \{ u \}$}\label{a:reach:setD}
+        \EndIf
+      \EndFor
+    \EndWhile
+    \Output {$D$, $V$}
+  \end{algorithmic}
+\end{algorithm}
+
+Let $D$ be the output of Alg.~\ref{a:reach}.
+The set $D^{-1}(U_2)$ is
+the \emph{minimal fixed point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
+\begin{IEEEeqnarray}{c}\label{e:theory:fp:reach}
+  G(Y):=Z_2\cup\pre(Y).
+\end{IEEEeqnarray}
+The minimal fixed point of~\eqref{e:theory:fp:reach} characterizes the largest
+set from which every element of the behavior of the system $S_2$ can be forced
+to reach the set $Z_2$.
+It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $I_2\subseteq D^{-1}(U_2)$. 
+
+%\begin{lemma}
+%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$,
+%let $Z_2\subseteq \bar X_2$  and let $D$ be the output of
+%Alg.~\ref{a:reach}. Then $Y_\infty:=D^{-1}(U_2)$ is the minimal fixed point
+%of~\eqref{e:theory:fp:reach}.
+%\end{lemma}
+%\begin{proof}[Proof sketch]
+%Let $Q_i$ denote the set $Q$ that is processed Alg.~\ref{a:reach} at iteration
+%$i$ of the while loop in line~\ref{a:reach:remove}. For example $Q_0=Z_2$ and
+%$Q_{i+1}$ results from $Q_i$ by removing and adding elements in
+%line~\ref{a:reach:remove} and~\ref{a:reach:add}, respectively. Let $i^*$ denote
+%the iteration when the algorithm terminates, i.e., $Q_{i^*}=\emptyset$. Since
+%every element of $Q_i$ for all $i\in\intco{0;i^*}$ is added to $E$ in
+%line~\ref{a:reach:addE}, we have 
+%$E=\cup_{i\in\intcc{0;i^*}}Q_i$. Moreover, $D(x)\neq\emptyset$ holds iff 
+%$x\in Q_i$ for some $i\in\intco{0;i^*}$ and we see that $Y_\infty=E$.
+%Another invariant which is easy to check is: $x\in Q_i$ for some $i\in
+%\intco{0;i^*}$ implies $V(x)<\infty$. Hence $M(x,u)$ is finite for every
+%$(x,u)\in X_2\times U_2$ throughout the whole computation.
+%
+%Let us show that $Y_\infty$ is a fixed point of~\eqref{e:theory:fp:reach}.
+%Let $x\in Y_\infty$. If $x\in Z_2$ we immediately obtain $x\in G(Y_\infty)$.
+%For $x\not\in Z_2$ we see that $D(x)$ has been set in line~\ref{a:reach:setD}
+%and we obtain $F_2(x,D(x))\subseteq E=Y_\infty$. Now let $x\in G(Y_\infty)$. If
+%$x\in Z_2$ we use line~\ref{a:reach:initD} to infer $x\in Y_\infty$ and
+%subsequently we consider $x\in \pre(Y_\infty)$. Since $Y_\infty=E$, there exists
+%$u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq E$. Since $M(x,u)<\infty$ holds
+%throughout the computation and initially $V(x)=\infty$, we see that there must have been an iteration $i$ where
+%both conditions in line~\ref{a:reach:conditions} have been true for $(x,u)$ (in
+%place of $(x_2,u)$), so that
+%$D(x)\neq\emptyset$, which shows $x\in Y_\infty$.
+%
+%We continue to show that $Y_\infty$ is the minimal fixed point
+%of~\eqref{e:theory:fp:reach}.
+%Let $D_i$ denote the map $D$ computed in Alg.~\ref{a:reach} at
+%line~\ref{a:reach:remove}, i.e., $D_0$ is
+%computed in line~\ref{a:reach:initD} and $D_{i+1}$ results from $D_i$ by setting
+%the input in line~\ref{a:reach:setD}. Let $Y_i:=D_i^{-1}(U_2)$ and observe that
+%$Y_0=Z_2$ and $Y_i\subseteq Y_{i+1}$ holds for all $i\ge0$. One can also show
+%that $Y_{i+1}\subseteq G(Y_i)$.
+%Moreover, one can show that $G$ is monotone, i.e., for  $Y,Y'\subseteq \bar X_2$ the inclusion
+%$Y\subseteq Y'$ implies $G(Y)\subseteq G(Y')$. Given this fact it is easy to see
+%that $G(\bar Y)\subseteq \bar Y$ implies $Y_{i}\subseteq \bar Y$ for all $i\ge0$, since we
+%have $Y_0=Z_2\subseteq \bar Y$ and $Y_{i+1}\subseteq G(Y_i)\subseteq G(\bar
+%Y)\subseteq \bar Y$. Given that the algorithm terminates there exists $i^*$ with
+%$Y_\infty=Y_{i^*}$ and $Y_\infty\subseteq \bar Y$ follows.
+%\end{proof}
+
+Given that $I_2\subseteq D^{-1}(U_2)$ holds, a controller
+$C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ that solves $(S_2,\Sigma_2)$ is identical
+to the controller that solves the invariance problem, i.e., $F_c$ and $H_c$ are
+given by~\eqref{e:controller}.
+
+Again, the refined controller $C\circ Q$ that is feedback composed with $S_1$ is
+implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
+explained in Section~\ref{s:usage:simulation}.
+
+\subsection{Reach-Avoid}
+Let $\Sigma_2$ be a reach-avoid specification associated with $I_2$ and $A_2,Z_2\subseteq \bar X_2$. 
+{\tt SCOTS} provides two alternatives on how to synthesize controller to enforce
+reach-avoid specifications. In the first method, the avoid set $A_2$ is
+accounted for in the transition function, i.e.,
+\begin{IEEEeqnarray}{c'c}\label{e:theory:tf:avoid}
+  \forall_{x_2\in A_2}:& F_2(x_2,u):=\emptyset.
+\end{IEEEeqnarray}
+In this way we can reduce a reach-avoid problem to a reachability problem. 
+Given that the transition function satisfies \eqref{e:theory:tf:avoid}, any
+controller that solves the control problem $(S_2,\Sigma_2')$, where $\Sigma_2'$
+is the reachability specification associated with $I_2$ and $Z_2$, also solves the
+control problem $(S_2,\Sigma_2)$. In order to enforce the
+equation~\eqref{e:theory:tf:avoid} in the computation of the transition function
+$F_2$ the user can optionally supply the avoid set to the function {\tt
+AbstractionGB::computeTransitionRelation}, see Section~\ref{s:usage:abs}.
+
+For the second method, the computation of the transition function is left
+unchanged, but Alg.~\ref{a:reach} is modified to account for the avoid set. To
+this end the condition in line~\ref{a:reach:conditions} in Alg.~\ref{a:reach} is modified to 
+\begin{IEEEeqnarray}{c't'c't'c}\label{a:avoid}
+ F_2(x_2,u) \subseteq E& and &V(x_2) > 1+M(x_2,u)& and & x_2\not\in A_2.
+\end{IEEEeqnarray}
+Again the user can optionally supply the avoid set to the function {\tt
+solveReachabilityGame}, see Section~\ref{s:usage:synthesis}.
+
+
+%\subsection{Customized Synthesis Algorithms}
+%\label{s:theory:customized}
+%
+%Even though {\tt SCOTS} natively supports only invariance and reachability
+%specification, an advanced user has the possibility to write customized
+%synthesis algorithms. We demonstrate such a customization for persistence and
+%recurrence specifications. 
+%
+%Let $S=(X,U,F)$ be a finite simple
+%system with and consider the sets $I, Z, T_i\subseteq X$, $i\in\intcc{1;p}$,
+%$p\in\N$. The \emph{persistence} specification $\Sigma$ for $S$ associated with $I$ and $Z$ is given by
+%\begin{IEEEeqnarray}{c}
+%  \Sigma:=\big\{(u,x)\in (U\times X)^\infty
+%  \mid  x(0)\in I\implies 
+%    \exists_{t\in\intco{0;\infty}}\forall_{t'\in\intcc{t;\infty}}: x(t')\in Z
+%  \big\}.
+%\end{IEEEeqnarray}
+%The \emph{recurrence} specification $\Sigma$ for $S$ associated with $I$ and
+%$T_i$, $i\in\intcc{1;p}$, $p\in\N$ is given by
+%\begin{IEEEeqnarray}{c}
+%  \Sigma:=\big\{(u,x)\in (U\times X)^\infty
+%  \mid  x(0)\in I\implies 
+%    \forall_{t\in\intco{0;\infty}}\forall_{i\in\intcc{1;p}}\exists_{t'\in\intcc{t;\infty}}:
+%    x(t')\in T_i
+%  \big\}.
+%\end{IEEEeqnarray}
+%Using the $\mu$-calculus notation, e.g. used
+%in~\cite{BloemJobstmannPitermanPnueliSaar12}, to denote minimal and maximal fixed
+%points of monotone functions, we can characterize the set of \emph{winning
+%states} for persistence and recurrence specifications by the fixed point expressions
+%\begin{IEEEeqnarray}{c}
+%  \mu Y_1.\nu Y_2. \pre(Y_1)\cup (\pre(Y_2)\cap Z)
+%\end{IEEEeqnarray}
+%respectively
+%\begin{IEEEeqnarray}{c}
+%  \nu Y_1.\bigcap_{i\in\intcc{1;p}}\mu Y_2. \pre(Y_2)\cup (\pre(Y_1)\cap T_i).
+%\end{IEEEeqnarray}
+
+
+
 
 \newpage
 
@@ -367,13 +1094,27 @@ For various reasons, you might consider to use additional software in combinatio
 \section{Computation of Symbolic Models}
 \label{s:usage:abs}
 
-\begin{itemize}
-  \item ordinary differential equation 
-  \item growth bound
-  \item abstract state alphabet 
-  \item abstract input alphabet 
-\end{itemize}
+Let $S_1=(X_1,U_1,F_1)$ be a simple system that represents the $\tau$-sampled
+behavior of continuous-time system~\eqref{e:sys:ct} as defined in
+Section~\ref{s:theory:control_problems}. In order to compute a symbolic model
+$S_2=(X_2,U_2,F_2)$ of $S_1$, i.e., the relation $Q$ in~\ref{e:theory:quantizer} is a feedback
+refinement relation from $S_1$ to $S_2$, the following ingredients are needed:
+\begin{enumerate}
+  \item the set of real quantizer symbols $\bar X_2$;
+  \item the input alphabet $U_2$;
+  \item the solution $\varphi(\tau,p,u)$ of the IVP $\dot \xi = f(\xi,u)$,
+  $\xi(0)=p$ at time $\tau$;
+  \item a growth bound $\beta(r,u)$.
+\end{enumerate}
+Subsequently, we demonstrate the usage of {\tt SCOTS} to compute a symbolic
+model of the $\tau$-sampled aircraft dynamics used
+in~\cite[Sec.~IX.B]{ReissigWeberRungger15}. 
 
+First, we define the set of real quantizer symbols $\bar X_2$ (defined
+in~\eqref{e:theory:ss}) and the input
+alphabet $U_2$. To this end, {\tt SCOTS} provides the class {\tt UniformGrid}. T  parameterized by the
+grid parameter $\eta\in \R^n_{>0}$ and the confining vectors  $a,b\in \R^n$. An
+instance is created by
 
 \section{Controller Synthesis}
 \label{s:usage:synthesis}
@@ -1289,726 +2030,6 @@ we specify that $0.7$ and $0.75$ correspond to the third, respectively, first co
 %\subsection{Symbolic Model}
 %
 %\subsection{Fixed Point Computations}
-
-\newpage
-\part{THEORY BASICS}
-
-\section{The Symbolic Approach}
-A detailed description of \emph{the symbolic approach to controller synthesis}
-that is implemented in {\tt SCOTS} is presented in~\cite{ReissigWeberRungger15}.
-The article~\cite{ReissigWeberRungger15} contains also a detailed explanation of
-the notation that we use in the following text.
-
-
-\subsection{Control Problems} 
-{\tt SCOTS} supports the computation of
-controllers for  
-nonlinear control systems of the form
-\begin{IEEEeqnarray}{c}\label{e:System:c-time}
-\dot \xi(t) \in f(\xi(t),u) + \segcc{-w,w}
-\end{IEEEeqnarray}
-where $f$ is given by \mbox{$f:\mathbb{R}^n\times U\to \mathbb{R}^n$} and
-$U\subseteq \R^m$. The vector $w=\intcc{w_1,\ldots,w_n}\in \mathbb{R}_+^n$ is a perturbation
-bound and $\segcc{-w,w}$ denotes the hyper-interval
-$\intcc{-w_1,w_1}\times\ldots\times \intcc{-w_n,w_n}$. Given a  time horizon $\tau>0$, we define a \emph{solution
-of~\eqref{e:System:c-time} on $\intcc{0,\tau}$ under (constant) input
-\mbox{$u\in U$}} 
-as an absolutely continuous function \mbox{$\xi \colon \intcc{0,\tau}
-\to \mathbb{R}^n$} that satisfies
-\eqref{e:System:c-time} for almost every (a.e.) \mbox{$t \in
-\intcc{0,\tau}$}.
-
-
-The desired behavior of the closed loop is defined with respect to the
-$\tau$-samp\-led behavior of the continuous-time systems~\eqref{e:System:c-time}.
-To this end, the sampled behavior of~\eqref{e:System:c-time} is casted as
-\emph{simple system}~\cite{ReissigWeberRungger15} 
-\begin{IEEEeqnarray}{c}
-  S_1:=(X_1,U_1,F_1)
-\end{IEEEeqnarray}
-with the \emph{state alphabet} $X_1:=\R^n$, \emph{input alphabet} $U_1:=U$ and
-the \emph{transition function} $F_1:X_1 \times U_1\rightrightarrows X_1$ defined
-by 
-\begin{IEEEeqnarray*}{c}
-  F_1(x,u):=\{x'\mid \exists_{ \text{$\xi$ is a solution of~\eqref{e:System:c-time} on
-  $\intcc{0,\tau}$ under $u$}}: \xi(0)=x \land \xi(\tau)=x'\}.
-\end{IEEEeqnarray*}
-A \emph{specification} $\Sigma_1$ for a simple system $S_1=(X_1,U_1,F_1)$ is
-simply a set 
-\begin{IEEEeqnarray}{c}
-  \Sigma_1
-	\subseteq
-  (U_1\times X_1)^\infty 
-  :=
-  \bigcup_{T\in \Z_{\ge0}\cup \{\infty\}} (U_1\times X_1)^{\intco{0;T}} 
-\end{IEEEeqnarray}
-of possibly finite and infinite input-state sequences.
-A simple system $S_1$ together with a specification $\Sigma_1$ constitute an
-\emph{control problem} $(S_1,\Sigma_1)$.
-
-The \emph{solution} of a control problem $(S_1,\Sigma_1)$ is a \emph{system} $C=(X_c,X_{c,0},U_c,V_c,Y_c,F_c,H_c)$ which is \emph{feedback composable} with
-$S_1$, see~\cite[Def.~III.3]{ReissigWeberRungger15}, and satisfies
-\begin{IEEEeqnarray*}{c}
-  \mathcal{B}(C\times S_1)\subseteq \Sigma_1.
-\end{IEEEeqnarray*}
-In this context $C$ and $C\times S_1$ are usually referred to as
-\emph{controller}, respectively, \emph{closed loop}.
-The symbol $\mathcal{B}(C\times S_1)$ denotes the \emph{behavior} of the closed
-loop $C\times S_1$, see~\cite[Def.~V.1]{ReissigWeberRungger15}.
-We say that a control problem $(S_1,\Sigma_1)$ is \emph{solvable} iff there
-exists a system $C$ that solves $(S_1,\Sigma_1)$.
-
-A block diagram
-of the feedback composition of a controller synthesized with {\tt SCOTS} and the
-system $S_1$ is illustrated in Fig.~\ref{f:closedloop}.
-
-
-\subsection{Supported Specifications}
-{\tt SCOTS} natively supports 
-\begin{itemize}
-\item invariance (often referred to as safety) specifications;
-\item reachability specifications; 
-\item reach-avoid specifications.
-\end{itemize}
-The specifications are defined as follows.
-Consider two sets $I_1\subseteq X_1$ and $Z_1\subseteq X_1$.
-An \emph{invariance} specification for $S_1$ associated with $I_1,Z_1$ follows by 
-\begin{IEEEeqnarray*}{c}
-\Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid x(0)\in I_1\implies \forall_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
-\end{IEEEeqnarray*}
-A \emph{reachability} specification for $S_1$ associated
-with $I_1,Z_1$ is defined by
-\begin{IEEEeqnarray*}{c}
-  \Sigma_1:=\{(u,x)\in (U_1\times X_1)^\infty
-  \mid  x(0)\in I_1\implies \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
-\end{IEEEeqnarray*}
-A \emph{reach-avoid} specification for $S_1$ associated
-with $I_1,A_1,Z_1$ with $A_1\subseteq X_1$ is defined by
-\begin{IEEEeqnarray*}{c}
-  \Sigma_1:=\big\{(u,x)\in (U_1\times X_1)^\infty
-  \mid  x(0)\in I_1\implies 
-  (
-    \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1
-  \wedge
-    \forall_{t'\in\intco{0;t}}: x(t')\not\in A_1
-  )
-  \big\}.
-\end{IEEEeqnarray*}
-In this context, the sets $I_1$, $A_1$ and $Z_1$ are referred to as \emph{atomic
-propositions}.
-\texttt{SCOTS} allows to define arbitrary sets as atomic propositions. 
-
-\subsection{Auxiliary Control Problems}
-\label{ss:symbolicmodel}
-
-Given a simple system $S_1=(X_1,U_1,F_1)$ representing the $\tau$-sampled
-behavior of~\eqref{e:System:c-time} and a specification $\Sigma_1$ for $S_1$,
-the control problem $(S_1,\Sigma_1)$ is not solved directly, but an auxiliary,
-finite control problem $(S_2,\Sigma_2)$ is used in the synthesis process. Here, 
-$S_2=(X_2,U_2,F_2)$ is a  \emph{symbolic model} or (discrete)
-\emph{abstraction} of $S_1$ and $\Sigma_2$ is an abstract specification.
-
-The state alphabet of $X_2$ is a cover of $X_1$ and the input alphabet $U_2$ is
-a subset of $U_1$. The set $X_2$ contains a subset $\bar X_2$, representing the ``real'' quantizer symbols,
-while the remaining symbols $X_2\smallsetminus \bar X_2$ are interpreted as
-``overflow'' symbols. The set of real quantizer symbols $\bar X_2$ are given by
-congruent hyper-rectangles aligned on a uniform grid 
-\begin{IEEEeqnarray}{c}
-\label{e:grid}
-  \eta\Z^n=\{c\in \R^n\mid \exists_{k\in\Z^n}\forall_{i\in\intcc{1;n}}\; c_i=k_i\eta_i\}
-\end{IEEEeqnarray}
-with \emph{grid parameter} $\eta\in(\R_+\smallsetminus\{0\})^n$, i.e., 
-\begin{IEEEeqnarray}{c}\label{e:abs:ss}
-  x_2\in \bar X_2\implies \exists_{c\in \eta\Z^n}\;x_2=c+\segcc{-\eta/2,\eta/2}.
-\end{IEEEeqnarray}
-{\tt SCOTS} computes symbolic models that are related via feedback
-refinement relations with the plant. A \emph{feedback refinement relation} from
-$S_1$ to $S_2$ is a strict relation $Q\subseteq X_1\times X_2$ that satisfies
-for all $(x_1,x_2)\in Q$ and for all $u\in U_2$ with $F_2(x_2,u)\neq\emptyset$
-the conditions
-\begin{enumerate}
-  \item $F_1(x_1,u)\neq \emptyset$ and
-  \item $Q(F_1(x_1,u))\subseteq F_2(x_2,u)$.
-\end{enumerate}
-In {\tt SCOTS}, the feedback refinement relation $Q$ is given by the set-membership
-relation
-\begin{IEEEeqnarray}{c}
-  Q:=\{ (x_1,x_2) \mid x_1 \in x_2\}.
-\end{IEEEeqnarray}
-Given an invariance (reachability) specification $\Sigma_1$ for $S_1$ associated
-with $I_1,Z_1$, then an \emph{abstract specification} is given by the
-invariance (reachability) specification for $S_2$ associated with 
-\begin{IEEEeqnarray}{c't'c}\label{e:abs:spec}
-  I_2=\{ x_2 \in X_2\mid x_2\cap I_1\neq\emptyset\} & and & Z_2=\{ x_2 \in
-X_2\mid x_2\subseteq  Z_1\}.
-\end{IEEEeqnarray}
-An abstract reach-avoid specification from $I_1,A_1,Z_1$ for $S_2$ follows by
-\begin{IEEEeqnarray}{c't'c}
-  A_2=\{ x_2 \in X_2\mid x_2\cap A_1\neq\emptyset\}
-\end{IEEEeqnarray}
-and $I_2$ and $Z_2$ as defined in~\eqref{e:abs:spec}.
-The algorithms to solve the control problems $(S_2,\Sigma_2)$ implemented in
-{\tt SCOTS} are outlined in Section~\ref{s:theory:alg}.
-
-
-\subsection{Closed Loop} The main statement facilitating the use of an auxiliary
-control problem reads as
-follows~\cite[Thm.~VI.3]{ReissigWeberRungger15}:
-
-\emph{Consider two control problems $(S_i,\Sigma_i)$, $i\in\{1,2\}$. Suppose that $Q$
-is a feedback refinement relation from $S_1$ to $S_2$ and $\Sigma_2$ is an
-abstract specification of $\Sigma_1$. If $C$ solves the control problem $(S_2,\Sigma_2)$, then $C\circ
-Q$ solves the control problem $(S_1,\Sigma_1)$.}
-
-The controller $C\circ Q$ for $S_1$ is given by the serial composition of the quantizer
-$Q:X_1\rightrightarrows X_2$ with the controller $C$. 
-The closed loop resulting from a simple system $\Sigma_1$ which represents the $\tau$-sampled
-behavior of~\eqref{e:System:c-time} and a controller $C\circ Q$ is illustrated
-in Fig.~\ref{f:closedloop}. At each $k\in\Z_{\ge0}$ sampling
-time $\tau>0$, the plant state $x_1=\xi(k\tau)$ is measured and fed to the
-quantizer $Q$, which is used to determine a cell $x_2\in X_2$ that contains
-$x_1\in x_2$. Then $x_2$ is fed to the controller $C$ to pick the input $u\in
-U_2\subseteq U_1$ which is applied to~\eqref{e:System:c-time}.
-\begin{figure}[h]
-  \centering
-  \begin{tikzpicture}
-    [
-    mynode/.style={draw,
-                   thick,
-                   inner sep=.3cm,
-                   minimum width=1cm},
-    %
-    to/.style={->,
-               >=stealth',
-               shorten >=1pt,
-               thick},
-    ]
-
-    \node [mynode] (sys) at (0,0) {$\dot \xi(t)\in f(\xi(t),u)+\segcc{-w,w}$};
-    \node [mynode] (con) at (0,-2.5) {$C$};
-    \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
-
-    %\node [mynode] (dist) at (4,0) {$P$};
-    \node [mynode] (quant) at (4,-1) {$Q$};
-
-    \node at (2.75,0.25) {$\tau$};
-
-
-    \draw [to]  (zoh.north) |-  (sys.west);
-    \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
-
-    \draw[to] (3.5,0) -| node[right] {$x_1$} (quant.north);
-    \draw[to] (quant.south) |- node[above, near end] {$x_1\in x_2$} (con.east);
-
-    \draw[thick] (sys.east) -- (2.75,0);
-    \draw[thick] (2.75,0) -- (3.5,.5);
-    \draw[dashed,thick,bend left,->] (3.1,.5) to (3.1,-.5);
-
-  \end{tikzpicture}
-\caption{Sample-and-hold implementation of a controller synthesized with {\tt SCOTS}.}\label{f:closedloop}
-\end{figure}
-
-%In case that
-%$\Sigma_1$ is an invariance or a reachability specification, the solution $C$ is
-%a \emph{static} system, which means that the state alphabet is a singleton, i.e.,
-%$X_c=\{x_c\}$. The output function 
-%
-%In the simplest
-%case, $C$ is a \emph{static} system, which means $X_c$
-
-Additionally to the perturbations on the right-hand-side
-of~\eqref{e:System:c-time}, it is possible to account for measurement errors
-modeled by a set-valued map $P \colon \mathbb{R}^n \rightrightarrows
-\mathbb{R}^n$ given by
-\begin{IEEEeqnarray}{c't'c}\label{e:perturbation}
-  P(x):=x+\segcc{-z,z} & with & z\in\R_+^n.
-\end{IEEEeqnarray}
-Please see~\cite[Sec.~VI.B]{ReissigWeberRungger15} and~\cite{RunggerZamani16}
-for some background theory.
-The closed loop with measurement errors is illustrated
-in~Fig.~\ref{f:closedloop:pert}.
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}
-  [
-  mynode/.style={draw,
-                 thick,
-                 inner sep=.3cm,
-                 minimum width=1cm},
-  %
-  to/.style={->,
-             >=stealth',
-             shorten >=1pt,
-             thick},
-  ]
-
-  \node [mynode] (sys) at (0,0) {$\dot \xi\in f(\xi,u)+\segcc{-w,w}$};
-  \node [mynode] (con) at (0,-2.5) {$C$};
-
-  \node [mynode] (zoh) at (-3.5,-1) {$\mathsf{ZOH}$};
-
-  \node [mynode] (dist) at (4,0) {$P$};
-  \node [mynode] (quant) at (4,-1.5) {$Q$};
-
-  \node at (2.25,0.25) {$\tau$};
-
-
-  \draw[thick] (sys.east) -- (2.25,0);
-  \draw[thick] (2.25,0) -- (2.75,.25);
-  \draw[dashed,thick,bend left,->] (2.5,.3) to (2.5,-.3);
-  \draw[thick] (2.75,0) -- (3,0);
-
-  \draw[to] (3,0) -- node[above] {$x_1$} (dist.west);
-  \draw[to] (dist.south) -- node[right] {$x_1'$} (quant.north);
-
-
-  \draw [to]  (zoh.north) |-  (sys.west);
-  \draw [to]  (con.west)  -| node[above, near start] {$u$} (zoh.south);
-
-  \draw[to] (quant.south) |- node[above, near end] {$x'_1\in x_2$} (con.east);
-
-\end{tikzpicture}
-\caption{Closed loop with measurement errors modeled by the set-valued map $x'_1 \in P(x_1)$.}\label{f:closedloop:pert}
-\end{figure}
-
-\section{Construction of Symbolic Models}
-
-\subsection{Growth Bound and A Priori Enclosure}
-\label{ss:GB} 
-
-The construction of a symbolic model $S_2$ of $S_1$
-is based on the over-approxima\-tion of
-attainable sets. In {\tt SCOTS}, the over-approximation of the attainable sets
-is based on a so-called growth bound~\cite{ReissigWeberRungger15}.
-A \emph{growth bound} of~\eqref{e:System:c-time} is a function $\beta \colon
-\mathbb{R}_{+}^n \times U' \to \mathbb{R}_{+}^n$, which is defined with respect to a sampling time
-$\tau>0$, a set $K\subseteq \mathbb{R}^n$ and a set $U'\subseteq U$.
-Basically, it provides an upper bound on the deviation of solutions $\xi$
-of~\eqref{e:System:c-time} from \emph{nominal
-solutions}\footnote{A nominal solution $\varphi(\cdot,p,u)$ of
-\eqref{e:System:c-time} is defined as solution of the initial value problem $\dot x=f(x,u)$,
-$x(0)=p$.} $\varphi$ of~\eqref{e:System:c-time}, i.e., for every solution $\xi$ of \eqref{e:System:c-time} on $\intcc{0,\tau}$ with input $u \in U'$ and $\xi(0),p \in K$,
-we have
-\begin{IEEEeqnarray}{c}
-\label{e:growthbound}
-| \xi(\tau) - \varphi(\tau,p,u) | \leq \beta( | \xi(0) - p |, u).
-\end{IEEEeqnarray}
-Here, $|x|$ for $x\in\R^n$, denotes the component-wise absolute value.
-A growth bound can be obtained essentially by bounding
-the Jacobian of $f$. Let
-$L \colon U' \to \mathbb{R}^{n \times n}$ satisfy
-\begin{IEEEeqnarray}{c}\label{e:lipschitz}
-L_{i,j}(u)
-\geq
-\begin{cases}
-D_j f_i(x,u)& \text{if $i=j$,}\\
-| D_j f_i(x,u) |& \text{otherwise}
-\end{cases}
-\end{IEEEeqnarray}
-for all $x\in K'\subseteq \R^n$ and $u\in U'\subseteq U$. Then 
-\begin{IEEEeqnarray}{c}
-\label{e:GrowthBoundComputation}
-\beta(r,u)
-=
-e^{L(u)\tau}
-r
-+
-\int_0^\tau
-e^{L(u)s}
-w
-\;\mathrm{d}s,
-\end{IEEEeqnarray}
-is a growth bound on $\intcc{0,\tau}$, $K$, $U'$
-associated with \eqref{e:System:c-time}. The set $K'$ on
-which~\eqref{e:lipschitz} needs to hold, is a so-called \emph{a priori
-enclosure}, i.e., $K'$  is assumed to be convex and contain any
-solution $\xi$ on $\intcc{0,\tau}$ of~\eqref{e:System:c-time} with $u\in U'$ and
-$\xi(0)\in K$,
-see~\cite[Thm.~VIII.5]{ReissigWeberRungger15}. 
-
-In order to use {\tt SCOTS}, the user needs to provide a growth bound, which for
-nonlinear control systems can be provided in terms of the parameterized matrix
-$L(u)$ whose entries satisfy~\eqref{e:lipschitz}. A priori enclosures as well
-as growth bounds can be computed automatically using interval arithmetic based
-ODE solvers. See Section~\ref{s:usage:abs} for more details on how to
-automatically obtain a priori enclosures and growth bounds.
-%An implementation of such computations using the interval ODE
-%solver {\tt vnodelp} for the aircraft example can be found in the directory
-%\begin{lstlisting}[basicstyle=\small\ttfamily]
-%./examples/aircraft/helper        	
-%\end{lstlisting}
-
-
-\subsection{The Transition Function}
-
-Recall that the state alphabet $X_2$ of the symbolic model $S_2=(X_2,U_2,F_2)$
-is composed of the real quantizer symbols $\bar X_2$, which are cells aligned on a
-uniform grid, and the overflow symbols $X_2\smallsetminus \bar X_2$. For $x_2\in
-X_2\smallsetminus \bar X_2$ the transition function is defined for all $u\in
-U_2$ by
-\begin{IEEEeqnarray}{c}
-  F_2(x_2,u):=\emptyset.
-\end{IEEEeqnarray}
-In order to determine the successors $x_2'\in F_2(x_2,u)$ for 
-$x_2=c+\segcc{-\eta/2,\eta/2}\in \bar X_2$ and $u\in U_2$, we first compute the
-hyper-interval 
-\begin{IEEEeqnarray}{c}\label{e:theory:attainableset}
-  R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2,u),\beta(\eta/2,u)}
-\end{IEEEeqnarray}
-which is an over-approximation of the attainable set of~\eqref{e:System:c-time}
-with respect to the set $c+\segcc{-\eta/2,\eta/2}$ and input $u$.
-If $P$ is not covered by the real quantizer symbols, i.e.,  $R\not\subseteq
-\cup_{x_2\in \bar X_2} x_2$, then we define
-\begin{IEEEeqnarray}{c}
-  F_2(x_2,u):=\emptyset.
-\end{IEEEeqnarray}
-Otherwise, we define the successor cells function by
-\begin{IEEEeqnarray}{c}\label{e:theory:tf3}
-x_2'\in F_2(x_2,u):\iff x_2'\cap R\neq\emptyset.
-\end{IEEEeqnarray}
-Using similar arguments as in~\cite[Thm.~VIII.4]{ReissigWeberRungger15}, it is
-straightforward to show that $Q$ is a feedback refinement relation from $S_1$ to
-$S_2$.
-
-If we need to be robust against measurement errors $P(x)=x+\segcc{-z,z}$, we
-slightly modify the computation of $R$ to 
-\begin{IEEEeqnarray}{c}
-  R:=\varphi(\tau,c,u)+\segcc{-\beta(\eta/2+z,u),\beta(\eta/2+z,u)}
-\end{IEEEeqnarray}
-and define the transition function to (instead of~\ref{e:theory:tf3})
-\begin{IEEEeqnarray}{c}
-x_2'\in F_2(x_2,u):\iff (x_2'+\segcc{-z,z})\cap R\neq\emptyset.
-\end{IEEEeqnarray}
-As a result we obtain that $Q\circ P$ is a feedback refinement relation from
-$S_1$ to $S_2$, see~\cite[Thm.~III.5]{WeberRunggerReissig17}, which enables the
-correct controller refinement under measurement errors~\cite[Sec.~VI.B]{ReissigWeberRungger15}. The use of the
-perturbation parameter $z\in\R_{>0}^n$ in {\tt SCOTS} is explained in detail in 
-Section~\ref{s:usage:abs}.
-
-In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver
-to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
-
-\section{Controller Synthesis}
-\label{s:theory:alg}
-
-We discuss the algorithms that are implemented in {\tt SCOTS} to
-solve synthesis problems for the finite symbolic model $S_2=(X_2,U_2,F_2)$. 
-We use the following notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
-\begin{IEEEeqnarray}{c}
-U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
-\end{IEEEeqnarray}
-We use the Weierstrass symbol $\wp$ to denote the power set and define $\pre:\wp(X_2)\to \wp(X_2)$ by
-\begin{IEEEeqnarray}{c}\label{e:pre}
-  \pre(Y):=\{x_2\in X_2\mid  \exists_{u\in U_{S_2}(x_2)}:\;F_2(x_2,u)\subseteq Y\}.
-\end{IEEEeqnarray}
-
-\subsection{Invariance}
-
-Let $\Sigma_2$ be an invariance specification associated with $I_2$ and $Z_2$. 
-We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
-solveInvarianceGame} in the file {\tt GameSolver.hh}, to synthesize a controller
-that solves the control problem $(S_2,\Sigma_2)$.  
-Alg.~\ref{a:safety} runs in $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
-triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$, since each state is added to the queue
-of bad states $Q$ at most once.
-
-\begin{algorithm}[h]
-\caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
-  \begin{algorithmic}[1]
-    \Input{$Z_2$, $S_2=(X_2,U_2,F_2)$}
-    \Require{$F_2(X_2,U_2)\subseteq \bar X_2$ and $Z_2\subseteq \bar X_2$}
-    \State $Q:=\emptyset$ \Comment{ FIFO queue of bad states} 
-    \State $E:=\emptyset$ \Comment{ bookkeeping of the bad states} 
-    \State $D:=\emptyset$ \Comment{ valid state-input pairs}
-    \ForAll{$x_2\in \bar X_2$}
-    \If{$x_2\not\in Z_2$ or $U_2(x_2)=\emptyset$}
-    \Comment{ mark all states outside $Z_2$ or blocking states as bad}
-    \State $Q:=Q\cup \{x_2\}$
-    \Else 
-    \State $D:=D\cup (\{x_2\}\times U_2(x_2))$ 
-    \EndIf
-    \EndFor
-    \State $E:=Q$
-    \While{ $Q\neq\emptyset$ }
-    \State $x'_2:\in Q$ \Comment{remove oldest element}\label{a:safety:beginwhile}
-    \State $Q:=Q\smallsetminus \{x_2'\}$\label{a:safety:remQ}
-    \ForAll{$(x_2,u)\in F_2^{-1}(x_2')$}
-    \State $D:=D\smallsetminus \{(x_2,u)\}$\label{a:safety:remove}
-    \Comment{ remove state-input pairs that lead to bad states}
-    \If{$x_2\not \in D^{-1}(U_2)$ and $x_2\not\in E$}
-    \Comment{ no valid input left and not already marked bad}
-    \State $Q:=Q\cup\{x_2\}$\label{a:safety:addQ}
-    \Comment{ add to queue of bad states}
-    \State $E:=E\cup\{x_2\}$\label{a:safety:addE}
-    \EndIf
-    \EndFor
-    \EndWhile
-    \Output $D$
-  \end{algorithmic}
-
-\end{algorithm}
-
-Let $D\subseteq X_2\times U_2$ be the set of state-input pairs computed in
-Alg.~\ref{a:safety}. One can show that $D^{-1}(U_2)$ is the \emph{maximal fixed
-point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
-\begin{IEEEeqnarray}{c}\label{e:theory:fp:safety}
-  G(Y):=Z_2\cap\pre(Y).
-\end{IEEEeqnarray}
-It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
-if $I_2\subseteq D^{-1}(U_2)$. 
-
-%\begin{lemma}
-%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$
-%and $F_2(X_2,U_2)\subseteq \bar X_2$. Let $Z_2\subseteq \bar X_2$ and let $D$ be the output of
-%Alg.~\ref{a:safety}. The set $Y_\infty:=D^{-1}(U_2)$ is the maximal fixed point
-%of~\eqref{e:theory:fp:safety}.
-%\end{lemma}
-%\begin{proof}
-%Let $D_i$, $E_i$ and $Q_i$ denote the sets $D$, $E$ and $Q$
-%manipulated in Alg.~\ref{a:safety} at the beginning of the while loop in
-%line~\ref{a:safety:beginwhile} of iteration $i\in \Z_{\ge0}$. For example for
-%$i=0$ we have $D_0=\{(x,u) \mid x\in Z_2\wedge u\in U_{S_2}(x)\}$ and $D_{i+1}$
-%results from $D_i$ by removing the elements in line~\ref{a:safety:remove}.
-%Similarly, $E_0=Q_0$ and $E_{i+1}$ results from $E_i$ by adding elements in
-%line~\ref{a:safety:addE} and $Q_{i+1}$ results from $Q_i$ by adding and removing
-%elements in line~\ref{a:safety:addQ} and line~\ref{a:safety:remQ}, respectively.
-%Parallel to $D_i$ we introduce $Y_i:=D_i^{-1}(U_2)$.  Let us point out that for
-%all $i\ge0$ we have $Q_i\subseteq E_i$, $E_i=\cup_{i'\in\intcc{0;i}} Q_{i'}$ and the sets 
-%$E_i$ and $Y_i$ are disjoint and satisfy $\bar X_2=E_i\cup Y_i$. Also $Y_{i+1}\subseteq Y_i\subseteq \cdots
-%\subseteq Z_2$ and there exists $i^*\in \Z_{\ge0}$ so that $Y_{i^*}=Y_\infty$.
-%
-%Let us first show that $Y_\infty=G(Y_\infty)$. Let $Y_\infty
-%=Y_{i^*}$ and $x\in Y_{i^*}$. Since $Y_{i^*}\subseteq Z_2$ we have $x\in Z_2$
-%and it remains to show that $x\in \pre(Y_{i^*})$. Let
-%$u\in U_{S_2}(x)$ be such that $(x,u)\in D_{i^*}$. As $(x,u)\in D_{i^*}$ we
-%conclude $F(x,u)\cap Q_i=\emptyset$ for all $i\in\intcc{0;i^*}$ (otherwise
-%$(x,u)$ would have been removed in line~\ref{a:safety:remove}). We obtain
-%$F(x,u)\cap E_{i^*}=\emptyset$. Since $F_2(x,u)\subseteq \bar X_2$ and $\bar
-%X_2=E_{i^*}\cup Y_{i^*}$ it follows that $F_2(x,u)\subseteq Y_{i^*}$ and $x\in
-%\pre(Y_{i^*})$ follows.  Now let $x\in G(Y_{i^*})=Z_2\cap \pre(Y_{i^*})$ and
-%assume for the sake of contradiction that $x\not\in Y_{i^*}$.
-%Let $u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq Y_{i^*}$. Since
-% $x\in Z_2$ we see that $(x,u)\in D_0$. Hence, if $x\not\in Y_{i^*}$ all pairs $(\bar x,\bar u)$
-%with $\bar x=x$ (including the pair $(x,u)$) need to have been removed from $D_0$ along the iteration
-%$i\in\intcc{0;i^*}$. However, from $F_2(x,u)\subseteq Y_{i^*}$ follows that
-%$F_2(x,u)\cap E_{i^*}=\emptyset$. Moreover, 
-%for all $i\in\intcc{0;i^*}$ holds $Q_i\subseteq E_{i^*}$ and we obtain $F_2(x,u)\cap
-%  Q_{i}=\emptyset$ for all $i\in\intcc{0;i^*}$ so that we arrive at a contradiction
-%  since $(x,u)$ cannot have been removed from $D_0$ in line~\ref{a:safety:remove}.
-%
-%Let $\bar Y\subseteq X_2$. We show that $\bar Y \subseteq G(\bar Y)$ implies
-%$\bar Y\subseteq Y_\infty$ by induction over  $i\ge 0$.
-%Let $i=0$ and $x\in \bar Y$. Since
-%$\bar Y\subseteq G(\bar Y)$ we have $x\in Z_2$ and $U_{S_2}(x)\neq\emptyset$,
-%which shows that $x\in Y_0$. Now suppose that $\bar Y\subseteq Y_i$ but $\bar
-%Y\not\subseteq Y_{i+1}$, i.e., there exist $x\in (Y_i\smallsetminus Y_{i+1})\cap
-%\bar Y$. That means all pairs $(\bar x,\bar u)$ with $\bar x=x$ in $D_i$ have been removed in line~\ref{a:safety:remove}. 
-%However, there exists at least one $u\in U_{S_2(x)}$ with
-%$F_2(x, u)\cap Q_i=\emptyset$. That follows from
-%the fact that $x\in G(\bar Y)$, $\bar Y\subseteq Y_i$ and $Q_i\cap Y_i\neq
-%\emptyset$. Hence,
-%we obtain a contradiction and $\bar Y\subseteq Y_{i+1}$ follows. As this holds
-%for all $i\ge0$ we conclude that $\bar Y\subseteq Y_{\infty}$ and the assertion follows.
-%\end{proof}
-
-
-Suppose that $I_2\subseteq D^{-1}(U_2)$ holds, then we obtain a controller
-$C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
-that solves $(S_2,\Sigma_2)$ by  
-\begin{IEEEeqnarray}{rCl}\label{e:controller}
-\begin{IEEEeqnarraybox}[][c]{rCl}
-H_c(q,x_2)&=&
-\begin{cases}
-D(x_2)\times \{x_2\} & \text{if } x_2\in D^{-1}(U_2)\\
-U_2\times\{x_2\} & \text{otherwise}
-\end{cases}\\
-F_c(q,x_2)&=&
-\begin{cases}
-\{q\} & \text{if } x_2\in D^{-1}(U_2)\\
-\emptyset &  \text{otherwise.}
-\end{cases}
-\end{IEEEeqnarraybox}
-\end{IEEEeqnarray}
-The refined controller $C\circ Q$ that is feedback composed with $S_1$ is
-implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
-explained in Section~\ref{s:usage:simulation}.
-
-
-\subsection{Reachability}
-
-Let $\Sigma_2$ be a reachability specification associated with $I_2$ and
-$Z_2\subseteq \bar X_2$. 
-We use Alg.~\ref{a:reach}, which is implemented in the function 
-{\tt solveReachabilityGame} in the file {\tt GameSolver.hh}, to synthesize a controller
-that solves the control problem $(S_2,\Sigma_2)$. The algorithm is a variant of
-Dijkstra's shortest path algorithm for hyper-graphs taken
-from~\cite{GalloLongoPallotinoNguyen93}. It runs in $O(m)$ time, where $m$ is
-the number of transitions, i.e., the number of elements in $X_2\times U_2\times
-X_2$ that satisfy $x_2'\in F_2(x_2,u)$.
-
-\begin{algorithm}[h]
-  \caption{Controller synthesis for reachability specs associated with $I_2$ and $Z_2$}
-  \label{a:reach}
-  \begin{algorithmic}[1]
-    \Input{ $Z_2$, $S_2=(X_2,U_2,F_2)$, $u_0\in U_2$}
-    \Require{ $Z_2\subseteq \bar X_2$}
-    \State {$Q := Z_2$ \Comment{FIFO queue}}
-    \State {$V := \infty$}\Comment{value function}\label{a:reach:initV}
-    \State $M:=0$ \Comment{intermediate values} 
-    \State {$E := \emptyset$ \Comment{bookkeeping of processed states}}
-    \ForAll {$x_2 \in\bar X_2$}
-      \State {$D(x_2) := \emptyset$}\Comment{keep track of optimal input}
-      \If{$x_2\in Z_2$}
-        \State {$V(x_2) := 0$}\Comment{cost at target are zero}
-        \label{a:reach:setV}
-        \State {$D(x_2) := \{u_0\}$}\label{a:reach:initD}
-        \label{a:reach:initD}
-      \EndIf
-    \EndFor
-    \While {$Q \not= \emptyset$}
-      \State {$x_2' :\in  Q $} \Comment{remove oldest element} \label{a:reach:remove}
-      \State {$Q := Q \smallsetminus \{ x_2' \}$}
-      \State {$E := E \cup \{ x_2' \}$}\label{a:reach:addE}
-      \ForAll {$(x_2,u) \in F_2^{-1}(x_2')$}
-        \State $M(x_2,u):=\max\{M(x_2,u),V(x_2')\}$
-        \If {$F_2(x_2,u) \subseteq E$ and $V(x_2) > 1+M(x_2,u)$} \Comment{if $u$ leads to better cost update input}
-        \label{a:reach:conditions}
-          \State {$V(x_2) := 1+M(x_2,u)$} \label{a:reach:updateV}
-          \State {$Q := Q \cup \{ x_2 \}$}\label{a:reach:add}
-          \State {$D(x_2) := \{ u \}$}\label{a:reach:setD}
-        \EndIf
-      \EndFor
-    \EndWhile
-    \Output {$D$, $V$}
-  \end{algorithmic}
-\end{algorithm}
-
-Let $D$ be the output of Alg.~\ref{a:reach}.
-Similar to the case of the invariance specification, the set $D^{-1}(U_2)$ is
-the \emph{minimal fixed point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
-\begin{IEEEeqnarray}{c}\label{e:theory:fp:reach}
-  G(Y):=Z_2\cup\pre(Y).
-\end{IEEEeqnarray}
-It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
-if $I_2\subseteq D^{-1}(U_2)$. 
-
-%\begin{lemma}
-%Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$,
-%let $Z_2\subseteq \bar X_2$  and let $D$ be the output of
-%Alg.~\ref{a:reach}. Then $Y_\infty:=D^{-1}(U_2)$ is the minimal fixed point
-%of~\eqref{e:theory:fp:reach}.
-%\end{lemma}
-%\begin{proof}[Proof sketch]
-%Let $Q_i$ denote the set $Q$ that is processed Alg.~\ref{a:reach} at iteration
-%$i$ of the while loop in line~\ref{a:reach:remove}. For example $Q_0=Z_2$ and
-%$Q_{i+1}$ results from $Q_i$ by removing and adding elements in
-%line~\ref{a:reach:remove} and~\ref{a:reach:add}, respectively. Let $i^*$ denote
-%the iteration when the algorithm terminates, i.e., $Q_{i^*}=\emptyset$. Since
-%every element of $Q_i$ for all $i\in\intco{0;i^*}$ is added to $E$ in
-%line~\ref{a:reach:addE}, we have 
-%$E=\cup_{i\in\intcc{0;i^*}}Q_i$. Moreover, $D(x)\neq\emptyset$ holds iff 
-%$x\in Q_i$ for some $i\in\intco{0;i^*}$ and we see that $Y_\infty=E$.
-%Another invariant which is easy to check is: $x\in Q_i$ for some $i\in
-%\intco{0;i^*}$ implies $V(x)<\infty$. Hence $M(x,u)$ is finite for every
-%$(x,u)\in X_2\times U_2$ throughout the whole computation.
-%
-%Let us show that $Y_\infty$ is a fixed point of~\eqref{e:theory:fp:reach}.
-%Let $x\in Y_\infty$. If $x\in Z_2$ we immediately obtain $x\in G(Y_\infty)$.
-%For $x\not\in Z_2$ we see that $D(x)$ has been set in line~\ref{a:reach:setD}
-%and we obtain $F_2(x,D(x))\subseteq E=Y_\infty$. Now let $x\in G(Y_\infty)$. If
-%$x\in Z_2$ we use line~\ref{a:reach:initD} to infer $x\in Y_\infty$ and
-%subsequently we consider $x\in \pre(Y_\infty)$. Since $Y_\infty=E$, there exists
-%$u\in U_{S_2}(x)$ so that $F_2(x,u)\subseteq E$. Since $M(x,u)<\infty$ holds
-%throughout the computation and initially $V(x)=\infty$, we see that there must have been an iteration $i$ where
-%both conditions in line~\ref{a:reach:conditions} have been true for $(x,u)$ (in
-%place of $(x_2,u)$), so that
-%$D(x)\neq\emptyset$, which shows $x\in Y_\infty$.
-%
-%We continue to show that $Y_\infty$ is the minimal fixed point
-%of~\eqref{e:theory:fp:reach}.
-%Let $D_i$ denote the map $D$ computed in Alg.~\ref{a:reach} at
-%line~\ref{a:reach:remove}, i.e., $D_0$ is
-%computed in line~\ref{a:reach:initD} and $D_{i+1}$ results from $D_i$ by setting
-%the input in line~\ref{a:reach:setD}. Let $Y_i:=D_i^{-1}(U_2)$ and observe that
-%$Y_0=Z_2$ and $Y_i\subseteq Y_{i+1}$ holds for all $i\ge0$. One can also show
-%that $Y_{i+1}\subseteq G(Y_i)$.
-%Moreover, one can show that $G$ is monotone, i.e., for  $Y,Y'\subseteq \bar X_2$ the inclusion
-%$Y\subseteq Y'$ implies $G(Y)\subseteq G(Y')$. Given this fact it is easy to see
-%that $G(\bar Y)\subseteq \bar Y$ implies $Y_{i}\subseteq \bar Y$ for all $i\ge0$, since we
-%have $Y_0=Z_2\subseteq \bar Y$ and $Y_{i+1}\subseteq G(Y_i)\subseteq G(\bar
-%Y)\subseteq \bar Y$. Given that the algorithm terminates there exists $i^*$ with
-%$Y_\infty=Y_{i^*}$ and $Y_\infty\subseteq \bar Y$ follows.
-%\end{proof}
-
-Given that $I_2\subseteq D^{-1}(U_2)$ holds, a controller
-$C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ that solves $(S_2,\Sigma_2)$ is identical
-to the controller that solves the invariance problem, i.e., $F_c$ and $H_c$ are
-given by~\eqref{e:controller}.
-
-Again, the refined controller $C\circ Q$ that is feedback composed with $S_1$ is
-implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
-explained in Section~\ref{s:usage:simulation}.
-
-\subsection{Reach-Avoid}
-Let $\Sigma_2$ be a reach-avoid specification associated with $I_2$ and $A_2,Z_2\subseteq \bar X_2$. 
-{\tt SCOTS} provides two alternatives on how to synthesize controller to enforce
-reach-avoid specifications. In the first method, the avoid set $A_2$ is
-accounted for in the transition function, i.e.,
-\begin{IEEEeqnarray}{c'c}\label{e:theory:tf:avoid}
-  \forall_{x_2\in A_2}:& F_2(x_2,u):=\emptyset.
-\end{IEEEeqnarray}
-In this way we can reduce a reach-avoid problem to a reachability problem. 
-Given that the transition function satisfies \eqref{e:theory:tf:avoid}, any
-controller that solves the control problem $(S_2,\Sigma_2')$, where $\Sigma_2'$
-is the reachability specification associated with $I_2$ and $Z_2$, also solves the
-control problem $(S_2,\Sigma_2)$. In order to enforce the
-equation~\eqref{e:theory:tf:avoid} in the computation of the transition function
-$F_2$ the user can optionally supply the avoid set to the function {\tt
-AbstractionGB::computeTransitionRelation}, see Section~\ref{s:usage:abs}.
-
-For the second method, the computation of the transition function is left
-unchanged, but Alg.~\ref{a:reach} is modified to account for the avoid set. To
-this end the condition in line~\ref{a:reach:conditions} in Alg.~\ref{a:reach} is modified to 
-\begin{IEEEeqnarray}{c't'c't'c}\label{a:avoid}
- F_2(x_2,u) \subseteq E& and &V(x_2) > 1+M(x_2,u)& and & x_2\not\in A_2.
-\end{IEEEeqnarray}
-Again the user can optionally supply the avoid set to the function {\tt
-solveReachabilityGame}, see Section~\ref{s:usage:synthesis}.
-
-
-\subsection{Customized Synthesis Algorithms}
-\label{s:theory:customized}
-
-Even though {\tt SCOTS} natively supports only invariance and reachability
-specification, an advanced user has the possibility to write customized
-synthesis algorithms. We demonstrate such a customization for persistence and
-recurrence specifications. 
-
-Let $S=(X,U,F)$ be a finite simple
-system with and consider the sets $I, Z, T_i\subseteq X$, $i\in\intcc{1;p}$,
-$p\in\N$. The \emph{persistence} specification $\Sigma$ for $S$ associated with $I$ and $Z$ is given by
-\begin{IEEEeqnarray*}{c}
-  \Sigma:=\big\{(u,x)\in (U\times X)^\infty
-  \mid  x(0)\in I\implies 
-    \exists_{t\in\intco{0;\infty}}\forall_{t'\in\intcc{t;\infty}}: x(t')\in Z
-  \big\}.
-\end{IEEEeqnarray*}
-The \emph{recurrence} specification $\Sigma$ for $S$ associated with $I$ and
-$T_i$, $i\in\intcc{1;p}$, $p\in\N$ is given by
-\begin{IEEEeqnarray*}{c}
-  \Sigma:=\big\{(u,x)\in (U\times X)^\infty
-  \mid  x(0)\in I\implies 
-    \forall_{t\in\intco{0;\infty}}\forall_{i\in\intcc{1;p}}\exists_{t'\in\intcc{t;\infty}}:
-    x(t')\in T_i
-  \big\}.
-\end{IEEEeqnarray*}
-%A fixed point characterization of the winning region
-%
-%
-%In case that the user is familiar with usual game formulation and fixed point
-%characterization of synthesis algorithms as for example described in~\cite{BloemJobstmannPitermanPnueliSaar12}, it is rather straightforward 
-
-
 
 \newpage
 
