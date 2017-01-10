@@ -21,8 +21,10 @@
 #include <climits>
 #include <set>
 
-#include "TransitionSystem.hh"
+//#include "TransitionSystem.hh"
 #include "FileHandler.hh"
+
+using abs_type=uint32_t;
 
 #define SCOTS_UG_TYPE   "UNIFORMGRID"
 #define SCOTS_UG_DIM    "DIM"
@@ -56,6 +58,7 @@ class UniformGrid {
 public:
   UniformGrid();                      //!< default contructor
   UniformGrid(const UniformGrid&);    //!< copy contructor
+  UniformGrid(UniformGrid&&);         //!< move contructor
   template<class grid_point_t>
   UniformGrid(const unsigned int,
               const grid_point_t& const,
@@ -64,7 +67,8 @@ public:
 
   ~UniformGrid();
 
-  UniformGrid& operator=(const UniformGrid &);    //!< copy asignment operator
+  UniformGrid& operator=(const UniformGrid&);    //!< copy asignment operator
+  UniformGrid& operator=(UniformGrid&&);         //!< move asignment operator
 
   template<class grid_point_t>
   inline void xtoi(abs_type &, const grid_point_t) const; //!< compute the index associated with a grid point
@@ -110,6 +114,9 @@ UniformGrid::UniformGrid(const UniformGrid& other) : UniformGrid() {
   *this=other;
 }
 
+UniformGrid::UniformGrid(UniformGrid&& other) : UniformGrid() {
+  *this=std::move(other);
+}
 /*!
  * \brief UniformGrid::UniformGrid
  *  provide uniform grid parameters and domain defining hyper interval \n
@@ -176,11 +183,9 @@ UniformGrid::~UniformGrid() {
 }
 
 UniformGrid &UniformGrid::operator=(const UniformGrid &other) {
-  delete[] m_eta;
-  delete[] m_first_grid_point;
-  delete[] m_no_of_grid_points;
-  delete[] m_NN;
-
+	if(this==other)
+		return *this;
+	reset();
   m_dimension=other.m_dimension;
   if(m_dimension != 0) {
     m_eta = new double[m_dimension];
@@ -190,17 +195,29 @@ UniformGrid &UniformGrid::operator=(const UniformGrid &other) {
     for(std::size_t index=0; index<m_dimension; index++) {
       m_eta[index] = other.m_eta[index];
       m_first_grid_point[index]  = other.m_first_grid_point[index];
-      m__no_of_grid_points[index]  = other.m_no_of_grid_points[index];
+      m_no_of_grid_points[index]  = other.m_no_of_grid_points[index];
       m_NN[index]  = other.m_NN[index];
     }
-  } else {
-    m_total_no_of_grid_points = 0;
-    m_eta = NULL;
-    m_first_grid_point = NULL;
-    m_no_of_grid_points = NULL;
-    m_NN = NULL;
-  }
+  } 
   return *this;
+}
+
+
+UniformGrid& UniformGrid::operator=(UniformGrid&& other) {
+	if(this==other)
+		return *this;
+	reset();
+
+  m_dimension=other.m_dimension;
+	m_eta=other.m_eta;
+	m_first_grid_point=other.m_first_grid_point;
+	m_no_of_grid_points=other.m_no_of_grid_points;
+	m_NN=other.m_NN;
+	m_total_no_of_grid_points=other.m_total_no_of_grid_points;
+
+	other.reset();
+
+	return *this;
 }
 
 template<class grid_point_t>
