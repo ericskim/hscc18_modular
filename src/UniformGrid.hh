@@ -35,77 +35,100 @@ using abs_type=uint32_t;
 
 namespace scots {
 
-/*!
- * \brief The UniformGrid class stores information of a uniform grid \n
+/**
+ * @class UniformGrid 
  *
- * Properties: \n
- * - the grid points are distributied uniformly in each dimension \n
- * - the domain of the unfiorm grid is defined by a hyper interval \n
- * - each grid pont is associated with a cell, i.e. a hyper rectangle with \n
- *   radius eta/2 centered at the grid point \n
+ * @brief Holds the information of a uniform grid confined by a hyper-interval
  *
- * Grid point alignment: \n
- * - the origin is a grid point (not necessarily contained in the set) \n
- * - the distance of the grid points in each dimension i is defined by eta[i] \n
+ * Properties: 
+ * - the grid points are distributied uniformly in each dimension 
+ * - the domain of the unfiorm grid is defined by a hyper interval 
+ * - each grid pont is associated with a hyper-rectangle with radius eta/2 centered at the grid point 
  *
- * See \n
- * - the manual in 
- * - http://arxiv.org/abs/1503.03715 for theoretical background \n
+ * Grid point alignment: 
+ * - the origin is a grid point (not necessarily contained in the set) 
+ * - the distance of the grid points in each dimension i is defined by eta[i] 
  *
- *
- */
+ * See 
+ * - the manual in <a href="./../../manual/manual.pdf">manual</a>
+ * - http://arxiv.org/abs/1503.03715 for theoretical background 
+ **/
 class UniformGrid {
 public:
-  UniformGrid();                      //!< default contructor
-  UniformGrid(const UniformGrid&);    //!< copy contructor
-  UniformGrid(UniformGrid&&);         //!< move contructor
+  /* \cond  EXCLUDE from doxygen */
+  /* default constructor */
+  UniformGrid();                      
+  /* destructor */
+  ~UniformGrid();
+  /* copy constructor */
+  UniformGrid(const UniformGrid&);   
+  /* move constructor */
+  UniformGrid(UniformGrid&&);        
+  /* copy assignment operator */
+  UniformGrid& operator=(const UniformGrid&);
+  /* move assignment operator */
+  UniformGrid& operator=(UniformGrid&&);         
+  /*\endcond */
+
+  /* constructor */
   template<class grid_point_t>
   UniformGrid(const unsigned int,
               const grid_point_t&,
               const grid_point_t&,
-              const grid_point_t&); //!< non-default constructor
+              const grid_point_t&); 
 
-  ~UniformGrid();
-
-  UniformGrid& operator=(const UniformGrid&);    //!< copy asignment operator
-  UniformGrid& operator=(UniformGrid&&);         //!< move asignment operator
-
+  /** @brief compute the index associated with a grid point **/
   template<class grid_point_t>
-  inline void xtoi(abs_type &, const grid_point_t&) const; //!< compute the index associated with a grid point
+  inline void xtoi(abs_type &, const grid_point_t&) const; 
+  /** @brief compute the grid point associated with a index **/
   template<class grid_point_t>
-  inline void itox(abs_type, grid_point_t &) const;       //!< compute the grid point associated with an index
+  inline void itox(abs_type, grid_point_t &) const;  
+  /** @brief creates console output with grid information **/
+  void printInfo() const;              
+  /* @brief function to write the grid into a file via a scots::FileWriter **/
+//  bool addGridToFile(FileWriter&);            
+  /* @brief function to read and reset(!) the grid from a file via a scots::FileReader **/
+//  bool readFromGridFile(FileReader&, std::size_t); 
 
-  void printInfo() const;              //!< creates console output with grid information
-//  bool addGridToFile(FileWriter&);            //!< function to write the grid into a file via a scots::FileWriter
-//  bool readFromGridFile(FileReader&, std::size_t); //!< function to read and reset(!) the grid from a file via a scots::FileReader
-
-  /* get functions */
+  /** @name get functions **/
+  //@{
   inline unsigned int getDimension() const;
   inline abs_type getTotalNoOfGridPoints() const;
   inline std::vector<double> getEta() const;
   inline std::vector<double> getFirstGridPoint() const;
   inline std::vector<abs_type> getNoOfGridPointsPerDimension() const;
   inline std::vector<abs_type> getNN() const;
+  //@}
 
 private:
-  unsigned int m_dimension;                //!< dimension of the real space
-  double*      m_eta;                      //!< m_dimension-dimensional vector containing the grid node distances
-  double*      m_first_grid_point;        //!< m_dimension-dimensional vector containing the real values of the first grid point
-  abs_type*    m_no_of_grid_points;        //!< scots::abs_type array[m_dimension] containing the number of grid points in each dimension */
-  abs_type     m_total_no_of_grid_points;  //!< total number of grid points */
-  abs_type*    m_NN;                       //!< ToDo
+  /** @brief dimension of the Eucleadian space **/
+  unsigned int m_dimension;                
+  /** @brief m_dimension-dimensional vector containing the grid node distances **/
+  double*      m_eta;                      
+	/** @brief m_dimension-dimensional vector containing the real values of the first grid point **/
+  double*      m_first_grid_point;        
+	/** @brief scots::abs_type array[m_dimension] containing the number of grid points in each dimension **/
+  abs_type*    m_no_of_grid_points;        
+	/** @brief total number of grid points  **/
+  abs_type     m_total_no_of_grid_points;  
+	/** @brief array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_of_grid_points[i-1]; **/
+  abs_type*    m_NN;                       
 
-  void reset();                            //!< helper for reseting the whole grid
-  void calculateTotalNumberOfGridPoints(); //!< helper function to calculate the overall number of grid points and NN
+	/** @brief helper for reseting the whole grid **/
+  void reset();                            
+	/** @brief setting everything to zero **/
+  void null();                             
+	/** @brief helper function to calculate the overall number of grid points and NN **/
+  void calculateTotalNumberOfGridPoints(); 
 };
 
 UniformGrid::UniformGrid() {
   m_dimension = 0;
   m_total_no_of_grid_points = 0;
-  m_eta = NULL;
-  m_first_grid_point = NULL;
-  m_no_of_grid_points = NULL; 
-  m_NN = NULL;
+  m_eta = nullptr;
+  m_first_grid_point = nullptr;
+  m_no_of_grid_points = nullptr; 
+  m_NN = nullptr;
 }
 
 UniformGrid::UniformGrid(const UniformGrid& other) : UniformGrid() {
@@ -115,16 +138,18 @@ UniformGrid::UniformGrid(const UniformGrid& other) : UniformGrid() {
 UniformGrid::UniformGrid(UniformGrid&& other) : UniformGrid() {
   *this=std::move(other);
 }
-/*!
- * \brief UniformGrid::UniformGrid
- *  provide uniform grid parameters and domain defining hyper interval \n
- * \param dim   - dimension of the real space
- * \param lb    - lower-left corner of the hyper-interval confining the uniform grid
- * \param ub    - upper-right corner of the hyper-interval confining the uniform grid
- * \param eta   - grid point distances
+
+/**
+ * @brief provide uniform grid parameters and domain defining hyper interval 
+ * 
+ * @param dim   - dimension of the real space
+ * @param lb    - lower-left corner of the hyper-interval confining the uniform grid
+ * @param ub    - upper-right corner of the hyper-interval confining the uniform grid
+ * @param eta   - grid point distances
+ *
  */
 template<class grid_point_t>
-UniformGrid::UniformGrid(const unsigned int dim, const grid_point_t& lb, const grid_point_t& ub, const grid_point_t& eta) : UniformGrid::UniformGrid() {
+UniformGrid::UniformGrid(const unsigned int dim, const grid_point_t& lb, const grid_point_t& ub, const grid_point_t& eta) : UniformGrid() {
   m_dimension = dim;
   if(m_dimension != 0) {
     /* check inut arguments */
@@ -198,6 +223,7 @@ UniformGrid &UniformGrid::operator=(const UniformGrid &other) {
 		return *this;
 	reset();
   m_dimension=other.m_dimension;
+  m_total_no_of_grid_points=other.m_total_no_of_grid_points;
   if(m_dimension != 0) {
     m_eta = new double[m_dimension];
     m_first_grid_point = new double[m_dimension];
@@ -226,8 +252,7 @@ UniformGrid& UniformGrid::operator=(UniformGrid&& other) {
 	m_NN=other.m_NN;
 	m_total_no_of_grid_points=other.m_total_no_of_grid_points;
 
-	other.reset();
-
+  other.null();
 	return *this;
 }
 
@@ -386,10 +411,19 @@ void UniformGrid::reset() {
   delete[] m_no_of_grid_points;
   delete[] m_NN;
 
-  m_eta = NULL;
-  m_first_grid_point = NULL;
-  m_no_of_grid_points = NULL;
-  m_NN = NULL;
+  m_eta = nullptr;
+  m_first_grid_point = nullptr;
+  m_no_of_grid_points = nullptr;
+  m_NN = nullptr;
+}
+
+void UniformGrid::null() {
+  m_dimension = 0;
+  m_total_no_of_grid_points = 0;
+  m_eta = nullptr;
+  m_first_grid_point = nullptr;
+  m_no_of_grid_points = nullptr;
+  m_NN = nullptr;
 }
 
 void UniformGrid::calculateTotalNumberOfGridPoints() {

@@ -11,8 +11,10 @@
 #include <iostream>
 #include <chrono>
 
-/* class: TicToc 
- * helper class to measure elapsed time based on std::chrono library */
+/**
+ * @class TicToc
+ * @brief Helper class to measure elapsed time based on std::chrono library
+ **/
 class TicToc {
   private:
     std::chrono::high_resolution_clock::time_point start;
@@ -21,15 +23,11 @@ class TicToc {
     TicToc(){};
     ~TicToc(){};
 
-    /* function: tic 
-     * set start time 
-     */
+    /** @brief: tic() set start time **/
     inline void tic(void) {
       start=std::chrono::high_resolution_clock::now();
     }
-    /* function: toc 
-     * set stop time and print out elapsed time since last call of tic()
-     */
+    /** @brief: toc() print out elapsed time since last call of tic() **/
     inline void toc(void) {
       stop=std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> dt;
