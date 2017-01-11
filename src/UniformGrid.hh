@@ -6,6 +6,8 @@
  *              Frederik Kunik
  */
 
+/** @file **/
+
 #ifndef UNIFORMGRID_HH_
 #define UNIFORMGRID_HH_
 
@@ -21,10 +23,8 @@
 #include <climits>
 #include <set>
 
-//#include "TransitionSystem.hh"
+#include "TransitionFunction.hh"
 //#include "FileHandler.hh"
-
-using abs_type=uint32_t;
 
 #define SCOTS_UG_TYPE   "UNIFORMGRID"
 #define SCOTS_UG_DIM    "DIM"
@@ -32,7 +32,7 @@ using abs_type=uint32_t;
 #define SCOTS_UG_ETA    "ETA"
 #define SCOTS_UG_GPPD   "GPPD"
 
-
+/** @namespace scots **/ 
 namespace scots {
 
 /**
@@ -55,7 +55,7 @@ namespace scots {
  **/
 class UniformGrid {
 public:
-  /* \cond  EXCLUDE from doxygen */
+  /* @cond  EXCLUDE from doxygen */
   /* default constructor */
   UniformGrid();                      
   /* destructor */
@@ -68,11 +68,11 @@ public:
   UniformGrid& operator=(const UniformGrid&);
   /* move assignment operator */
   UniformGrid& operator=(UniformGrid&&);         
-  /*\endcond */
+  /* @endcond */
 
   /* constructor */
   template<class grid_point_t>
-  UniformGrid(const unsigned int,
+  UniformGrid(const int,
               const grid_point_t&,
               const grid_point_t&,
               const grid_point_t&); 
@@ -92,26 +92,27 @@ public:
 
   /** @name get functions **/
   //@{
-  inline unsigned int getDimension() const;
-  inline abs_type getTotalNoOfGridPoints() const;
+  inline int getDimension() const;
+  inline abs_type getTotalNoGridPoints() const;
   inline std::vector<double> getEta() const;
-  inline std::vector<double> getFirstGridPoint() const;
-  inline std::vector<abs_type> getNoOfGridPointsPerDimension() const;
+  inline std::vector<double> getLowerLeftGridPoint() const;
+  inline std::vector<double> getUpperRightGridPoint() const;
+  inline std::vector<abs_type> getNoGridPointsPerDimension() const;
   inline std::vector<abs_type> getNN() const;
   //@}
 
 private:
   /** @brief dimension of the Eucleadian space **/
-  unsigned int m_dimension;                
+  int m_dimension;                
   /** @brief m_dimension-dimensional vector containing the grid node distances **/
   double*      m_eta;                      
 	/** @brief m_dimension-dimensional vector containing the real values of the first grid point **/
   double*      m_first_grid_point;        
 	/** @brief scots::abs_type array[m_dimension] containing the number of grid points in each dimension **/
-  abs_type*    m_no_of_grid_points;        
+  abs_type*    m_no_grid_points;        
 	/** @brief total number of grid points  **/
-  abs_type     m_total_no_of_grid_points;  
-	/** @brief array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_of_grid_points[i-1]; **/
+  abs_type     m_total_no_grid_points;  
+	/** @brief array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_grid_points[i-1]; **/
   abs_type*    m_NN;                       
 
 	/** @brief helper for reseting the whole grid **/
@@ -124,10 +125,10 @@ private:
 
 UniformGrid::UniformGrid() {
   m_dimension = 0;
-  m_total_no_of_grid_points = 0;
+  m_total_no_grid_points = 0;
   m_eta = nullptr;
   m_first_grid_point = nullptr;
-  m_no_of_grid_points = nullptr; 
+  m_no_grid_points = nullptr; 
   m_NN = nullptr;
 }
 
@@ -149,11 +150,11 @@ UniformGrid::UniformGrid(UniformGrid&& other) : UniformGrid() {
  *
  */
 template<class grid_point_t>
-UniformGrid::UniformGrid(const unsigned int dim, const grid_point_t& lb, const grid_point_t& ub, const grid_point_t& eta) : UniformGrid() {
+UniformGrid::UniformGrid(const int dim, const grid_point_t& lb, const grid_point_t& ub, const grid_point_t& eta) : UniformGrid() {
   m_dimension = dim;
   if(m_dimension != 0) {
     /* check inut arguments */
-    for(std::size_t index=0; index<dim; index++) {
+    for(int index=0; index<dim; index++) {
       if(eta[index] <= 0) 
         throw std::runtime_error("\nscots::UniformGrid: eta must have positive entries.");
       if(lb[index] > ub[index]) 
@@ -161,13 +162,13 @@ UniformGrid::UniformGrid(const unsigned int dim, const grid_point_t& lb, const g
     }
     m_eta = new double[m_dimension];
     m_first_grid_point = new double[m_dimension];
-    m_no_of_grid_points = new abs_type[m_dimension];
+    m_no_grid_points = new abs_type[m_dimension];
     m_NN = new abs_type[m_dimension];
 
     /* determine number grid points in each dimension */
     std::size_t no_l, no_u;
     int sign_l, sign_u;
-    for(std::size_t index=0; index<m_dimension; index++) {
+    for(int index=0; index<m_dimension; index++) {
       m_eta[index] = eta[index];
       /* ceil */
       try {
@@ -199,7 +200,7 @@ UniformGrid::UniformGrid(const unsigned int dim, const grid_point_t& lb, const g
         std::ostringstream os;
         throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in TransitionSystem.hh).");
       }
-      m_no_of_grid_points[index] = sign_u*no_u-sign_l*no_l+1;
+      m_no_grid_points[index] = sign_u*no_u-sign_l*no_l+1;
       /* first grid point coordinates */
       m_first_grid_point[index]= (double)sign_l*(double)no_l*eta[index];
     }
@@ -214,7 +215,7 @@ UniformGrid::UniformGrid(const unsigned int dim, const grid_point_t& lb, const g
 UniformGrid::~UniformGrid() {
   delete[] m_eta;
   delete[] m_first_grid_point;
-  delete[] m_no_of_grid_points;
+  delete[] m_no_grid_points;
   delete[] m_NN;
 }
 
@@ -223,34 +224,31 @@ UniformGrid &UniformGrid::operator=(const UniformGrid &other) {
 		return *this;
 	reset();
   m_dimension=other.m_dimension;
-  m_total_no_of_grid_points=other.m_total_no_of_grid_points;
+  m_total_no_grid_points=other.m_total_no_grid_points;
   if(m_dimension != 0) {
     m_eta = new double[m_dimension];
     m_first_grid_point = new double[m_dimension];
-    m_no_of_grid_points = new abs_type[m_dimension];
+    m_no_grid_points = new abs_type[m_dimension];
     m_NN = new abs_type[m_dimension];
-    for(std::size_t index=0; index<m_dimension; index++) {
+    for(int index=0; index<m_dimension; index++) {
       m_eta[index] = other.m_eta[index];
       m_first_grid_point[index]  = other.m_first_grid_point[index];
-      m_no_of_grid_points[index]  = other.m_no_of_grid_points[index];
+      m_no_grid_points[index]  = other.m_no_grid_points[index];
       m_NN[index]  = other.m_NN[index];
     }
   } 
   return *this;
 }
 
-
 UniformGrid& UniformGrid::operator=(UniformGrid&& other) {
-	if(this==&other)
-		return *this;
 	reset();
 
   m_dimension=other.m_dimension;
 	m_eta=other.m_eta;
 	m_first_grid_point=other.m_first_grid_point;
-	m_no_of_grid_points=other.m_no_of_grid_points;
+	m_no_grid_points=other.m_no_grid_points;
 	m_NN=other.m_NN;
-	m_total_no_of_grid_points=other.m_total_no_of_grid_points;
+	m_total_no_grid_points=other.m_total_no_grid_points;
 
   other.null();
 	return *this;
@@ -262,11 +260,11 @@ inline void UniformGrid::xtoi(abs_type &idx, const grid_point_t& x) const {
   double d_idx;
   double eta_h;
 
-  for(std::size_t k=0; k<m_dimension; k++) {
+  for(int k=0; k<m_dimension; k++) {
     d_idx = x[k]-m_first_grid_point[k];
     eta_h = m_eta[k]/2.0;
 
-    if ( d_idx <= -eta_h || d_idx >= m_no_of_grid_points[k]*m_eta[k]+eta_h ) {
+    if ( d_idx <= -eta_h || d_idx >= m_no_grid_points[k]*m_eta[k]+eta_h ) {
       std::ostringstream os;
       os << "\nscots::UniformGrid: x is outside uniform grid." << x[k] ;
       throw std::runtime_error(os.str().c_str());
@@ -277,7 +275,7 @@ inline void UniformGrid::xtoi(abs_type &idx, const grid_point_t& x) const {
 
 template<class grid_point_t>
 inline void UniformGrid::itox(abs_type idx, grid_point_t &x) const {
-  if(idx >= m_total_no_of_grid_points) {
+  if(idx >= m_total_no_grid_points) {
     std::ostringstream os;
     os << "\nscots::UniformGrid: idx larger than number of grid points.";
     throw std::runtime_error(os.str().c_str());
@@ -294,32 +292,39 @@ inline void UniformGrid::itox(abs_type idx, grid_point_t &x) const {
 }
 
 void UniformGrid::printInfo(void) const {
-  std::cout << "Grid node distance (eta) in each dimension: ";
-  for(std::size_t i=0; i<m_dimension; i++) {
+  std::cout << "Distance of grid points (eta): ";
+  for(int i=0; i<m_dimension; i++) {
     std::cout << m_eta[i] << " ";
   }
   std::cout << std::endl;
 
-  std::cout << "First grid point: ";
-  for(std::size_t i=0; i<m_dimension; i++) {
+  std::cout << "Lower-left grid point: ";
+  for(int i=0; i<m_dimension; i++) {
     std::cout << m_first_grid_point[i] << " ";
   }
   std::cout << std::endl;
 
-  std::cout << "Number of grid points in each dimension: ";
-  for(std::size_t i=0; i<m_dimension; i++) {
-      std::cout << m_no_of_grid_points[i] << " ";
+  std::cout << "Upper-right grid point: ";
+  for(int i=0; i<m_dimension; i++) {
+    std::cout << m_first_grid_point[i]+m_eta[i]*(m_no_grid_points[i]-1) << " ";
   }
   std::cout << std::endl;
 
-  std::cout << "Number of grid points: "<< m_total_no_of_grid_points << std::endl;
+  std::cout << "Number of grid points in each dimension: ";
+  for(int i=0; i<m_dimension; i++) {
+      std::cout << m_no_grid_points[i] << " ";
+  }
+  std::cout << std::endl;
+
+  std::cout << "Number of grid points: "<< m_total_no_grid_points << std::endl;
+  std::cout << std::endl;
 }
 
 //bool UniformGrid::addGridToFile(FileWriter& writer) {
 //  if(writer.open()) {
 //    writer.add_TYPE(SCOTS_UG_TYPE);
 //    writer.add_MEMBER(SCOTS_UG_DIM,m_dimension);
-//    writer.add_ARRAY(SCOTS_UG_GPPD,m_no_of_grid_points);
+//    writer.add_ARRAY(SCOTS_UG_GPPD,m_no_grid_points);
 //    writer.add_ARRAY(SCOTS_UG_ETA,m_eta,m_dimension);
 //    writer.add_ARRAY(SCOTS_UG_FIRST,m_first_grid_point,m_dimension);
 //
@@ -340,10 +345,10 @@ void UniformGrid::printInfo(void) const {
 //  } else {
 //   m_eta = new double[m_dimension];
 //   m_first_grid_point = new double[m_dimension];
-//   m_no_of_grid_points = new abs_type[m_dimension];
+//   m_no_grid_points = new abs_type[m_dimension];
 //   m_NN = new abs_type[m_dimension];
 //  }
-//  if(!reader.get_ARRAY(SCOTS_UG_GPPD,m_no_of_grid_points,offset)) {
+//  if(!reader.get_ARRAY(SCOTS_UG_GPPD,m_no_grid_points,offset)) {
 //    reset();
 //    return false;
 //  }
@@ -362,83 +367,110 @@ void UniformGrid::printInfo(void) const {
 //}
 
 
-inline abs_type UniformGrid::getDimension(void) const {
+inline int UniformGrid::getDimension(void) const {
   return m_dimension;
 }
 
-inline abs_type UniformGrid::getTotalNoOfGridPoints() const {
-  return m_total_no_of_grid_points;
+inline abs_type UniformGrid::getTotalNoGridPoints() const {
+  return m_total_no_grid_points;
 }
 
 inline std::vector<double> UniformGrid::getEta(void) const {
-  std::vector<double> eta(m_dimension);
-  for(std::size_t index=0; index<m_dimension; index++) {
-    eta[index]=m_eta[index];
+  std::vector<double> eta;
+  for(int i=0; i<m_dimension; i++) {
+    eta.push_back(m_eta[i]);
   }
-  return std::move(eta);
+  return eta;
 }
 
-inline std::vector<double> UniformGrid::getFirstGridPoint(void) const {
-  std::vector<double> first(m_dimension);
-  for(std::size_t index=0; index<m_dimension; index++) {
-    first[index]=m_first_grid_point[index];
+inline std::vector<double> UniformGrid::getLowerLeftGridPoint(void) const {
+  std::vector<double> lower_left;
+  for(int i=0; i<m_dimension; i++) {
+    lower_left.push_back(m_first_grid_point[i]);
   }
-  return std::move(first);
+  return lower_left;
 }
 
-inline std::vector<abs_type> UniformGrid::getNoOfGridPointsPerDimension() const {
-  std::vector<abs_type> no_of_grid_points(m_dimension);
-  for(std::size_t index=0; index<m_dimension; index++) {
-    no_of_grid_points.push_back(m_no_of_grid_points[index]);
+inline std::vector<double> UniformGrid::getUpperRightGridPoint(void) const {
+  std::vector<double> upper_right;
+  for(int i=0; i<m_dimension; i++) {
+    upper_right.push_back(m_first_grid_point[i]+m_eta[i]*(m_no_grid_points[i]-1));
   }
-  return std::move(no_of_grid_points);
+  return upper_right;
+}
+inline std::vector<abs_type> UniformGrid::getNoGridPointsPerDimension() const {
+  std::vector<abs_type> no_grid_points;
+  for(int i=0; i<m_dimension; i++) {
+    no_grid_points.push_back(m_no_grid_points[i]);
+  }
+  return no_grid_points;
 }
 
 inline std::vector<abs_type> UniformGrid::getNN() const {
-  std::vector<abs_type> NN(m_dimension);
-  for(std::size_t index=0; index<m_dimension; index++) {
-    NN.push_back(m_NN[index]);
+  std::vector<abs_type> NN;
+  for(int i=0; i<m_dimension; i++) {
+    NN.push_back(m_NN[i]);
   }
-  return std::move(NN);
+  return NN;
 }
 
 void UniformGrid::reset() {
   m_dimension = 0;
-  m_total_no_of_grid_points = 0;
+  m_total_no_grid_points = 0;
 
   delete[] m_eta;
   delete[] m_first_grid_point;
-  delete[] m_no_of_grid_points;
+  delete[] m_no_grid_points;
   delete[] m_NN;
 
   m_eta = nullptr;
   m_first_grid_point = nullptr;
-  m_no_of_grid_points = nullptr;
+  m_no_grid_points = nullptr;
   m_NN = nullptr;
 }
 
 void UniformGrid::null() {
   m_dimension = 0;
-  m_total_no_of_grid_points = 0;
+  m_total_no_grid_points = 0;
   m_eta = nullptr;
   m_first_grid_point = nullptr;
-  m_no_of_grid_points = nullptr;
+  m_no_grid_points = nullptr;
   m_NN = nullptr;
 }
 
 void UniformGrid::calculateTotalNumberOfGridPoints() {
   std::size_t total=1;
-  for(std::size_t index=0; index<m_dimension; index++) {
-    m_NN[index] = total;
+  for(int i=0; i<m_dimension; i++) {
+    m_NN[i] = total;
     /* check overflow */
-    if((total > std::numeric_limits<abs_type>::max()) || (total==std::numeric_limits<abs_type>::max() && m_no_of_grid_points[index]>1)) {
+    if((total > std::numeric_limits<abs_type>::max()) || (total==std::numeric_limits<abs_type>::max() && m_no_grid_points[i]>1)) {
       reset();
       throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in TransitionSystem.hh).");
     }
-    total *= m_no_of_grid_points[index];
+    total *= m_no_grid_points[i];
   }
-  m_total_no_of_grid_points = total;
+  m_total_no_grid_points = total;
 }
+
+///** 
+// * @brief write atomic propositions to file
+// */
+//template<class F>
+//bool writeAtomicPropositionsToFile(F& AP,abs_type numberOfCells,FileWriter& file,std::string name)
+//{
+//    if(!file.open())
+//    {
+//        return false;
+//    }
+//    scots::array<bool> table(numberOfCells);
+//
+//    for(size_t index = 0; index < numberOfCells; index++)
+//    {
+//        table[index] = AP(index);
+//    }
+//
+//    return file.add_ARRAY<scots::array<bool> >(name,table,table.size());
+//}
 
 } /* close namespace */
 

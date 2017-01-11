@@ -18,17 +18,15 @@
 
 /* SCOTS header */
 #include "UniformGrid.hh"
-#include "TransitionSystem.hh"
+#include "TransitionFunction.hh"
 #include "AbstractionGB.hh"
-#include "ReachabilityGame.hh"
-#include "StaticController.hh"
+#include "GameSolver.hh"
 
 /* time profiling */
 #include "TicToc.hh"
 
 /* ode solver */
-#include "RungeKutta4_old.hh"
-OdeSolver ode_solver;
+#include "RungeKutta4.hh"
 
 /* state space dim */
 const int state_dim=3;
@@ -43,9 +41,6 @@ const double tau = 0.3;
 #include <sys/resource.h>
 
 struct rusage usage;
-
-// resident size is in t_info.resident_size;
-// virtual size is in t_info.virtual_size;
 
 /*
  * data types for the state space elements and input space
@@ -68,7 +63,7 @@ auto  vehicle_post = [](state_type &x, const input_type &u) {
     xx[2] = u[0]*std::tan(u[1]);
   };
   /* simulate (use 10 intermediate steps in the ode solver) */
-  ode_solver(rhs,x,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
 };
 
 /* we integrate the growth bound by 0.3 sec (the result is stored in r)  */
@@ -93,9 +88,9 @@ int main() {
   state_type ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
   state_type eta={{.2,.2,.2}};
-  scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta);
+  scots::UniformGrid ss(state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  ss.printInfo(1);
+  ss.printInfo();
 
   /****************************************************************************/
   /* construct grid for the input space */
@@ -106,7 +101,8 @@ int main() {
   input_type iub={{1,1}};
   /* grid node distance diameter */
   input_type ieta={{.3,.3}};
-  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
+  scots::UniformGrid is(input_dim,ilb,iub,ieta);
+  is.printInfo();
 
   /****************************************************************************/
   /* set up constraint functions with obtacles */
@@ -129,9 +125,9 @@ int main() {
     { 9.3, 10 , 2.3,  2.5}
   };
 
-  /* overflow function returns 1 if x \in overflow symbol  */
+  /* avoid function returns 1 if x \in avoid set  */
   state_type x;
-  auto overflow = [&](const size_t idx) {
+  auto avoid = [&](const size_t idx) {
     ss.itox(idx,x);
     double c1= eta[0]/2.0;
     double c2= eta[1]/2.0;
@@ -142,38 +138,39 @@ int main() {
     return false;
   };
 
-  /* transition system to be computed */
-  scots::TransitionSystem ts;
+  /* transition function of symbolic model */
+  scots::TransitionFunction tf;
 
-  std::cout << "Computing the abstraction: " << std::endl;
+  std::cout << "Computing the transition function: " << std::endl;
   tt.tic();
-  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
+  scots::AbstractionGB<state_type,input_type> abs(ss,is);
 
-  abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
-  //abs.computeTransitionRelation(vehicle_post, radius_post);
+  abs.compute(tf,vehicle_post, radius_post, avoid);
+  //abs.compute(tf,vehicle_post, radius_post);
 
-  std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
+  std::cout << "Number of transitions: " << tf.getNoTransitions() << std::endl;
   tt.toc();
 
   if(!getrusage(RUSAGE_SELF, &usage))
-    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)ts.getNoTransitions() << std::endl;
-    
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.getNoTransitions() << std::endl;
+
   /* define target set */
   auto target = [&](size_t idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
     if (9 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 9.5 && 0 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0.5)
       return true;
-    else
     return false;
   };
 
+  
+  
   std::cout << "\nController synthesis: " << std::endl;
-  scots::ReachabilityGame reach(ts);
+  scots::det_map_type inputs;
   tt.tic();
-  reach.solve(target);
+  abs_type size_dom = scots::solve_reachability_game(tf,target,inputs);
   tt.toc();
-  std::cout << "Domain size: " << reach.size() << std::endl;
+  std::cout << "Domain size: " << size_dom << std::endl;
 
   return 1;
 }

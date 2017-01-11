@@ -96,6 +96,7 @@ void computeTransitionRelation(F1& system_post, F2& radius_post, F3&& overflow) 
   npoints = stateSpace_.getNofGridPoints();
   for(int i=0; i<dim; i++)
     last[i]=first[i]+eta[i]*(npoints[i]-1);
+
   /* number of pre indices of (i,j) */
   std::unique_ptr<abs_type[]> noPre(new abs_type[N*M] ());  
   /* number of post indices of (i,j) */
@@ -203,7 +204,9 @@ void computeTransitionRelation(F1& system_post, F2& radius_post, F3&& overflow) 
       sum+=noPre[i*M+j];
       prePointer[i*M+j]=sum;
     }
+    //std::cout << prePointer[i*M] << " " ;
   }
+  std::cout << std::endl;
   /* allocate memory for pre list */
   std::unique_ptr<abs_type[]> pre(new abs_type[noT]);
   /* fill in pre list */
