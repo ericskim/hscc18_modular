@@ -1,7 +1,7 @@
 /*
  * UniformGrid.hh
  *
- *  created on: 26.10.2015
+ *     created: Dec 2016
  *      author: Matthias Rungger
  *              Frederik Kunik
  */
