@@ -13,21 +13,26 @@ CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG
 SCOTSROOT		= ../..
 SCOTSINC		= -I$(SCOTSROOT)/sparse -I$(SCOTSROOT)/utils
 
+SCOTSNEW		= -I$(SCOTSROOT)/src -I$(SCOTSROOT)/utils
+
 
 #
 # cudd 
 #
 
 
-.PHONY: aircraft
+.PHONY: aircraft aircraft_new
 
-TARGET = aircraft
+TARGET = aircraft aircraft_new
 
 all: $(TARGET)
 
 aircraft: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) aircraft.cc -o aircraft
 
+aircraft_new: 
+	$(CC) $(CXXFLAGS) $(SCOTSNEW) aircraft_new.cc -o aircraft_new
+
 
 clean:
-	rm aircraft
+	rm aircraft aircraft_new

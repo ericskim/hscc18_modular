@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cstring>
 #include <memory>
+#include <vector>
 
 #include "UniformGrid.hh"
 #include "TransitionFunction.hh"
@@ -120,9 +121,44 @@ public:
    *  @param x - center of cell 
    *  @param u - input
    **/
-  std::vector<state_type> getPost(const TransitionFunction& transition_function,
-                                  const state_type& x,
-                                  const input_type& u);
+  std::vector<state_type> get_post(const TransitionFunction& transition_function,
+                                   const state_type& x,
+                                   const input_type& u) const {
+    std::vector<state_type> post{};
+    abs_type i,j;
+    m_state_alphabet.xtoi(i,x);
+    m_input_alphabet.xtoi(j,u);
+    std::vector<abs_type> k=transition_function.get_post(i,j);
+    for(abs_type v=0; v<k.size(); v++) {
+      state_type s;
+      m_state_alphabet.itox(k[v],s);
+      post.push_back(s);
+    }
+    return std::move(post);
+  }
+
+  /** @brief print the center of cells that are used to over-approximated the
+   *  attainable set associated with cell with center x and input u
+   *
+   *  @param transition_function - the transition function of the abstraction
+   *  @param x - center of cell 
+   *  @param u - input
+   **/
+  void print_post(const TransitionFunction& transition_function,
+                                     const state_type& x,
+                                     const input_type& u) const {
+    std::vector<state_type> post = get_post(transition_function, x, u);
+    std::cout << "\nPost states: \n";
+    for(abs_type v=0; v<post.size(); v++) {
+      for(int i=0; i<m_state_alphabet.getDimension(); i++) {
+        std::cout << post[v][i] << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+
+
 
   /** @brief set measurement error bound **/
   void  setMeasurementErrorBound(const state_type& error_bound);	
@@ -382,24 +418,7 @@ void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transitio
   transition_function.m_pre_ptr=pre_ptr;
   /* cleanup */
   delete[] corner_IDs;
-  delete[]  out_of_domain;
-}
-
-template<class state_type, class input_type>
-std::vector<state_type>  AbstractionGB<state_type,input_type>::getPost(const TransitionFunction& abstraction, const state_type& x, const input_type& u) {
-  abs_type i,j;
-  std::vector<state_type> post;
-  std::vector<abs_type> k;
-
-  m_state_alphabet.xtoi(i,x);
-  m_input_alphabet.xtoi(j,u);
-  k=abstraction.getPost(i,j);
-  for(abs_type v=0; v<k.size(); v++) {
-    state_type s;
-    m_state_alphabet.itox(k[v],s);
-    post.push_back(s);
-  }
-  return std::move(post);
+  delete[] out_of_domain;
 }
 
 template<class state_type, class input_type>

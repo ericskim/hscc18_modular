@@ -13,15 +13,14 @@
 
 #include <vector>
 #include <array>
+#include <cmath>
 #include <sstream>
 #include <string>
-#include <cassert>
-#include <cmath>
+#include <exception>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <climits>
-#include <set>
+#include <limits>
 
 #include "TransitionFunction.hh"
 //#include "FileHandler.hh"
@@ -266,7 +265,11 @@ inline void UniformGrid::xtoi(abs_type &idx, const grid_point_t& x) const {
 
     if ( d_idx <= -eta_h || d_idx >= m_no_grid_points[k]*m_eta[k]+eta_h ) {
       std::ostringstream os;
-      os << "\nscots::UniformGrid: x is outside uniform grid." << x[k] ;
+      os << "\nscots::UniformGrid: state ";
+      for(int i=0; i<m_dimension; i++) {
+        os << x[i] << " ";
+      }
+      os << " is outside uniform grid.";
       throw std::runtime_error(os.str().c_str());
     }
     idx += static_cast<abs_type>((d_idx+eta_h )/m_eta[k])*m_NN[k];

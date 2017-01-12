@@ -14,18 +14,15 @@
  *
  */
 
-#include <iostream>
-#include <array>
-
 /* SCOTS header */
 #include "UniformGrid.hh"
-#include "TransitionSystem.hh"
+#include "TransitionFunction.hh"
 #include "AbstractionGB.hh"
-#include "ReachabilityGame.hh"
+#include "GameSolver.hh"
+#include "WinningDomain.hh"
 
 /* time profiling */
 #include "TicToc.hh"
-
 /* memory profiling */
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -35,16 +32,12 @@ struct rusage usage;
 
 
 /* ode solver */
-#include "RungeKutta4_old.hh"
-
-/* ode solver */
-OdeSolver ode_solver;
+#include "RungeKutta4.hh"
 
 /* state space dim */
 const int state_dim=3;
 /* input space dim */
 const int input_dim=2;
-
 /* sampling time */
 const double tau = 0.25;
 
@@ -53,8 +46,10 @@ const double tau = 0.25;
  * space elements used in uniform grid and ode solver
  *
  */
-typedef std::array<double,state_dim> state_type;
-typedef std::array<double,input_dim> input_type;
+using state_type=std::array<double,state_dim>;
+using input_type=std::array<double,input_dim>;
+
+using abs_type = scots::abs_type;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 double mg = 60000.0*9.81;
@@ -68,7 +63,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
     xx[2] = x[0]*std::sin(x[1]);
   };
   /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
-  ode_solver(rhs,x,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
 };
 
 double L[3][2];
@@ -94,7 +89,7 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
   /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
-  ode_solver(rhs,r,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,10);
 };
 
 int main() {
@@ -112,11 +107,10 @@ int main() {
   state_type lb={{58,-3*M_PI/180,0}};
   /* upper bounds of the hyper rectangle */
   state_type ub={{83,0,56}}; 
-  /* measurement disturbances  */
-  state_type z={{0.0125,0.0025/180*M_PI,0.05}};
-  scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta,z);
+
+  scots::UniformGrid ss(state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  ss.printInfo(1);
+  ss.printInfo();
 
   /****************************************************************************/
   /* construct grid for the input space */
@@ -128,20 +122,20 @@ int main() {
   /* grid node distance diameter */
   input_type ieta={{32000,8.0/9.0*M_PI/180}};
 
-  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
-  is.printInfo(1);
+  scots::UniformGrid is(input_dim,ilb,iub,ieta);
+  is.printInfo();
 
   /* transition system to be computed */
-  scots::TransitionSystem ts;
+  scots::TransitionFunction tf;
 
+  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  /* measurement error  */
+  abs.setMeasurementErrorBound({{0.0125,0.0025/180*M_PI,0.05}});
 
   tt.tic();
-  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
-
-  abs.computeTransitionRelation(aircraft_post, radius_post);
-
-  std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
+  abs.compute(tf, aircraft_post, radius_post);
   tt.toc();
+  std::cout << "Number of transitions: " << tf.getNoTransitions() << std::endl;
 
   if(0 == getrusage(RUSAGE_SELF, &usage))
     std::cout << "rusage: " << usage.ru_maxrss << std::endl;
@@ -149,29 +143,23 @@ int main() {
 
   /* define target set */
   state_type x;
-  auto target = [&](const size_t idx) {
+  auto target = [&](const abs_type idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
-    if(  63 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 75 &&
-         -3*M_PI/180 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0 &&
-         0 <= (x[2]-eta[2]/2.0) &&  (x[2]+eta[2]/2.0) <= 2.5 &&
-         -0.91 <=  ( (x[0]+eta[0]/2.0) * std::sin(x[1]-eta[1]/2.0) )
+    if(          63 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0) <= 75 &&
+        -3*M_PI/180 <= (x[1]-eta[1]/2.0) && (x[1]+eta[1]/2.0) <= 0 &&
+                  0 <= (x[2]-eta[2]/2.0) && (x[2]+eta[2]/2.0) <= 2.5 &&
+              -0.91 <=  ( (x[0]+eta[0]/2.0) * std::sin(x[1]-eta[1]/2.0) )
       )
       return true;
     return false;
   };
 
-
+  std::cout << "\nController synthesis: " << std::endl;
   tt.tic();
-
-  std::cout << "Solve game " << std::endl;
-
-  scots::ReachabilityGame reach(ts);
-  reach.solve(target);
+  scots::WinningDomain win = scots::solve_reachability_game(tf,target);
   tt.toc();
-
-  std::cout << "Size: " << reach.size() << std::endl;
-
+  std::cout << "Domain size: " << win.get_size() << std::endl;
 
   return 1;
 }

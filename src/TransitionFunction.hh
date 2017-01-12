@@ -86,7 +86,28 @@ public:
   /** @brief return list of pre associated with action j and post k **/
   std::vector<abs_type> getPre(const abs_type& k, const abs_type& j) const; 
   /** @brief return list of post associated with action j and post i **/
-  std::vector<abs_type> getPost(const abs_type& i, const abs_type& j) const;
+  std::vector<abs_type> get_post(const abs_type& i, const abs_type& j) const {
+    std::vector<abs_type> post;
+    if(m_pre!=nullptr) {
+      for(abs_type k=0; k<m_no_states; k++) {
+        if(m_no_post[k*m_no_inputs+j]) {
+          for(abs_type no=0; no<m_no_post[k*m_no_inputs+j]; no++) {
+            abs_type pos=m_pre_ptr[k*m_no_inputs+j]+no;
+            if(m_pre[pos]==i) {
+              post.push_back(k);
+            }
+          }
+        }
+      }
+    } else {
+      std::ostringstream os;
+      os << "TransitionFunction.hh: Error: Unable to get post. Transition relation is empty, i.e.,  m_pre and post_ are nullptr.";
+      throw std::runtime_error(os.str().c_str());
+    }
+    return post;
+  }
+
+
 
   /** @brief number of states N **/
   abs_type m_no_states;
@@ -169,28 +190,6 @@ std::vector<abs_type> TransitionFunction::getPre(const abs_type& k, const abs_ty
   }
   return pre;
 }
-
-std::vector<abs_type> TransitionFunction::getPost(const abs_type& i, const abs_type& j) const {
-  std::vector<abs_type> post;
-  if(m_pre!=nullptr) {
-    for(abs_type k=0; k<m_no_states; k++) {
-      if(m_no_post[k*m_no_inputs+j]) {
-        for(abs_type no=0; no<m_no_post[k*m_no_inputs+j]; no++) {
-          abs_type pos=m_pre_ptr[k*m_no_inputs+j]+no;
-          if(m_pre[pos]==i) {
-            post.push_back(k);
-          }
-        }
-      }
-    }
-  } else {
-    std::ostringstream os;
-    os << "TransitionFunction.hh: Error: Unable to get post. Transition relation is empty, i.e.,  m_pre and post_ are nullptr.";
-    throw std::runtime_error(os.str().c_str());
-  }
-  return post;
-}
-
 
 } /* end of namespace scots */
 

@@ -21,6 +21,8 @@
 #include "TransitionFunction.hh"
 #include "AbstractionGB.hh"
 #include "GameSolver.hh"
+#include "WinningDomain.hh"
+#include "StaticController.hh"
 
 /* time profiling */
 #include "TicToc.hh"
@@ -164,13 +166,27 @@ int main() {
   };
 
   
-  
   std::cout << "\nController synthesis: " << std::endl;
-  scots::det_map_type inputs;
   tt.tic();
-  abs_type size_dom = scots::solve_reachability_game(tf,target,inputs);
+  scots::WinningDomain win = scots::solve_reachability_game(tf,target);
   tt.toc();
-  std::cout << "Domain size: " << size_dom << std::endl;
+  std::cout << "Domain size: " << win.get_size() << std::endl;
+
+
+  scots::StaticController con(ss,is,std::move(win));
+
+  std::cout << "\nSimulation:\n " << std::endl;
+  x={{.2, 0.6, M_PI}};
+  for(size_t i=0; i<2; i++) {
+    std::cout << "States: " << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;
+    std::vector<input_type> u = con.get_control<state_type,input_type>(x);
+    std::cout << "Inputs: " << u[0][0] <<  " "  << u[0][1] << std::endl;
+    abs.print_post(tf,x,u[0]);
+    std::cout << std::endl;
+    vehicle_post(x,u[0]);
+  }
+
+
 
   return 1;
 }
