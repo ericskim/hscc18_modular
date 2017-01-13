@@ -66,26 +66,22 @@ public:
   template<class state_type, class input_type>
   std::vector<input_type> get_control(const state_type &x) {
     /* abstract state index */
-    abs_type i;
-    m_state_grid.xtoi(i,x);
+    abs_type i = m_state_grid.xtoi(x);
     std::vector<abs_type> abs_inputs = m_winning_domain.get_inputs(i);
 
     if(!m_winning_domain.is_winning(i)) {
       std::ostringstream os;
       os << "\nscots::StaticController: state ";
-      for(int i=0; i<m_state_grid.getDimension(); i++) {
+      for(int i=0; i<m_state_grid.get_dim(); i++) {
         os << x[i] << " ";
       }
       os << "is out of winning domain: no progress possible.";
 
       throw std::runtime_error(os.str().c_str());
     }
-    std::vector<input_type> inputs(abs_inputs.size());
-
-    input_type u;
+    std::vector<input_type> inputs{};
     for(abs_type i=0; i<abs_inputs.size();i++) {
-      m_input_grid.itox(abs_inputs[i],u);
-      inputs[i]=u;
+      inputs.push_back(m_input_grid.itox(abs_inputs[i]));
     }
     return inputs;
   }
@@ -214,15 +210,15 @@ private:
 //bool nonDeterministic_staticController::validation()
 //{
 //  uint8_t flag = 0;
-//  if((m_inputGrid.getTotalNrOfGridPoints() !=0 )& (m_stateGrid.getTotalNrOfGridPoints() != 0) & (m_map.NrOfCells() !=0) & (m_map.NrOfInputIndices() != 0))
+//  if((m_inputGrid.size() !=0 )& (m_stateGrid.size() != 0) & (m_map.NrOfCells() !=0) & (m_map.NrOfInputIndices() != 0))
 //  {
 //    flag++;
 //  }
-//  if(m_inputGrid.getTotalNrOfGridPoints() == m_map.NrOfInputIndices())
+//  if(m_inputGrid.size() == m_map.NrOfInputIndices())
 //  {
 //    flag++;
 //  }
-//  if(m_stateGrid.getTotalNrOfGridPoints() == m_map.NrOfCells())
+//  if(m_stateGrid.size() == m_map.NrOfCells())
 //  {
 //    flag++;
 //  }

@@ -130,7 +130,7 @@ int main() {
   /* avoid function returns 1 if x \in avoid set  */
   state_type x;
   auto avoid = [&](const size_t idx) {
-    ss.itox(idx,x);
+    x = ss.itox(idx);
     double c1= eta[0]/2.0;
     double c2= eta[1]/2.0;
     for(size_t i=0; i<15; i++) {
@@ -158,7 +158,7 @@ int main() {
 
   /* define target set */
   auto target = [&](size_t idx) {
-    ss.itox(idx,x);
+    x = ss.itox(idx);
     /* function returns 1 if cell associated with x is in target set  */
     if (9 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 9.5 && 0 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0.5)
       return true;

@@ -114,7 +114,7 @@ public:
     /* initialize return value */
     std::vector<state_type> post {};
     /* state space dimension */
-    int dim = m_state_alphabet.getDimension();
+    int dim = m_state_alphabet.get_dim();
     /* variables for managing the post */
     std::vector<abs_type> lb(dim);  /* lower-left corner */
     std::vector<abs_type> ub(dim);  /* upper-right corner */
@@ -128,10 +128,10 @@ public:
     state_type upper_right;
     /* fill in data */
     for(int i=0; i<dim; i++) {
-      eta[i]=m_state_alphabet.getEta()[i];
-      r[i]=m_state_alphabet.getEta()[i]/2.0+m_z[i];
-      lower_left[i]=m_state_alphabet.getLowerLeftGridPoint()[i];
-      upper_right[i]=m_state_alphabet.getUpperRightGridPoint()[i];
+      eta[i]=m_state_alphabet.get_eta()[i];
+      r[i]=m_state_alphabet.get_eta()[i]/2.0+m_z[i];
+      lower_left[i]=m_state_alphabet.get_lower_left()[i];
+      upper_right[i]=m_state_alphabet.get_upper_right()[i];
     }
     state_type xx=x;
     /* compute growth bound and numerical solution of ODE */
@@ -161,7 +161,7 @@ public:
     for(abs_type k=0; k<npost; k++) {
       abs_type q=0;
       for(int l=0; l<dim; l++)  {
-        q+=(lb[l]+cc[l])*m_state_alphabet.getNN()[l];
+        q+=(lb[l]+cc[l])*m_state_alphabet.get_nn()[l];
       }
       cc[0]++;
       for(int l=0; l<dim-1; l++) {
@@ -171,8 +171,7 @@ public:
         }
       }
       /* (i,j,q) is a transition */    
-      m_state_alphabet.itox(q,xx);
-      post.push_back(xx);
+      post.push_back(m_state_alphabet.itox(q));
     }
     return post;
   }
@@ -190,14 +189,9 @@ public:
                                    const state_type& x,
                                    const input_type& u) const {
     std::vector<state_type> post{};
-    abs_type i,j;
-    m_state_alphabet.xtoi(i,x);
-    m_input_alphabet.xtoi(j,u);
-    std::vector<abs_type> k=transition_function.get_post(i,j);
+    std::vector<abs_type> k=transition_function.get_post(m_state_alphabet.xtoi(x),m_input_alphabet.xtoi(u));
     for(abs_type v=0; v<k.size(); v++) {
-      state_type s;
-      m_state_alphabet.itox(k[v],s);
-      post.push_back(s);
+      post.push_back(m_state_alphabet.itox(k[v]));
     }
     return std::move(post);
   }
@@ -215,7 +209,7 @@ public:
     std::vector<state_type> post = get_post(transition_function, x, u);
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
-      for(int i=0; i<m_state_alphabet.getDimension(); i++) {
+      for(int i=0; i<m_state_alphabet.get_dim(); i++) {
         std::cout << post[v][i] << " ";
       }
       std::cout << std::endl;
@@ -239,7 +233,7 @@ public:
     std::vector<state_type> post = get_post(system_post,radius_post,x,u);
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
-      for(int i=0; i<m_state_alphabet.getDimension(); i++) {
+      for(int i=0; i<m_state_alphabet.get_dim(); i++) {
         std::cout << post[v][i] << " ";
       }
       std::cout << std::endl;
@@ -276,8 +270,8 @@ AbstractionGB<state_type,input_type>::AbstractionGB(const UniformGrid& state_alp
                              const UniformGrid& input_alphabet) :
                              m_state_alphabet(state_alphabet),
                              m_input_alphabet(input_alphabet) {
-  m_z = new double[state_alphabet.getDimension()];
-  for(int i=0; i<state_alphabet.getDimension(); i++) {
+  m_z = new double[state_alphabet.get_dim()];
+  for(int i=0; i<state_alphabet.get_dim(); i++) {
     m_z[i]=0;
   }
 }
@@ -291,18 +285,18 @@ void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transitio
 template<class state_type, class input_type>
 template<class F1, class F2, class F3>
 void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transition_function, F1& system_post, F2& radius_post, F3&& overflow) {
-  /* number of cells (=grid points) */
-  abs_type N=m_state_alphabet.getTotalNoGridPoints(); 
+  /* number of cells */
+  abs_type N=m_state_alphabet.size(); 
   /* number of inputs */
-  abs_type M=m_input_alphabet.getTotalNoGridPoints();
+  abs_type M=m_input_alphabet.size();
   /* number of transitions (to be computed) */
   std::size_t T=0; 
   /* state space dimension */
-  int dim=m_state_alphabet.getDimension();
+  int dim=m_state_alphabet.get_dim();
   /* for display purpose */
   abs_type counter=0;
   /* some grid information */
-  std::vector<abs_type> NN=m_state_alphabet.getNN();
+  std::vector<abs_type> NN=m_state_alphabet.get_nn();
   /* variables for managing the post */
   std::vector<abs_type> lb(dim);  /* lower-left corner */
   std::vector<abs_type> ub(dim);  /* upper-right corner */
@@ -319,9 +313,9 @@ void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transitio
   state_type upper_right;
   /* copy data from m_state_alphabet */
   for(int i=0; i<dim; i++) {
-    eta[i]=m_state_alphabet.getEta()[i];
-    lower_left[i]=m_state_alphabet.getLowerLeftGridPoint()[i];
-    upper_right[i]=m_state_alphabet.getUpperRightGridPoint()[i];
+    eta[i]=m_state_alphabet.get_eta()[i];
+    lower_left[i]=m_state_alphabet.get_lower_left()[i];
+    upper_right[i]=m_state_alphabet.get_upper_right()[i];
   }
   /* number of pre indices of (i,j), initialized to 0  */
   abs_type* no_pre = new abs_type[N*M]();  
@@ -350,12 +344,12 @@ void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transitio
         break;
       }
       /* get center x of cell */
-      m_state_alphabet.itox(i,x);
+      i=m_state_alphabet.itox(x);
       /* cell radius (including measurement errors) */
       for(int k=0; k<dim; k++)
         r[k]=eta[k]/2.0+m_z[k];
       /* current input */
-      m_input_alphabet.itox(j,u);
+      j=m_input_alphabet.itox(u);
       /* integrate system and radius growth bound */
       /* the result is stored in x and r */
       radius_post(r,x,u);
@@ -512,7 +506,7 @@ void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transitio
 
 template<class state_type, class input_type>
 void  AbstractionGB<state_type,input_type>::setMeasurementErrorBound(const state_type& error_bound) {
-  for(int i=0; i<m_state_alphabet.getDimension(); i++) {
+  for(int i=0; i<m_state_alphabet.get_dim(); i++) {
 		m_z[i]=error_bound[i];
   }
 }
@@ -520,7 +514,7 @@ void  AbstractionGB<state_type,input_type>::setMeasurementErrorBound(const state
 template<class state_type, class input_type>
 std::vector<double> AbstractionGB<state_type,input_type>::getMeasruementErrorBound() {
   std::vector<double> z;
-  for(int i=0; i<m_state_alphabet.getDimension(); i++) {
+  for(int i=0; i<m_state_alphabet.get_dim(); i++) {
 		z.push_back(m_z[i]);
   }
 	return z;
