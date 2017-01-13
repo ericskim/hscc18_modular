@@ -87,11 +87,11 @@ public:
   std::vector<abs_type> getPre(const abs_type& k, const abs_type& j) const; 
   /** @brief return list of post associated with action j and post i **/
   std::vector<abs_type> get_post(const abs_type& i, const abs_type& j) const {
-    std::vector<abs_type> post;
+    std::vector<abs_type> post{};
     if(m_pre!=nullptr) {
       for(abs_type k=0; k<m_no_states; k++) {
-        if(m_no_post[k*m_no_inputs+j]) {
-          for(abs_type no=0; no<m_no_post[k*m_no_inputs+j]; no++) {
+        if(m_no_pre[k*m_no_inputs+j]) {
+          for(abs_type no=0; no<m_no_pre[k*m_no_inputs+j]; no++) {
             abs_type pos=m_pre_ptr[k*m_no_inputs+j]+no;
             if(m_pre[pos]==i) {
               post.push_back(k);

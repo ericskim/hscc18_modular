@@ -176,14 +176,34 @@ int main() {
   scots::StaticController con(ss,is,std::move(win));
 
   std::cout << "\nSimulation:\n " << std::endl;
-  x={{.2, 0.6, M_PI}};
-  for(size_t i=0; i<2; i++) {
-    std::cout << "States: " << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;
+  //x={{.6, 0.6, 0}};
+  x={{.6, 5.6, M_PI/2.0}};
+  state_type r={{0.1,0.1,0.1}};
+  radius_post(r,x,{{0,0}});
+  abs_type j,k;
+  for(size_t i=0; i<5; i++) {
     std::vector<input_type> u = con.get_control<state_type,input_type>(x);
+    std::cout << "\n Init :\n" ;
+    std::cout << "States: " << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;
     std::cout << "Inputs: " << u[0][0] <<  " "  << u[0][1] << std::endl;
+    ss.xtoi(k,x);
+    is.xtoi(j,u[0]);
+    std::cout << "Abs States: " << k << std::endl;
+    std::cout << "Abs Inputs: " << j << std::endl;
+    std::cout << std::endl;
+    std::cout << " no of pts: " << tf.m_no_post[k*is.getTotalNoGridPoints()+j] << " " << tf.get_post(k,j).size();
+    std::cout << std::endl;
+    std::cout << " no of pts abs: "  << abs.get_post(tf,x,u[0]).size() << " " << abs.get_post(vehicle_post,radius_post,x,u[0]).size();
+
+
     abs.print_post(tf,x,u[0]);
+    abs.print_post(vehicle_post,radius_post,x,u[0]);
+
     std::cout << std::endl;
     vehicle_post(x,u[0]);
+    std::cout << "States: " << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;
+    std::cout << "lower: " << x[0]-r[0] <<  " "  << x[1]-r[1] << " " << x[2]-r[2] << std::endl;
+    std::cout << "upper: " << x[0]+r[0] <<  " "  << x[1]+r[1] << " " << x[2]+r[2] << std::endl;
   }
 
 

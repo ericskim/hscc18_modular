@@ -97,7 +97,7 @@ public:
                     F2& radius_post,
                     F3&& overflow);
  
-  /** @brief get the indices of cells that are used to over-approximated the
+  /** @brief get the center of cells that are used to over-approximated the
    *  attainable set associated with cell (with center x) and input u
    *
    *  @returns std::vector<abs_type>
@@ -107,10 +107,78 @@ public:
    *  @param u - input
    **/
   template<class F1, class F2>
-  std::vector<abs_type> getPost(F1& system_post,
-																F2& radius_post,
-                                const state_type& x,
-                                const input_type& u);
+  std::vector<state_type> get_post(F1& system_post,
+                                   F2& radius_post,
+                                   const state_type& x,
+                                   const input_type& u) const {
+    /* initialize return value */
+    std::vector<state_type> post {};
+    /* state space dimension */
+    int dim = m_state_alphabet.getDimension();
+    /* variables for managing the post */
+    std::vector<abs_type> lb(dim);  /* lower-left corner */
+    std::vector<abs_type> ub(dim);  /* upper-right corner */
+    std::vector<abs_type> no(dim);  /* number of cells per dim */
+    std::vector<abs_type> cc(dim);  /* coordinate of current cell in the post */
+    /* get radius */
+    state_type r;
+    state_type eta;
+    /* for out of bounds check */
+    state_type lower_left;
+    state_type upper_right;
+    /* fill in data */
+    for(int i=0; i<dim; i++) {
+      eta[i]=m_state_alphabet.getEta()[i];
+      r[i]=m_state_alphabet.getEta()[i]/2.0+m_z[i];
+      lower_left[i]=m_state_alphabet.getLowerLeftGridPoint()[i];
+      upper_right[i]=m_state_alphabet.getUpperRightGridPoint()[i];
+    }
+
+    /* make a copy of cell */
+    state_type xx=x;
+
+    /* compute growth bound and numerical solution of ODE */
+    radius_post(r,x,u);
+    system_post(xx,u);
+
+    /* determine post */
+    abs_type npost=1;
+    for(int k=0; k<dim; k++) {
+      /* check for out of bounds */
+      double left = xx[k]-r[k]-m_z[k];
+      double right = xx[k]+r[k]+m_z[k];
+      if(left <= lower_left[k]-eta[k]/2.0  || right >= upper_right[k]+eta[k]/2.0) {
+        return post;
+      } 
+      /* integer coordinate of lower left corner of post */
+      lb[k] = static_cast<abs_type>((left-lower_left[k]+eta[k]/2.0)/eta[k]);
+      /* integer coordinate of upper right corner of post */
+      ub[k] = static_cast<abs_type>((right-lower_left[k]+eta[k]/2.0)/eta[k]);
+      /* number of grid points in the post in each dimension */
+      no[k]=(ub[k]-lb[k]+1);
+      /* total number of post */
+      npost*=no[k];
+      cc[k]=0;
+    }
+    /* compute indices of post */
+    for(abs_type k=0; k<npost; k++) {
+      abs_type q=0;
+      for(int l=0; l<dim; l++)  {
+        q+=(lb[l]+cc[l])*m_state_alphabet.getNN()[l];
+      }
+      cc[0]++;
+      for(int l=0; l<dim-1; l++) {
+        if(cc[l]==no[l]) {
+          cc[l]=0;
+          cc[l+1]++;
+        }
+      }
+      /* (i,j,q) is a transition */    
+      m_state_alphabet.itox(q,xx);
+      post.push_back(xx);
+    }
+    return post;
+  }
 
 
   /** @brief get the center of cells that are used to over-approximated the
@@ -148,6 +216,30 @@ public:
                                      const state_type& x,
                                      const input_type& u) const {
     std::vector<state_type> post = get_post(transition_function, x, u);
+    std::cout << "\nPost states: \n";
+    for(abs_type v=0; v<post.size(); v++) {
+      for(int i=0; i<m_state_alphabet.getDimension(); i++) {
+        std::cout << post[v][i] << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+
+  /** @brief print the center of cells that are used to over-approximated the
+   *  attainable set associated with cell (with center x) and input u
+   *
+   *  @param system_post - lambda function as in compute
+   *  @param radius_post - lambda function as in compute
+   *  @param x - center of cell 
+   *  @param u - input
+   **/
+  template<class F1, class F2>
+  void print_post(F1& system_post,
+								  F2& radius_post,
+                  const state_type& x,
+                  const input_type& u) const {
+    std::vector<state_type> post = get_post(system_post,radius_post,x,u);
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
       for(int i=0; i<m_state_alphabet.getDimension(); i++) {
@@ -419,78 +511,6 @@ void AbstractionGB<state_type,input_type>::compute(TransitionFunction& transitio
   /* cleanup */
   delete[] corner_IDs;
   delete[] out_of_domain;
-}
-
-template<class state_type, class input_type>
-template<class F1, class F2> 
-std::vector<abs_type> AbstractionGB<state_type,input_type>::getPost(F1& system_post, F2& radius_post, const state_type& x, const input_type& u) {
-	/* initialize return value */
-  std::vector<abs_type> post;
-  post.clear();
-  /* state space dimension */
-	int dim = m_state_alphabet.getDimension();
-  /* variables for managing the post */
-  std::vector<abs_type> lb(dim);  /* lower-left corner */
-  std::vector<abs_type> ub(dim);  /* upper-right corner */
-  std::vector<abs_type> no(dim);  /* number of cells per dim */
-  std::vector<abs_type> cc(dim);  /* coordinate of current cell in the post */
-  /* get radius */
-	state_type r;
-  state_type eta;
-  /* for out of bounds check */
-  state_type lower_left;
-  state_type upper_right;
-  /* fill in data */
-	for(int i=0; i<dim; i++) {
-    eta[i]=m_state_alphabet.getEta()[i];
-    r[i]=m_state_alphabet.getEta()[i]/2.0+m_z[i];
-    lower_left[i]=m_state_alphabet.getLowerLeftGridPoint()[i];
-    upper_right[i]=m_state_alphabet.getUpperRightGridPoint()[i];
-  }
-
-  /* make a copy of cell */
-	state_type xx=x;
-
-  /* compute growth bound and numerical solution of ODE */
-  radius_post(r,xx,u);
-  system_post(x,u);
-
-  /* determine post */
-  abs_type npost=1;
-  for(int k=0; k<dim; k++) {
-    /* check for out of bounds */
-    double left = x[k]-r[k]-m_z[k];
-    double right = x[k]+r[k]+m_z[k];
-    if(left <= lower_left[k]-eta[k]/2.0  || right >= upper_right[k]+eta[k]/2.0) {
-      return post;
-    } 
-    /* integer coordinate of lower left corner of post */
-    lb[k] = static_cast<abs_type>((left-lower_left[k]+eta[k]/2.0)/eta[k]);
-    /* integer coordinate of upper right corner of post */
-    ub[k] = static_cast<abs_type>((right-lower_left[k]+eta[k]/2.0)/eta[k]);
-    /* number of grid points in the post in each dimension */
-    no[k]=(ub[k]-lb[k]+1);
-    /* total number of post */
-    npost*=no[k];
-    cc[k]=0;
-  }
-  /* compute indices of post */
-  for(abs_type k=0; k<npost; k++) {
-    abs_type q=0;
-    for(int l=0; l<dim; l++)  {
-      q+=(lb[l]+cc[l])*m_state_alphabet.getNN()[l];
-    }
-    cc[0]++;
-    for(int l=0; l<dim-1; l++) {
-      if(cc[l]==no[l]) {
-        cc[l]=0;
-        cc[l+1]++;
-      }
-    }
-    /* (i,j,q) is a transition */    
-    post.push_back(q);
-  }
-  return post;
 }
 
 template<class state_type, class input_type>
