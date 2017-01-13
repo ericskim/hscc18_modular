@@ -133,10 +133,7 @@ public:
       lower_left[i]=m_state_alphabet.getLowerLeftGridPoint()[i];
       upper_right[i]=m_state_alphabet.getUpperRightGridPoint()[i];
     }
-
-    /* make a copy of cell */
     state_type xx=x;
-
     /* compute growth bound and numerical solution of ODE */
     radius_post(r,x,u);
     system_post(xx,u);

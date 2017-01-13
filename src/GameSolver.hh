@@ -80,6 +80,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
    * j = max if the target is not reachable from i 
    */
   abs_type max = std::numeric_limits<abs_type>::max();
+  std::cout << "max max " << max << std::endl;
   if(M > max-1) {
     throw std::runtime_error("scots::solve_reachability_game: Number of inputs exceeds maximum supported value");
   }

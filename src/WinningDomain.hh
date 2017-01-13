@@ -62,27 +62,27 @@ public:
   WinningDomain(const abs_type no_states, const abs_type no_inputs) :
                 m_no_states(no_states), m_no_inputs(no_inputs) {}
 
-  /** @brief construct WinningDomain with array of wining states **/
+  /** @brief construct WinningDomain with array of winning states **/
   WinningDomain(const abs_type no_states,
                 const abs_type no_inputs,
-                std::vector<abs_type>&& wining_domain) :
+                std::vector<abs_type>&& winning_domain) :
                 m_no_states(no_states), m_no_inputs(no_inputs),
-                m_wining_domain(std::move(wining_domain)) {}
+                m_winning_domain(std::move(winning_domain)) {}
 
   /** @brief construct WinningDomain with array of winning states and valid inputs **/
   WinningDomain(const abs_type no_states,
                 const abs_type no_inputs,
-                std::vector<abs_type>&& wining_domain,
+                std::vector<abs_type>&& winning_domain,
                 std::vector<bool>&& inputs) : 
                 m_no_states(no_states), m_no_inputs(no_inputs),
-                m_wining_domain(std::move(wining_domain)), m_inputs(std::move(inputs)) {}
+                m_winning_domain(std::move(winning_domain)), m_inputs(std::move(inputs)) {}
 
   /** 
    * @brief set the array of winning states\n
    *        the set of states can only be set by \b moving from win_domain
    **/
   void set_winning_domain(std::vector<abs_type>&& win_domain) {
-		m_wining_domain = std::move(win_domain);
+		m_winning_domain = std::move(win_domain);
   }
 
   /** 
@@ -101,7 +101,7 @@ public:
 
   /** @brief check if state i is winning **/
   bool is_winning(const abs_type& i) {
-    if(i<m_wining_domain.size() && m_wining_domain[i]!=m_max) {
+    if(i<m_winning_domain.size() && m_winning_domain[i]!=m_max) {
       return true;
     }
     return false;
@@ -119,9 +119,9 @@ public:
       }
       return inputs;
     }
-    /* otherwise valid input might be written directly in m_wining_domain */
+    /* otherwise valid input might be written directly in m_winning_domain */
     if(is_winning(i)) {
-      inputs.push_back(is_winning(i));
+      inputs.push_back(m_winning_domain[i]);
       return inputs;
     }
     return inputs;
@@ -158,9 +158,9 @@ private:
   abs_type m_max = std::numeric_limits<abs_type>::max();
   /**
    * @brief array of size N  \n
-   * (m_wining_domain[i]=m_max if i is not winning) 
+   * (m_winning_domain[i]=m_max if i is not winning) 
    **/
-  std::vector<abs_type> m_wining_domain{};
+  std::vector<abs_type> m_winning_domain{};
   /**
    * @brief bool array of size N*M encoding the valid inputs\n
    *         m_inputs[i*M +j]==true iff j is a valid input at i) 
