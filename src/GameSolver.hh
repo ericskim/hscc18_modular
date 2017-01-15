@@ -6,7 +6,7 @@
  * 
  */
 
-/** @file GameSolver.hh **/
+/** @file **/
 
 #ifndef GAMESOLVER_HH_
 #define GAMESOLVER_HH_
@@ -19,7 +19,6 @@
 
 #include "TransitionFunction.hh"
 #include "WinningDomain.hh"
-//#include "FileHandler.hh"
 
 
 /** @namespace scots **/ 
@@ -219,5 +218,4 @@ WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F&
 }
 
 } /* end of namespace scots */
-
 #endif /* GAMESOLVER_HH_ */

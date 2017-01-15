@@ -1,5 +1,5 @@
 /*
- * IO.hh
+ * InputOutput.hh
  *
  *     created: Jan 2017
  *      author: Matthias Rungger
@@ -7,22 +7,22 @@
 
 /** @file **/
 
-#ifndef IO_HH_
-#define IO_HH_
+#ifndef InputOutput_HH_
+#define IInputOutputO_HH_
 
 #include <string>
 
 #include "FileHandler.hh"
 
-#include "TransitionFunction.hh"
 #include "UniformGrid.hh"
+#include "TransitionFunction.hh"
 #include "StaticController.hh"
 #include "WinningDomain.hh"
 
 /* StaticController definitions */
 #define  SCOTS_SC_TYPE          "STATICCONTROLLER"
 
-/* StaticController definitions */
+/* WinningDomain definitions */
 #define  SCOTS_WD_TYPE          "WINNINGDOMAIN"
 #define  SCOTS_WD_DATA          "DATA"
 
@@ -46,7 +46,6 @@
 /* Grid points definitions */
 #define  SCOTS_GP_TYPE        "SET_OF_GRIDPOINTS"
 #define  SCOTS_GP_DATA        "GRIDPOINTS"
-
 
 /** @namespace scots **/ 
 namespace scots {
@@ -323,4 +322,4 @@ bool read_from_file(TransitionFunction& tf, const std::string& filename) {
 }
 
 } /* end namespace */
-#endif /* IO_HH_ */
+#endif /* InputOutput_HH_ */

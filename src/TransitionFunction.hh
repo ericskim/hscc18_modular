@@ -6,10 +6,7 @@
  * 
  */
 
-/** 
- * @file
- * Containing the TransitionFunction and abs_type definition
- **/
+/** @file **/
 
 #ifndef TRANSITIONFUNKTION_HH_
 #define TRANSITIONFUNKTION_HH_
@@ -183,5 +180,4 @@ public:
 };
 
 } /* end of namespace scots */
-
-#endif /* TRANSITIONFUNKTION_HH_ */
+#endif /* TRANSITIONFUNCTION_HH_ */

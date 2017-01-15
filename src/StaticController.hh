@@ -99,5 +99,6 @@ public:
     return domain;
   }
 };
+
 } /* end of namespace scots */
 #endif /* STATICCONTROLLER_HH_ */

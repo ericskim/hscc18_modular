@@ -68,7 +68,6 @@ public:
     }
   }
 
-
   /** 
    * @brief computes the transition function
    *
@@ -503,9 +502,5 @@ public:
   }
 };
 
-
-
-
 } /* close namespace */
-
 #endif /* ABSTRACTIONGB_HH_ */

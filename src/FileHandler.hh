@@ -33,9 +33,7 @@
 
 namespace scots {
   
-/**
- * @brief The FileHandler class stores the filename
- **/
+/** @brief The FileHandler class stores the filename **/
 class FileHandler {
 protected:
   std::string m_filename{"file.scs"};
@@ -47,15 +45,12 @@ public:
   }
 };
 
-/**
- * @brief The FileWriter class is used to write information into files
- **/
-class FileWriter :public FileHandler {
+/** @brief The FileWriter class is used to write information into files **/
+class FileWriter : public FileHandler {
 private:
   std::ofstream m_file;
 public:
   FileWriter(const std::string& filename) : FileHandler(filename) {};
-
   bool create() {
     m_file.close();
     m_file.open(m_filename,std::fstream::out);
@@ -69,7 +64,6 @@ public:
   void close() {
     m_file.close();
   }
-
   bool add_TEXT(const std::string& text) {
     if(m_file.is_open()) {
       m_file << SCOTS_FH_KEY << text <<"\n";
@@ -127,7 +121,6 @@ public:
     }
     return false;
   }
-
   template<class T>
   bool add_WINNINGDOMAIN(const std::string& name, 
                          const std::vector<T>& vector,
@@ -166,9 +159,7 @@ public:
   }
 };
 
-/**
- * @brief The FileReader class is used to read information from files
- **/
+/** @brief The FileReader class is used to read information from files **/
 class FileReader : public FileHandler {
 private:
   std::ifstream       m_file;
@@ -189,7 +180,6 @@ private:
 
 public:
   FileReader(const std::string& filename) : FileHandler(filename) {};
-
   bool open() {
     m_file.open(m_filename);
     return m_file.good();
@@ -197,7 +187,6 @@ public:
   void close() {
     m_file.close();
   }
-
   size_t get_VERSION(double& version, size_t offset=0) {
     back_to_first_line();
     if(skip_offset(offset)) {
@@ -264,7 +253,6 @@ public:
     }
     return 0;
   }
-
   template<class T>
   size_t get_VECTOR(const std::string& vector_name, std::vector<T>& vector, size_t offset=0) {
     back_to_first_line();
@@ -358,7 +346,6 @@ public:
     }
     return 0;
   }
-
   template<class T>
   bool get_WINNINGDOMAIN(const std::string& name, 
                          std::vector<T>& vector,

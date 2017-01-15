@@ -359,5 +359,6 @@ private:
     m_NN = nullptr;
   }
 };
+
 } /* close namespace */
 #endif /* UNIFORMGRID_HH_ */
