@@ -1,34 +1,30 @@
 /*
  * vehicle.cc
  *
- *  created on: 26.10.2015
- *      author: rungger
+ *  created: Oct 2015
+ *   author: Matthias Rungger
  */
 
 /*
  * information about this example is given in
  * http://arxiv.org/abs/1503.03715
  * doi: 10.1109/TAC.2016.2593947
- *
  */
 
 #include <iostream>
 #include <array>
-#include <iomanip>
 
 /* SCOTS header */
-#include "UniformGrid.hh"
-#include "TransitionSystem.hh"
-#include "AbstractionGB.hh"
-#include "ReachabilityGame.hh"
-#include "StaticController.hh"
+#include "scots.hh"
+/* ode solver */
+#include "RungeKutta4.hh"
 
 /* time profiling */
 #include "TicToc.hh"
-
-/* ode solver */
-#include "RungeKutta4_old.hh"
-OdeSolver ode_solver;
+/* memory profiling */
+#include <sys/time.h>
+#include <sys/resource.h>
+struct rusage usage;
 
 /* state space dim */
 const int state_dim=3;
@@ -38,25 +34,15 @@ const int input_dim=2;
 /* sampling time */
 const double tau = 0.3;
 
-/* memory profiling */
-#include <sys/time.h>
-#include <sys/resource.h>
-
-struct rusage usage;
-
-// resident size is in t_info.resident_size;
-// virtual size is in t_info.virtual_size;
-
 /*
  * data types for the state space elements and input space
  * elements used in uniform grid and ode solvers
- *
  */
 using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 
+/* abbrev of the type for abstract states and inputs */
 using abs_type = scots::abs_type;
-
 
 /* we integrate the vehicle ode by 0.3 sec (the result is stored in x)  */
 auto  vehicle_post = [](state_type &x, const input_type &u) {
@@ -68,7 +54,7 @@ auto  vehicle_post = [](state_type &x, const input_type &u) {
     xx[2] = u[0]*std::tan(u[1]);
   };
   /* simulate (use 10 intermediate steps in the ode solver) */
-  ode_solver(rhs,x,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
 };
 
 /* we integrate the growth bound by 0.3 sec (the result is stored in r)  */
@@ -79,38 +65,31 @@ auto radius_post = [](state_type &r, const state_type &, const input_type &u) {
 };
 
 int main() {
-
   /* to measure time */
   TicToc tt;
 
-  /****************************************************************************/
-  /* construct grid for the state space */
-  /****************************************************************************/
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* lower bounds of the hyper rectangle */
-  state_type lb={{0,0,-M_PI-0.4}};
+  state_type s_lb={{0,0,-M_PI-0.4}};
   /* upper bounds of the hyper rectangle */
-  state_type ub={{10,10,M_PI+0.4}};
+  state_type s_ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
-  state_type eta={{.2,.2,.2}};
-  scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta);
+  state_type s_eta={{.2,.2,.2}};
+  scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  ss.printInfo(1);
+  ss.print_info();
 
-  /****************************************************************************/
   /* construct grid for the input space */
-  /****************************************************************************/
   /* lower bounds of the hyper rectangle */
-  input_type ilb={{-1,-1}};
+  input_type i_lb={{-1,-1}};
   /* upper bounds of the hyper rectangle */
-  input_type iub={{1,1}};
+  input_type i_ub={{1,1}};
   /* grid node distance diameter */
-  input_type ieta={{.3,.3}};
-  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
+  input_type i_eta={{.3,.3}};
+  scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
+  is.print_info();
 
-  /****************************************************************************/
   /* set up constraint functions with obtacles */
-  /****************************************************************************/
   double H[15][4] = {
     { 1  , 1.2, 0  ,   9 },
     { 2.2, 2.4, 0  ,   5 },
@@ -129,51 +108,58 @@ int main() {
     { 9.3, 10 , 2.3,  2.5}
   };
 
-  /* overflow function returns 1 if x \in overflow symbol  */
+  /* avoid function returns 1 if x is in avoid set  */
   state_type x;
-  auto overflow = [&](const size_t idx) {
+  auto avoid = [&](const size_t idx) {
     ss.itox(idx,x);
-    double c1= eta[0]/2.0;
-    double c2= eta[1]/2.0;
+    double c1= s_eta[0]/2.0+1e-10;
+    double c2= s_eta[1]/2.0+1e-10;
     for(size_t i=0; i<15; i++) {
-      if ((H[i][0]-c1) <= x[0] && x[0]<= (H[i][1]+c1) && (H[i][2]-c2) <= x[1] && x[1] <= (H[i][3]+c2))
+      if ((H[i][0]-c1) <= x[0] && x[0] <= (H[i][1]+c1) && 
+          (H[i][2]-c2) <= x[1] && x[1] <= (H[i][3]+c2))
         return true;
     }
     return false;
   };
+  /* write obstacles to file */
+  write_to_file(ss,avoid,"obstacles.scs");
 
-  /* transition system to be computed */
-  scots::TransitionSystem ts;
+  std::cout << "Computing the transition function: " << std::endl;
+  /* transition function of symbolic model */
+  scots::TransitionFunction tf;
+  scots::AbstractionGB<state_type,input_type> abs(ss,is);
 
-  std::cout << "Computing the abstraction: " << std::endl;
   tt.tic();
-  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
-
-  abs.computeTransitionRelation(vehicle_post, radius_post, overflow);
-  //abs.computeTransitionRelation(vehicle_post, radius_post);
-
-  std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
+  abs.compute(tf,vehicle_post, radius_post, avoid);
+  //abs.compute(tf,vehicle_post, radius_post);
   tt.toc();
+  std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
 
   if(!getrusage(RUSAGE_SELF, &usage))
-    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)ts.getNoTransitions() << std::endl;
-    
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
+
   /* define target set */
-  auto target = [&](size_t idx) {
+  auto target = [&](abs_type idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
-    if (9 <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= 9.5 && 0 <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= 0.5)
+    if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 
+        0 <= (x[1]-s_eta[1]/2.0) && (x[1]+s_eta[1]/2.0) <= 0.5)
       return true;
-    else
     return false;
   };
+   /* write target to file */
+  write_to_file(ss,target,"target.scs");
 
-  std::cout << "\nController synthesis: " << std::endl;
-  scots::ReachabilityGame reach(ts);
+ 
+  std::cout << "\nSynthesis: " << std::endl;
   tt.tic();
-  reach.solve(target);
+  scots::WinningDomain win=scots::solve_reachability_game(tf,target);
   tt.toc();
-  std::cout << "Domain size: " << reach.size() << std::endl;
+  std::cout << "Winning domain size: " << win.get_size() << std::endl;
+
+  std::cout << "\nWrite controller to controller.scs \n";
+  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller.scs"))
+    std::cout << "Done. \n";
 
   return 1;
 }

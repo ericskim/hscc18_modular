@@ -17,7 +17,6 @@
 
 /* to get abs_type */
 #include "TransitionFunction.hh"
-//#include "FileHandler.hh"
 
 #define SCOTS_WD_TYPE   "WINNINGDOMAIN"
 #define SCOTS_WD_DATA   "DATA"
@@ -42,6 +41,26 @@ namespace scots {
  *
  **/
 class WinningDomain {
+/* allow the write_to_file function to access the private members */
+friend bool write_to_file(const WinningDomain&, const std::string&);
+private:
+  /** @brief size of state alphabet N **/
+  abs_type m_no_states=0;
+  /** @brief size of input alphabet M **/
+  abs_type m_no_inputs=0;
+  /** @brief used to encode loosing states **/
+  abs_type m_max = std::numeric_limits<abs_type>::max();
+  /**
+   * @brief array of size N  \n
+   * (m_winning_domain[i]=m_max if i is not winning) 
+   **/
+  std::vector<abs_type> m_winning_domain{};
+  /**
+   * @brief bool array of size N*M encoding the valid inputs\n
+   *         m_inputs[i*M +j]==true iff j is a valid input at i) 
+   **/
+  std::vector<bool> m_inputs{}; 
+
 public:
   /** @cond  EXCLUDE from doxygen **/
   /* default constructor */
@@ -76,28 +95,28 @@ public:
                 std::vector<bool>&& inputs) : 
                 m_no_states(no_states), m_no_inputs(no_inputs),
                 m_winning_domain(std::move(winning_domain)), m_inputs(std::move(inputs)) {}
-
-  /** 
-   * @brief set the array of winning states\n
-   *        the set of states can only be set by \b moving from win_domain
-   **/
-  void set_winning_domain(std::vector<abs_type>&& win_domain) {
-		m_winning_domain = std::move(win_domain);
-  }
-
-  /** 
-   * @brief set the array of valid inputs \n
-   *        inputs can only be set by \b moving from inuts
-   **/
-  void set_inputs(std::vector<bool>&& inputs) {
-		m_inputs = std::move(inputs);
-  }
-
-  /** @brief set the size of state alphabet and input alphabet **/
-  void set_alphabet_size(const abs_type no_states, const abs_type no_inputs) {
-		m_no_states = no_states;
-		m_no_inputs = no_inputs;
-  }
+//
+//  /** 
+//   * @brief set the array of winning states\n
+//   *        the set of states can only be set by \b moving from win_domain
+//   **/
+//  void set_winning_domain(std::vector<abs_type>&& win_domain) {
+//		m_winning_domain = std::move(win_domain);
+//  }
+//
+//  /** 
+//   * @brief set the array of valid inputs \n
+//   *        inputs can only be set by \b moving from inuts
+//   **/
+//  void set_inputs(std::vector<bool>&& inputs) {
+//		m_inputs = std::move(inputs);
+//  }
+//
+//  /** @brief set the size of state alphabet and input alphabet **/
+//  void set_alphabet_size(const abs_type no_states, const abs_type no_inputs) {
+//		m_no_states = no_states;
+//		m_no_inputs = no_inputs;
+//  }
 
   /** @brief check if state i is winning **/
   bool is_winning(const abs_type& i) {
@@ -149,23 +168,6 @@ public:
     return ws;
   }
 
-private:
-  /** @brief size of state alphabet N **/
-  abs_type m_no_states=0;
-  /** @brief size of input alphabet M **/
-  abs_type m_no_inputs=0;
-  /** @brief used to encode loosing states **/
-  abs_type m_max = std::numeric_limits<abs_type>::max();
-  /**
-   * @brief array of size N  \n
-   * (m_winning_domain[i]=m_max if i is not winning) 
-   **/
-  std::vector<abs_type> m_winning_domain{};
-  /**
-   * @brief bool array of size N*M encoding the valid inputs\n
-   *         m_inputs[i*M +j]==true iff j is a valid input at i) 
-   **/
-  std::vector<bool> m_inputs{}; 
 };
 } /* close namespace */
 

@@ -20,16 +20,9 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <limits>
+#include <climits>
 
 #include "TransitionFunction.hh"
-//#include "FileHandler.hh"
-
-#define SCOTS_UG_TYPE   "UNIFORMGRID"
-#define SCOTS_UG_DIM    "DIM"
-#define SCOTS_UG_FIRST  "FIRST"
-#define SCOTS_UG_ETA    "ETA"
-#define SCOTS_UG_GPPD   "GPPD"
 
 /** @namespace scots **/ 
 namespace scots {
@@ -132,13 +125,12 @@ public:
    * @param lb    - lower-left corner of the hyper-interval confining the uniform grid
    * @param ub    - upper-right corner of the hyper-interval confining the uniform grid
    * @param eta   - grid point distances
-   *
-   */
+   **/
   template<class grid_point_t>
-  UniformGrid::UniformGrid(const int dim,
-                           const grid_point_t& lb,
-                           const grid_point_t& ub,
-                           const grid_point_t& eta) : UniformGrid() {
+  UniformGrid(const int dim,
+              const grid_point_t& lb,
+              const grid_point_t& ub,
+              const grid_point_t& eta) : UniformGrid() {
     m_dim = dim;
     if(m_dim != 0) {
       /* check inut arguments */
@@ -192,14 +184,12 @@ public:
         /* first grid point coordinates */
         m_first[index]= (double)sign_l*(double)no_l*eta[index];
       }
-      /* compute m_NN */
-      total_no_grid_points();
+      calc_nn();
     } else {
       reset();
       throw std::runtime_error("\nscots::UniformGrid: grid dimension has to be greater than zero (using non-default constructor)");
     }
   }
-
 
   /** @brief compute the index associated with a grid point **/
   template<class grid_point_t>
@@ -228,9 +218,8 @@ public:
 
   /** @brief compute the grid point associated with a index **/
   template<class grid_point_t>
-  grid_point_t itox(abs_type idx) const {
+  void itox(abs_type idx, grid_point_t& x) const {
     /* map index idx to grid point */
-    grid_point_t x;
     abs_type num;
     for(abs_type k = m_dim-1; k > 0; k--) {
       num=idx/m_NN[k];
@@ -239,7 +228,20 @@ public:
     }
     num=idx;
     x[0]=m_first[0]+num*m_eta[0];
-    return x;
+  }
+
+  /** @brief compute the grid point associated with a index **/
+  void itox(abs_type idx, std::vector<double>& x) const {
+    x.resize(m_dim);
+    /* map index idx to grid point */
+    abs_type num;
+    for(abs_type k = m_dim-1; k > 0; k--) {
+      num=idx/m_NN[k];
+      idx=idx%m_NN[k];
+      x[k]=m_first[k]+num*m_eta[k];
+    }
+    num=idx;
+    x[0]=m_first[0]+num*m_eta[0];
   }
 
   /** @brief creates console output with grid information **/
@@ -248,35 +250,21 @@ public:
     for(int i=0; i<m_dim; i++) {
       std::cout << m_eta[i] << " ";
     }
-    std::cout << std::endl;
-
-    std::cout << "Lower-left grid point: ";
+    std::cout << "\nLower-left grid point: ";
     for(int i=0; i<m_dim; i++) {
       std::cout << m_first[i] << " ";
     }
-    std::cout << std::endl;
-
-    std::cout << "Upper-right grid point: ";
+    std::cout << "\nUpper-right grid point: ";
     for(int i=0; i<m_dim; i++) {
       std::cout << m_first[i]+m_eta[i]*(m_no_grid_points[i]-1) << " ";
     }
-    std::cout << std::endl;
-
-    std::cout << "Number of grid points in each dimension: ";
+    std::cout << "\nNumber of grid points in each dimension: ";
     for(int i=0; i<m_dim; i++) {
         std::cout << m_no_grid_points[i] << " ";
     }
-    std::cout << std::endl;
-
-    std::cout << "Number of grid points: "<< total_no_grid_points() << std::endl;
+    std::cout << "\nNumber of grid points: "<< total_no_grid_points() << std::endl;
     std::cout << std::endl;
   }
-
-
-  /* @brief function to write the grid into a file via a scots::FileWriter **/
-//  bool addGridToFile(FileWriter&);            
-  /* @brief function to read and reset(!) the grid from a file via a scots::FileReader **/
-//  bool readFromGridFile(FileReader&, std::size_t); 
 
   /** @name get functions **/
   //@{
@@ -325,119 +313,51 @@ public:
   //@}
 
 private:
-	/** @brief helper function to calculate the overall number of grid points and NN **/
-  abs_type total_no_grid_points() {
+  void calc_nn() {
+    /* compute m_NN */
+    abs_type max = std::numeric_limits<abs_type>::max();
     abs_type total=1;
     for(int i=0; i<m_dim; i++) {
       m_NN[i] = total;
       /* check overflow */
-      if((total > std::numeric_limits<abs_type>::max()) || (total==std::numeric_limits<abs_type>::max() && m_no_grid_points[i]>1)) {
+      if(total > (max/m_no_grid_points[i])) {
         reset();
         throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in TransitionSystem.hh).");
       }
       total *= m_no_grid_points[i];
     }
+  }
+
+  /** @brief helper function to calculate the overall number of grid points **/
+  abs_type total_no_grid_points() const {
+    abs_type total=1;
+    for(int i=0; i<m_dim; i++) {
+      total *= m_no_grid_points[i];
+    }
     return total;
   }
 	/** @brief helper for reseting the whole grid **/
-  void reset();                            
+  void reset() {
+    m_dim = 0;
+
+    delete[] m_eta;
+    delete[] m_first;
+    delete[] m_no_grid_points;
+    delete[] m_NN;
+
+    m_eta = nullptr;
+    m_first = nullptr;
+    m_no_grid_points = nullptr;
+    m_NN = nullptr;
+  }
 	/** @brief setting everything to zero **/
-  void null();                             
+  void null() {
+    m_dim = 0;
+    m_eta = nullptr;
+    m_first = nullptr;
+    m_no_grid_points = nullptr;
+    m_NN = nullptr;
+  }
 };
-
-
-//bool UniformGrid::addGridToFile(FileWriter& writer) {
-//  if(writer.open()) {
-//    writer.add_TYPE(SCOTS_UG_TYPE);
-//    writer.add_MEMBER(SCOTS_UG_DIM,m_dim);
-//    writer.add_ARRAY(SCOTS_UG_GPPD,m_no_grid_points);
-//    writer.add_ARRAY(SCOTS_UG_ETA,m_eta,m_dim);
-//    writer.add_ARRAY(SCOTS_UG_FIRST,m_first,m_dim);
-//
-//    writer.close();
-//    return true;
-//  }
-//  return false;
-//}
-
-//bool UniformGrid::readFromGridFile(FileReader& reader, std::size_t offset) {
-//  reset();
-//  if(!reader.open()) {
-//    return false;
-//  }
-//  if(!reader.get_MEMBER(SCOTS_UG_DIM,m_dim,offset)) {
-//    reset();
-//    return false;
-//  } else {
-//   m_eta = new double[m_dim];
-//   m_first = new double[m_dim];
-//   m_no_grid_points = new abs_type[m_dim];
-//   m_NN = new abs_type[m_dim];
-//  }
-//  if(!reader.get_ARRAY(SCOTS_UG_GPPD,m_no_grid_points,offset)) {
-//    reset();
-//    return false;
-//  }
-//  if(!reader.get_ARRAY(SCOTS_UG_ETA,m_eta,m_dim,offset)) {
-//    reset();
-//    return false;
-//  }
-//  if(!reader.get_ARRAY(SCOTS_UG_FIRST,m_first,m_dim,offset)) {
-//    reset();
-//    return false;
-//  }
-//
-//  reader.close();
-//  calculateTotalNumberOfGridPoints();
-//  return true;
-//}
-
-
-
-void UniformGrid::reset() {
-  m_dim = 0;
-
-  delete[] m_eta;
-  delete[] m_first;
-  delete[] m_no_grid_points;
-  delete[] m_NN;
-
-  m_eta = nullptr;
-  m_first = nullptr;
-  m_no_grid_points = nullptr;
-  m_NN = nullptr;
-}
-
-void UniformGrid::null() {
-  m_dim = 0;
-  m_eta = nullptr;
-  m_first = nullptr;
-  m_no_grid_points = nullptr;
-  m_NN = nullptr;
-}
-
-
-
-///** 
-// * @brief write atomic propositions to file
-// */
-//template<class F>
-//bool writeAtomicPropositionsToFile(F& AP,abs_type numberOfCells,FileWriter& file,std::string name)
-//{
-//    if(!file.open())
-//    {
-//        return false;
-//    }
-//    scots::array<bool> table(numberOfCells);
-//
-//    for(size_t index = 0; index < numberOfCells; index++)
-//    {
-//        table[index] = AP(index);
-//    }
-//
-//    return file.add_ARRAY<scots::array<bool> >(name,table,table.size());
-//}
-
 } /* close namespace */
-
 #endif /* UNIFORMGRID_HH_ */

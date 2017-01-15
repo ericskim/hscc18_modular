@@ -2,32 +2,27 @@
 # compiler
 #
 #CC        = g++
-CC       	  = g++
-CXXFLAGS 		= -g -Wall -Wextra -std=c++14
-CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3 -DNDEBUG
-
+CC       	  = clang++
+CXXFLAGS 		= -g -Wall -Wextra -std=c++11
+CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG
 
 #
 # scots 
 #
 SCOTSROOT		= ../..
-SCOTSINC		= -I$(SCOTSROOT)/sparse  -I$(SCOTSROOT)/utils/
+SCOTSINC		= -I$(SCOTSROOT)/src  -I$(SCOTSROOT)/utils/
 
+.PHONY: dcdc simulate
 
-#
-# cudd 
-#
-
-
-.PHONY: dcdc
-
-TARGET = dcdc
+TARGET = dcdc simulate
 
 all: $(TARGET)
 
 dcdc: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) dcdc.cc -o dcdc
 
+simulate: 
+	$(CC) $(CXXFLAGS) $(SCOTSINC) simulate.cc -o simulate
 
 clean:
-	rm dcdc
+	rm dcdc simulate

@@ -1,54 +1,59 @@
 /*
- * Boost Converter 
+ * dcdc.cc
  *
- *  created on: 28.11.2016
- *      author: rungger
+ *  created: Oct 2015
+ *   author: Matthias Rungger
  */
 
 /*
  * information about this example is given in the readme file
- *
  */
 
 #include <iostream>
 #include <array>
 #include <cmath>
 
-#include "UniformGrid.hh"
-#include "AbstractionGB.hh"
-#include "SafetyGame.hh"
-
+/* SCOTS header */
+#include "scots.hh"
 /* ode solver */
 #include "RungeKutta4.hh"
 
+
+/* time profiling */
 #include "TicToc.hh"
-//#include "IO.hh"
+/* memory profiling */
+#include <sys/time.h>
+#include <sys/resource.h>
+struct rusage usage;
+
 
 /* state space dim */
-#define sDIM 2      // dimension of statespace
-#define iDIM 1      // dimension of inputspace
+const int state_dim=2;
+/* input space dim */
+const int input_dim=1;
+/* sampling time */
+const double tau = 0.5;
 
-/* data types for the ode solver */
-typedef std::array<double,sDIM> state_type;
-typedef std::array<double,iDIM> input_type;
+/*
+ * data types for the elements of the state space 
+ * and input space used by the ODE solver
+ */
+using state_type = std::array<double,state_dim>;
+using input_type = std::array<double,input_dim>;
+
+/* abbrev of the type for abstract states and inputs */
+using abs_type = scots::abs_type;
+
 
 /* parameters for system dynamics */
-double xc=70;
-double xl=3;
-double rc=0.005;
-double rl=0.05;
-double ro=1;
-double vs=1;
-
+const double xc=70;
+const double xl=3;
+const double rc=0.005;
+const double rl=0.05;
+const double ro=1;
+const double vs=1;
 /* parameters for radius calculation */
-double k=0.014;
-double tau=0.5;			// sampling time
-double mu=sqrt(2);
-
-/* ode solver */
-OdeSolver ode_solver;
-
-
+const double mu=std::sqrt(2);
 /* we integrate the dcdc ode by 0.5 sec (the result is stored in x)  */
 auto system_post = [](state_type &x, const input_type &u) noexcept {
   /* the ode describing the dcdc converter */
@@ -61,9 +66,8 @@ auto system_post = [](state_type &x, const input_type &u) noexcept {
       xx[1]=(1/xc)*5*ro/(ro+rc)*x[0]-(1/xc)*(1/(ro+rc))*x[1];
     }
 	};
-  ode_solver(rhs,x,u,sDIM,tau);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,5);
 };
-
 /* we integrate the growth bound by 0.5 sec (the result is stored in r)  */
 auto radius_post = [](state_type &r, const state_type&, const input_type &u) noexcept {
   /* the ode for the growth bound */
@@ -76,56 +80,46 @@ auto radius_post = [](state_type &r, const state_type&, const input_type &u) noe
       rr[1]=5*(1/xc)*ro/(ro+rc)*r[0]-(1/xc)*(1/(ro+rc))*r[1];
     }
 	};
-  ode_solver(rhs,r,u,sDIM,tau);
+  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,5);
 };
 
 int main() {
   /* to measure time */
   TicToc tt;
 
-  /****************************************************************************/
-  /* construct grid for the state space */
-  /****************************************************************************/
   /* setup the workspace of the synthesis problem and the uniform grid */
-  /* lower bounds of the hyper rectangle */
-  //state_type lb={{1.15,5.45}};
-  ///* upper bounds of the hyper rectangle */
-  //state_type ub={{1.55,5.85}};
-  ///* grid node distance diameter */
-  //state_type eta={{2/4e3,2/4e3}};
-  state_type lb={{1.15,5.45}};
-  /* upper bounds of the hyper rectangle */
-  state_type ub={{1.55,5.85}};
-  /* grid node distance diameter */
-  state_type eta={{2/4e3,2/4e3}};
-  scots::UniformGrid<state_type> ss(sDIM,lb,ub,eta);
-  std::cout << "Unfiorm grid details:" << std::endl;
-  ss.printInfo(1);
+   /* grid node distance diameter */
+  state_type eta={{2.0/4e3,2.0/4e3}};
+ /* lower bounds of the hyper-rectangle */
+  state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
+  /* upper bounds of the hyper-rectangle */
+  state_type ub={{1.55+eta[0]/2,5.85+eta[1]/2}};
+  scots::UniformGrid ss(state_dim,lb,ub,eta);
+  std::cout << "Unfiorm grid details:\n";
+  ss.print_info();
 
-  /****************************************************************************/
-  /* construct grid for the input space */
-  /****************************************************************************/
-  /* lower bounds of the hyper rectangle */
-  input_type ilb={{1}};
-  /* upper bounds of the hyper rectangle */
-  input_type iub={{2}};
-  /* grid node distance diameter */
-  input_type ieta={{1}};
-  scots::UniformGrid<input_type> is(iDIM,ilb,iub,ieta);
+  /* construct grid for the input alphabet */
+  /* hyper-rectangle [1,2] with grid node distance 1 */
+  scots::UniformGrid is(input_dim,input_type{{.99}},input_type{{2.1}},input_type{{1}});
+  is.print_info();
 
-  std::cout << "Compute absraction "<< std::endl;
-  /* transition system to be computed */
-  scots::TransitionSystem ts;
+  /* compute transition function of symbolic model */
+  std::cout << "Computing the transition function:\n";
+  /* transition function of symbolic model */
+  scots::TransitionFunction tf;
+  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  abs.set_verbose_off();
+
   tt.tic();
-  scots::AbstractionGB<state_type,input_type> abs(ss,is,ts);
-  abs.computeTransitionRelation(system_post,radius_post);
-
-  std::cout << "Number of transitions: " << ts.getNoTransitions() << std::endl;
+  abs.compute(tf,system_post, radius_post);
   tt.toc();
+  std::cout << "Number of transitions: " << tf.get_no_transitions() <<"\n";
 
+  if(!getrusage(RUSAGE_SELF, &usage))
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << "\n";
 
-  /* calculate maximal fixed point */
-  /* define function to check if the cell is in the safe set?  */
+  /* continue with synthesis */
+  /* define function to check if the cell is in the safe set  */
   state_type x;
   auto safeset = [&](const size_t idx) noexcept {
     ss.itox(idx,x);
@@ -134,16 +128,16 @@ int main() {
       return true;
     return false;
   };
-
-  std::cout << "Start synthesis "<< std::endl;
-  /* save the result of safety controller in safe.scs */
-  scots::SafetyGame safety(ts);
+  /* compute winning domain (contains also valid inputs) */
+  std::cout << "\nSynthesis: \n";
   tt.tic();
-  safety.solve(safeset);
+  scots::WinningDomain win = scots::solve_invariance_game(tf,safeset);
   tt.toc();
+  std::cout << "Winning domain size: " << win.get_size() << "\n";
 
-  std::cout << "Size: " << safety.size() << std::endl;
-  std::cout << "Size pairs: " << safety.sizePairs() << std::endl;
+  std::cout << "\nWrite controller to controller.scs \n";
+  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller.scs"))
+    std::cout << "Done. \n";
 
   return 1;
 }

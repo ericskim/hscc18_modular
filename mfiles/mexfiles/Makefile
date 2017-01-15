@@ -14,20 +14,18 @@ CXXFLAGS 		= -g -Wall -Wextra -std=c++11 -O3
 # scots
 #
 SCOTSROOT   = ../..
-SCOTSINC		= -I$(SCOTSROOT)/sparse\
-							-I$(SCOTSROOT)/utils 
+SCOTSINC		= -I$(SCOTSROOT)/src
 
 
 all: sparse 
 
-sparse 		 	: mexUniformGrid\
-							mexController
+sparse: GridPoints mexStaticController
 
 
-mexUniformGrid: mexUniformGrid.cc
-	$(CC) COMPFLAGS='$(COMPFLAGS) $(CXXFLAGS)' -largeArrayDims $(SCOTSINC) mexUniformGrid.cc
+mexStaticController: mexStaticController.cc
+	$(CC) COMPFLAGS='$(COMPFLAGS) $(CXXFLAGS)' -largeArrayDims $(SCOTSINC) mexStaticController.cc
 
-mexController: mexController.cc
-	$(CC) COMPFLAGS='$(COMPFLAGS) $(CXXFLAGS)' -largeArrayDims $(SCOTSINC) mexController.cc
+GridPoints: GridPoints.cc
+	$(CC) COMPFLAGS='$(COMPFLAGS) $(CXXFLAGS)' -largeArrayDims $(SCOTSINC) GridPoints.cc
 
 

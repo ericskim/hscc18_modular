@@ -10,4 +10,4 @@ To run simulations in matlab with SCOTS you need compile the mexfile
   a) MATLABROOT
   b) in a terminal run
 
-  $ make
+  $ make sparse

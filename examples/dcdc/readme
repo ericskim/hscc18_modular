@@ -1,16 +1,27 @@
 
-An example for safety game and maximal fixed point
+Controller synthesis for a DC DC boost converter to enforce a safety
+specification
 
 1. Edit the makefile 
 
   Adjust the compiler to your programming environment
 
-2. Compile the dcdc.cc file by typing in the command line
+2. Compile the dcdc.cc and simualte.cc file by typing in the command line
 
   $ make
 
-2. Execute 
+3. Execute 
 
-  $./dcdc
+  $./dcdc     
+  Computes the symbolic model and synthesizes the controller. The result is
+  stored in controller.scs.
 
+  $./simulate
+  Reads the controller from file and performs the closed loop simulation.
 
+4. Information on the example is found in
+
+- A. Girard, G. Pola, and P. Tabuada. “Approximately bisimilar symbolic models
+  for incrementally stable switched systems”. In: IEEE TAC 55.1 (2010), pp. 116–126.
+- S. Mouelhi, A. Girard, and G. Go ̈ssler. “CoSyMA: a tool for controller
+  synthesis using multi-scale abstrac- tions”. In: HSCC. ACM. 2013, pp. 83–88.

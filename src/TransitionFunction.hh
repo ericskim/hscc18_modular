@@ -1,8 +1,8 @@
 /*
  * TransitionFunction.hh
  *
- *  created on: 10.01.2016
- *      author: Matthias Rungger
+ *  createdn: Jan 2017
+ *    author: Matthias Rungger
  * 
  */
 
@@ -29,6 +29,12 @@ namespace scots {
 using abs_type=std::uint32_t;
 
 /**
+ * @brief abs_ptr_type defines type used to point to the array m_pre (default = uint64_t) \n
+ * determinse implicitely an upper bound on the number of transitions (default = * 2^64-1)
+ **/
+using abs_ptr_type=std::uint64_t;
+
+/**
  * @class TransitionFunction
  * 
  * @brief The transition function of the abstraction
@@ -52,9 +58,9 @@ using abs_type=std::uint32_t;
  * the number of pres is stored in  m_no_pre
  * 
  * To copy the pres of the state-input pair (k,j) to a std::vector<abs_type> pre the
- * following code is implemented in getPre(k,j)
+ * following code is implemented in get_pre(k,j)
   \verbatim
-  for(std::size_t i=0; i<m_no_pre[k*M+j]; i++) {
+  for(abs_type i=0; i<m_no_pre[k*M+j]; i++) {
     pre.push_back(m_pre[m_pre_ptr[k*M+j]]+i);
   }
   \endverbatim
@@ -65,15 +71,66 @@ using abs_type=std::uint32_t;
  **/
 class TransitionFunction {
 public:
+  /** @brief number of states N **/
+  abs_type m_no_states;
+  /** @brief number of inputs M **/
+  abs_type m_no_inputs;   
+  /** @brief number of transitions T **/
+  abs_ptr_type m_no_transitions; 
+  /** @brief array[N*M] containing the pre's address in the array m_pre[T] **/
+  abs_ptr_type* m_pre_ptr;    
+  /** @brief array[T] containing the list of all pre */
+  abs_type* m_pre;         
+  /** @brief array[N*M] saving the number of post for each state-input pair (i,j) **/
+  abs_type* m_no_post;      
+  /** @brief array[N*M] saving the number of pre for each state-input pair (i,j) **/
+  abs_type* m_no_pre;    
+public:
   /* @cond  EXCLUDE from doxygen */
   /* default constructor */
-  TransitionFunction();     
+  TransitionFunction() {
+    m_no_states=0;
+    m_no_inputs=0;
+    m_no_transitions=0;
+
+    m_pre=nullptr;
+    m_pre_ptr=nullptr;
+    m_no_pre=nullptr;
+    m_no_post=nullptr;
+  }  
   /* default destructor */
-  ~TransitionFunction();    
+  ~TransitionFunction() {
+    delete[] m_pre;
+    delete[] m_pre_ptr;
+    delete[] m_no_post;
+    delete[] m_no_pre;
+  }
   /* move constructor */
-  TransitionFunction(TransitionFunction&&);     
+  TransitionFunction(TransitionFunction&& other) {
+    *this = std::move(other);  
+  }
   /* move asignement operator */
-  TransitionFunction& operator=(TransitionFunction&&);
+  TransitionFunction& operator=(TransitionFunction&& other) {
+    m_no_states=other.m_no_states;
+    m_no_inputs=other.m_no_inputs;
+    m_no_transitions=other.m_no_transitions;
+
+    m_pre=other.m_pre;
+    m_pre_ptr=other.m_pre_ptr;
+    m_no_pre=other.m_no_pre;
+    m_no_post=other.m_no_post;
+
+    other.m_no_states=0;
+    other.m_no_inputs=0;
+    other.m_no_transitions=0;
+
+    other.m_pre=nullptr;
+    other.m_pre_ptr=nullptr;
+    other.m_no_pre=nullptr;
+    other.m_no_post=nullptr;
+
+    return *this;
+  }
   /* deactivate copy constructor */
   TransitionFunction(const TransitionFunction&) = delete;     
   /* deactivate copy asignement operator */
@@ -81,10 +138,27 @@ public:
   /* @endcond */
 
   /** @brief number of elements of the transition relation **/
-  std::size_t getNoTransitions(void) const;  
-
+  abs_ptr_type get_no_transitions(void) const {
+    return m_no_transitions;
+  }
   /** @brief return list of pre associated with action j and post k **/
-  std::vector<abs_type> getPre(const abs_type& k, const abs_type& j) const; 
+  std::vector<abs_type> get_pre(const abs_type& k, const abs_type& j) const {
+    std::vector<abs_type> pre{};
+    if(m_pre!=nullptr) {
+      if(!m_no_pre[k*m_no_inputs+j]) {
+        return pre;
+      }
+      for(abs_type v=0; v<m_no_pre[k*m_no_inputs+j]; v++) {
+        pre.push_back(m_pre[m_pre_ptr[k*m_no_inputs+j]+v]);
+      }
+    } else {
+      std::ostringstream os;
+      os << "scots::TransitionFunction.hh: Unable to get post. Transition relation is empty.";
+      throw std::runtime_error(os.str().c_str());
+    }
+    return pre;
+  }
+    
   /** @brief return list of post associated with action j and post i **/
   std::vector<abs_type> get_post(const abs_type& i, const abs_type& j) const {
     std::vector<abs_type> post{};
@@ -106,90 +180,7 @@ public:
     }
     return post;
   }
-
-
-
-  /** @brief number of states N **/
-  abs_type m_no_states;
-  /** @brief number of inputs M **/
-  abs_type m_no_inputs;   
-  /** @brief number of transitions T **/
-  std::size_t m_no_transitions; 
-
-  /** @brief array[N*M] containing the pre's address in the array m_pre[T] **/
-  std::size_t *m_pre_ptr;    
-  /** @brief array[T] containing the list of all pre */
-  abs_type *m_pre;         
-  /** @brief array[N*M] saving the number of post for each state-input pair (i,j) **/
-  abs_type *m_no_post;      
-  /** @brief array[N*M] saving the number of pre for each state-input pair (i,j) **/
-  abs_type *m_no_pre;       
 };
-
-TransitionFunction::TransitionFunction() {
-  m_no_states=0;
-  m_no_inputs=0;
-  m_no_transitions=0;
-
-  m_pre=nullptr;
-  m_pre_ptr=nullptr;
-  m_no_pre=nullptr;
-  m_no_post=nullptr;
-}
-
-TransitionFunction::TransitionFunction(TransitionFunction&& other) : TransitionFunction() {
-  *this = std::move(other);  
-}
-
-TransitionFunction& TransitionFunction::operator=(TransitionFunction&& other) {
-  m_no_states=other.m_no_states;
-  m_no_inputs=other.m_no_inputs;
-  m_no_transitions=other.m_no_transitions;
-
-  m_pre=other.m_pre;
-  m_pre_ptr=other.m_pre_ptr;
-  m_no_pre=other.m_no_pre;
-  m_no_post=other.m_no_post;
-
-  other.m_no_states=0;
-  other.m_no_inputs=0;
-  other.m_no_transitions=0;
-
-  other.m_pre=nullptr;
-  other.m_pre_ptr=nullptr;
-  other.m_no_pre=nullptr;
-  other.m_no_post=nullptr;
-
-  return *this;
-}
-
-TransitionFunction::~TransitionFunction() {
-  delete[] m_pre;
-  delete[] m_pre_ptr;
-  delete[] m_no_post;
-  delete[] m_no_pre;
-}
-
-std::size_t TransitionFunction::getNoTransitions(void) const {
-  return m_no_transitions;
-}
-
-std::vector<abs_type> TransitionFunction::getPre(const abs_type& k, const abs_type& j) const {
-  std::vector<abs_type> pre;
-  if(m_pre!=nullptr) {
-    if(!m_no_pre[k*m_no_inputs+j]) {
-      return pre;
-    }
-    for(abs_type v=0; v<m_no_pre[k*m_no_inputs+j]; v++) {
-      pre.push_back(m_pre[m_pre_ptr[k*m_no_inputs+j]+v]);
-    }
-  } else {
-    std::ostringstream os;
-    os << "TransitionFunction.hh: Error: Unable to get post. Transition relation is empty.";
-    throw std::runtime_error(os.str().c_str());
-  }
-  return pre;
-}
 
 } /* end of namespace scots */
 
