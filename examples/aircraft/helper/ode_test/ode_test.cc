@@ -13,19 +13,13 @@
 #include <array>
 #include <cmath>
 /* SCOTS header */
-#include "UniformGrid.hh"
-#include "TransitionSystem.hh"
-#include "AbstractionGB.hh"
-#include "ReachabilityGame.hh"
+#include "scots.hh"
 /* time profiling */
 #include "TicToc.hh"
 /* ode solver */
 #include "RungeKutta4.hh"
 /* vnodelp solver */
 #include "vnode.h"
-
-/* ode solver */
-OdeSolver ode_solver;
 
 /* state space dim */
 const int state_dim=3;
@@ -87,9 +81,9 @@ int main() {
   state_type lb={{58,-3*M_PI/180,0}};  
   /* upper bounds of the hyper rectangle */
   state_type ub={{83,0,56}}; 
-  scots::UniformGrid<state_type> ss(state_dim,lb,ub,eta);
+  scots::UniformGrid ss(state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  ss.printInfo(1);
+  ss.print_info();
 
   /****************************************************************************/
   /* construct grid for the input space */
@@ -100,7 +94,7 @@ int main() {
   input_type iub={{36000,8*M_PI/180}};  
   /* grid node distance diameter */
   input_type ieta={{36000,8.0/9.0*M_PI/180}};  
-  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
+  scots::UniformGrid is(input_dim,ilb,iub,ieta);
 
   /* variables used in the integration */
   state_type x;
@@ -114,8 +108,8 @@ int main() {
   vnodelp::VNODE* vnode_solver = new vnodelp::VNODE(ad);
   vnode_solver->setTols(1e-16,1e-16);
 
-  size_t N=ss.getN();
-  size_t M=is.getN();
+  size_t N=ss.size();
+  size_t M=is.size();
 
   tt.tic();
 
@@ -147,7 +141,7 @@ int main() {
         std::cout<<"VNODE-LP something wrong " << std::endl;
 
       /* solve ode with RungeKutta solver */
-      ode_solver(rhs,x,u,state_dim,tau,10);
+      scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
 
       /* check if RungeKutta accuracy exceeds the defined accuracy */
       for(size_t k=0; k<state_dim; k++) {

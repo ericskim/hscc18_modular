@@ -32,8 +32,11 @@ void aircraft(int n, var_type* xx, const var_type* x, var_type t, void* param) {
   vnodelp::interval mi = vnodelp::interval(1.0)/60000.0;
   vnodelp::interval c = vnodelp::interval(1.25+4.2*u[1]);
 
-  xx[0] = mi*(u[0]*cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*sin(x[1]));
-  xx[1] = (1.0/(60000.0*x[0]))*(u[0]*sin(u[1])+68.6*c*x[0]*x[0]-mg*cos(x[1]));
+  vnodelp::interval w0 = vnodelp::interval(-0.108,0.108);
+  vnodelp::interval w1 = vnodelp::interval(-0.002,0.002);
+
+  xx[0] = mi*(u[0]*cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*sin(x[1]))+w0;
+  xx[1] = (1.0/(60000.0*x[0]))*(u[0]*sin(u[1])+68.6*c*x[0]*x[0]-mg*cos(x[1]))+w1;
   xx[2] = x[0]*sin(x[1]);
 
 }

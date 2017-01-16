@@ -1,7 +1,7 @@
 /*
  * vehicle.cc
  *
- *  created: Oct 2015
+ *  created: Oct 2016
  *   author: Matthias Rungger
  */
 
@@ -139,7 +139,7 @@ int main() {
 
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
   /* define target set */
-  auto target = [&](abs_type idx) {
+  auto target = [&](const abs_type idx) {
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
     if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 

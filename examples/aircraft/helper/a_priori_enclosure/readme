@@ -23,6 +23,14 @@ How to use:
 
 1. install the vnodelp package  
 
+  We installed vnodelp with Profil-2.0.8. For a successful compilation of
+  Profil-2.0.8 under macOS we had to edit the assembler file fpRound.s under 
+  Profil-2.0.8/x86-64-Linux-compat-gcc/
+  to account for the different function naming strategies of macOS assembly vs linux
+  assembly code. 
+
+  Alternatively, vnodelp can also be installed with Filib++.
+
 2. edit the Makefile and adjust header and library paths
 
   the current makefile is supposed to be used with vnodelp in combination with
@@ -48,3 +56,5 @@ How to use:
    - vnodelp (downloaded in Dec 2016)
    - Profil-2.0.8
    - gfortran-6.2-bin
+
+

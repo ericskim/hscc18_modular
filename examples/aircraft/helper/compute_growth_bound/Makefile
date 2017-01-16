@@ -10,7 +10,7 @@ LDFLAGS 		=
 # scots 
 #
 SCOTSROOT		= ../../../..
-SCOTSINC		= -I$(SCOTSROOT)/sparse -I$(SCOTSROOT)/utils
+SCOTSINC		= -I$(SCOTSROOT)/src -I$(SCOTSROOT)/utils
 
 #
 # vnodelp/fadbad/filib 

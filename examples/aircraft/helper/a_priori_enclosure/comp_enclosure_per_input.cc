@@ -1,8 +1,8 @@
 /*
  * compute_enclosure_per_input.cc
  *
- *  created on: 07.12.2016
- *  author: rungger
+ *  created: Dec 2016
+ *   author: Matthias Rungger
  */
 
 /* 
@@ -12,7 +12,7 @@
 #include <array>
 
 #include "vnode.h"
-#include "UniformGrid.hh"
+#include "scots.hh"
 
 const int state_dim = 3; 
 const int input_dim = 2; 
@@ -36,8 +36,11 @@ void aircraft(int n, var_type* xx, const var_type* x, var_type t, void* param) {
   vnodelp::interval mi = vnodelp::interval(1.0)/60000.0;
   vnodelp::interval c = vnodelp::interval(1.25+4.2*u[1]);
 
-  xx[0] = mi*(u[0]*cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*sin(x[1]));
-  xx[1] = (1.0/(60000.0*x[0]))*(u[0]*sin(u[1])+68.6*c*x[0]*x[0]-mg*cos(x[1]));
+  vnodelp::interval w0 = vnodelp::interval(-0.108,0.108);
+  vnodelp::interval w1 = vnodelp::interval(-0.002,0.002);
+
+  xx[0] = mi*(u[0]*cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*sin(x[1]))+w0;
+  xx[1] = (1.0/(60000.0*x[0]))*(u[0]*sin(u[1])+68.6*c*x[0]*x[0]-mg*cos(x[1]))+w1;
   xx[2] = x[0]*sin(x[1]);
 
 }
@@ -59,7 +62,7 @@ int main(){
   input_type iub={{32000,8*M_PI/180}};
   /* grid node distance diameter */
   input_type ieta={{32000,8.0/9.0*M_PI/180}};
-  scots::UniformGrid<input_type> is(input_dim,ilb,iub,ieta);
+  scots::UniformGrid is(input_dim,ilb,iub,ieta);
   /* setup param struct to update input */
   param_t* param = new param_t;
 
@@ -88,7 +91,7 @@ int main(){
   vnodelp::iVector yy(state_dim);
 
   /* loop over all inputs */
-  for(size_t i=0; i<is.getN(); i++) {
+  for(size_t i=0; i<is.size(); i++) {
     /* get input */
     is.itox(i,u);
     param->u1 = vnodelp::interval(u[0]);
