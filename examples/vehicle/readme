@@ -15,7 +15,7 @@ A path planning problem for a vehicle using the bycicle model
   ./controller.scs
   ./obstacles.scs
 
-3. simulate the closed loo by running
+3. simulate the closed loop by running
 
   $./simulate
 
