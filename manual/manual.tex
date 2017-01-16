@@ -377,18 +377,19 @@ as an absolutely continuous function \mbox{$\xi \colon \intcc{0,\tau}
 The desired behavior of the closed loop is defined with respect to the
 $\tau$-samp\-led behavior of the continuous-time systems~\eqref{e:sys:ct}.
 To this end, the sampled behavior of~\eqref{e:sys:ct} is casted as
-\emph{simple system}~\cite{ReissigWeberRungger15} 
-\begin{IEEEeqnarray}{c}
-  S_1:=(X_1,U_1,F_1)
+\emph{simple system} (with initial states) 
+\begin{IEEEeqnarray}{c}\label{e:sys}
+  S_1:=(X_1,X_{1,0},U_1,F_1)
 \end{IEEEeqnarray}
-with the \emph{state alphabet} $X_1:=\R^n$, \emph{input alphabet} $U_1:=U$ and
+with the \emph{state alphabet} $X_1:=\R^n$, the \emph{set of initial states},
+the \emph{input alphabet} $U_1:=U$ and
 the \emph{transition function} $F_1:X_1 \times U_1\rightrightarrows X_1$ defined
 by 
 \begin{IEEEeqnarray}{c}
   F_1(x,u):=\{x'\mid \exists_{ \text{$\xi$ is a solution of~\eqref{e:sys:ct} on
   $\intcc{0,\tau}$ under $u$}}: \xi(0)=x \land \xi(\tau)=x'\}.
 \end{IEEEeqnarray}
-A \emph{specification} $\Sigma_1$ for a simple system $S_1=(X_1,U_1,F_1)$ is
+A \emph{specification} $\Sigma_1$ for a simple system~\eqref{e:sys} is
 simply a set 
 \begin{IEEEeqnarray}{c}
   \Sigma_1
@@ -425,42 +426,42 @@ system $S_1$ is illustrated in Fig.~\ref{f:closedloop}.
 \item reachability specifications; 
 \item reach-avoid specifications.
 \end{itemize}
-The specifications are defined as follows.
-Consider two sets $I_1\subseteq X_1$ and $Z_1\subseteq X_1$
-An \emph{invariance} specification for $S_1$ associated with $I_1$ and $Z_1$ follows by 
+An \emph{invariance} specification for \eqref{e:sys} associated with
+$Z_1\subseteq X_1$ is
+defined by 
 \begin{IEEEeqnarray*}{c}
-\Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid x(0)\in I_1\implies \forall_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
+\Sigma_1:=\{(u,x)\in (U_1\times X_1)^{\intco{0;\infty}} \mid \forall_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
 \end{IEEEeqnarray*}
-A \emph{reachability} specification for $S_1$ associated
-with $I_1$ and $Z_1$ is defined by
+A \emph{reachability} specification for \eqref{e:sys} associated with $Z_1\subseteq X_1$ is defined by
 \begin{IEEEeqnarray*}{c}
   \Sigma_1:=\{(u,x)\in (U_1\times X_1)^\infty
-  \mid  x(0)\in I_1\implies \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
+  \mid  \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1\}.
 \end{IEEEeqnarray*}
-A \emph{reach-avoid} specification for $S_1$ associated
-with $I_1$, $A_1$ and $Z_1$, where $A_1\subseteq X_1$, is defined by
+A \emph{reach-avoid} specification for \eqref{e:sys} associated
+with $A_1\subseteq X_1$ and $Z_1\subseteq X_1$ is defined by
 \begin{IEEEeqnarray*}{c}
   \Sigma_1:=\big\{(u,x)\in (U_1\times X_1)^\infty
-  \mid  x(0)\in I_1\implies 
-  (
+  \mid  
     \exists_{t\in\intco{0;\infty}}: x(t)\in Z_1
   \wedge
     \forall_{t'\in\intco{0;t}}: x(t')\not\in A_1
-  )
   \big\}.
 \end{IEEEeqnarray*}
-In context of Linear Temporal Logic, the sets $I_1$, $A_1$ and $Z_1$ are often
+In the context of Linear Temporal Logic, the sets $A_1$ and $Z_1$ are often
 identified with \emph{atomic propositions}. In this sense, \texttt{SCOTS} allows to define arbitrary sets as atomic propositions. 
 
 \subsection{Auxiliary Control Problems}
 \label{ss:symbolicmodel}
 
-Given a simple system $S_1=(X_1,U_1,F_1)$ representing the $\tau$-sampled
-behavior of~\eqref{e:sys:ct} and a specification $\Sigma_1$ for $S_1$,
+Given a simple system \eqref{e:sys} representing the $\tau$-sampled
+behavior of~\eqref{e:sys:ct} and a specification $\Sigma_1$ for \eqref{e:sys},
 the control problem $(S_1,\Sigma_1)$ is not solved directly, but an auxiliary,
 finite control problem $(S_2,\Sigma_2)$ is used in the synthesis process. Here, 
-$S_2=(X_2,U_2,F_2)$ is a  \emph{symbolic model} or (discrete)
-\emph{abstraction} of $S_1$ and $\Sigma_2$ is an abstract specification.
+\begin{IEEEeqnarray}{c}\label{e:abs:sys}
+S_2=(X_2,X_{2,0},U_2,F_2)
+\end{IEEEeqnarray}
+is referred to as \emph{symbolic model} or (discrete)
+\emph{abstraction} of $S_1$ and $\Sigma_2$ is an \emph{abstract specification}.
 
 The state alphabet of $X_2$ is a cover of $X_1$ and the input alphabet $U_2$ is
 a subset of $U_1$. The set $X_2$ contains a subset $\bar X_2$, representing the ``real'' quantizer symbols,
@@ -471,7 +472,8 @@ congruent hyper-rectangles aligned on a uniform grid
 \label{e:grid}
   \eta\Z^n=\{c\in \R^n\mid \exists_{k\in\Z^n}\forall_{i\in\intcc{1;n}}\; c_i=k_i\eta_i\}
 \end{IEEEeqnarray}
-with \emph{grid parameter} $\eta\in(\R_+\smallsetminus\{0\})^n$. The real
+with \emph{grid parameter} $\eta\in(\R_+\smallsetminus\{0\})^n$. The elements of
+$\eta\Z^n$ are called \emph{grid points}. The real
 quantizer symbols are further parameterized by two
 vectors $a,b\in\R^n$ representing the lower-left and upper-right corners of the
 hyper-interval $\segcc{a,b}$ confining the set $\bar X_2$: 
@@ -479,32 +481,39 @@ hyper-interval $\segcc{a,b}$ confining the set $\bar X_2$:
  \bar X_2:=\{x_2\mid \exists_{c\in (\eta\Z^n\cap
  \segcc{a,b})}\;x_2=c+\segcc{-\eta/2,\eta/2}\}.
 \end{IEEEeqnarray}
+The elements of the real quantizer symbols are also referred to as
+\emph{cells}. Each cell
+$x_2=c+\segcc{-\eta/2,\eta/2}$ is associated with a \emph{center} $c\in \R^n$
+(which is also a \emph{grid point} $c\in \eta\Z^n$) and a \emph{radius}
+$r\in\R^n_{\ge0}$.
+
+
+
 {\tt SCOTS} computes symbolic models that are related via feedback
 refinement relations with the plant. A \emph{feedback refinement relation} from
 $S_1$ to $S_2$ is a strict relation $Q\subseteq X_1\times X_2$ that satisfies
-for all $(x_1,x_2)\in Q$ and for all $u\in U_2$ with $F_2(x_2,u)\neq\emptyset$
-the conditions
+for all $(x_1,x_2)\in Q$ and $u\in U_2$ the conditions
 \begin{enumerate}
-  \item $F_1(x_1,u)\neq \emptyset$ and
-  \item $Q(F_1(x_1,u))\subseteq F_2(x_2,u)$.
+  \item $x_1\in X_{1,0}$ implies $x_2\in X_{2,0}$
+  \item $F_2(x_2,u)\neq\emptyset$ implies $F_1(x_1,u)\neq \emptyset$ and $Q(F_1(x_1,u))\subseteq F_2(x_2,u)$.
 \end{enumerate}
 In {\tt SCOTS}, the feedback refinement relation $Q$ is given by the set-membership
 relation
 \begin{IEEEeqnarray}{c}\label{e:theory:quantizer}
   Q:=\{ (x_1,x_2) \mid x_1 \in x_2\}.
 \end{IEEEeqnarray}
-Given an invariance (reachability) specification $\Sigma_1$ for $S_1$ associated
-with $I_1,Z_1$, then an \emph{abstract specification} is given by the
-invariance (reachability) specification for $S_2$ associated with 
-\begin{IEEEeqnarray}{c't'c}\label{e:abs:spec}
-  I_2=\{ x_2 \in X_2\mid x_2\cap I_1\neq\emptyset\} & and & Z_2=\{ x_2 \in
+Given an invariance (reachability) specification $\Sigma_1$ for \eqref{e:sys} associated
+with $Z_1$, then an \emph{abstract specification} is given by the
+invariance (reachability) specification for $S_2=(X_2,X_{2,0},U_2,F_2)$ associated with 
+\begin{IEEEeqnarray}{c}\label{e:abs:spec}
+  Z_2=\{ x_2 \in
 X_2\mid x_2\subseteq  Z_1\}.
 \end{IEEEeqnarray}
-An abstract reach-avoid specification from $I_1,A_1,Z_1$ for $S_2$ follows by
-\begin{IEEEeqnarray}{c't'c}
+An abstract reach-avoid specification from $A_1,Z_1$ for $S_2$ follows by
+\begin{IEEEeqnarray}{c}
   A_2=\{ x_2 \in X_2\mid x_2\cap A_1\neq\emptyset\}
 \end{IEEEeqnarray}
-and $I_2$ and $Z_2$ as defined in~\eqref{e:abs:spec}.
+and $Z_2$ as defined in~\eqref{e:abs:spec}.
 The algorithms to solve the control problems $(S_2,\Sigma_2)$ implemented in
 {\tt SCOTS} are outlined in Section~\ref{s:theory:alg}.
 
@@ -644,14 +653,15 @@ Basically, it provides an upper bound on the deviation of solutions $\xi$
 of~\eqref{e:sys:ct} from \emph{nominal
 solutions}\footnote{A nominal solution $\varphi(\cdot,p,u)$ of
 \eqref{e:sys:ct} is defined as solution of the initial value problem $\dot x=f(x,u)$,
-$x(0)=p$.} $\varphi$ of~\eqref{e:sys:ct}, i.e., for every solution $\xi$ of \eqref{e:sys:ct} on $\intcc{0,\tau}$ with input $u \in U'$ and $\xi(0),p \in K$,
+$x(0)=p$.} $\varphi$ of~\eqref{e:sys:ct}, i.e., for every solution $\xi$ of
+\eqref{e:sys:ct} on $\intcc{0,\tau}$ with input $u \in U'$ and $\xi(0)$, $p \in K$
 we have
 \begin{IEEEeqnarray}{c}
 \label{e:growthbound}
 | \xi(\tau) - \varphi(\tau,p,u) | \leq \beta( | \xi(0) - p |, u).
 \end{IEEEeqnarray}
 Here, $|x|$ for $x\in\R^n$, denotes the component-wise absolute value.
-A growth bound can be obtained essentially by bounding
+Essentially, a growth bound can be obtained by bounding
 the Jacobian of $f$. Let
 $L \colon U' \to \mathbb{R}^{n \times n}$ satisfy
 \begin{IEEEeqnarray}{c}\label{e:lipschitz}
@@ -698,8 +708,7 @@ automatically obtain a priori enclosures and growth bounds.
 
 \subsection{The Transition Function}
 
-Recall that the state alphabet $X_2$ of the symbolic model $S_2=(X_2,U_2,F_2)$
-is composed of the real quantizer symbols $\bar X_2$, which are cells aligned on a
+Recall that the state alphabet $X_2$ of the symbolic model \eqref{e:abs:sys} is composed of the real quantizer symbols $\bar X_2$, which are cells aligned on a
 uniform grid, and the overflow symbols $X_2\smallsetminus \bar X_2$. For $x_2\in
 X_2\smallsetminus \bar X_2$ the transition function is defined for all $u\in
 U_2$ by
@@ -751,8 +760,21 @@ to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 \section{Controller Synthesis}
 \label{s:theory:alg}
 
-We discuss the algorithms that are implemented in {\tt SCOTS} to
-solve synthesis problems for the finite symbolic model $S_2=(X_2,U_2,F_2)$. 
+In this section, we discuss the algorithms that are implemented in {\tt SCOTS} to
+solve synthesis problems for the finite symbolic model \eqref{e:abs:sys}. 
+Usually, synthesis algorithms are developed in the context of two-player games on graphs. The player associated with the controller tries to
+enforce the specification while the player associated with disturbances tries to
+violate the specification, e.g.~\cite{BloemJobstmannPitermanPnueliSaar12}.
+
+Given a control problem $(S_2,\Sigma_2)$ with $S_2$ given in~\eqref{e:abs:sys},
+the construction of a controller to enforce a specification $\Sigma_2$ proceeds in two
+steps. First, a subset $Y_\infty$ of the state alphabet $X_2$ is computed, which
+characterizes the largest set of initial states so that the control problem is
+solvable, i.e., $(S_2,\Sigma_2)$ is solvable if and only if $X_{2,0}\subseteq
+Y_\infty$. The set $Y_\infty$ is referred to as \emph{winning domain} (or set of \emph{winning
+states}) associated with $(S_2,\Sigma_2)$.
+In a second step, the controller $C$ is derived form the set $Y_\infty$ and some other information available in synthesis algorithm.
+
 We use the following notation. The set of \emph{admissible inputs} at $x_2\in X_2$ is denoted by
 \begin{IEEEeqnarray}{c}
 U_{S_2}(x_2):=\{u\in U_2\mid F_2(x_2,u)\neq\emptyset\}.
@@ -762,23 +784,18 @@ We use the Weierstrass symbol $\wp$ to denote the power set and define $\pre:\wp
   \pre(Y):=\{x_2\in X_2\mid  \exists_{u\in U_{S_2}(x_2)}:\;F_2(x_2,u)\subseteq Y\}.
 \end{IEEEeqnarray}
 
-Usually, synthesis algorithms are developed in the context of two-player games on graphs. The player associated with the controller tries to
-enforce the specification while the player associated with disturbances tries to
-violate the specification, e.g.~\cite{BloemJobstmannPitermanPnueliSaar12}.
-
-
 \subsection{Invariance}
 
-Let $\Sigma_2$ be an invariance specification associated with $I_2$ and $Z_2$. 
+Let $\Sigma_2$ be an invariance specification associated with $Z_2$. 
 We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
-solveInvarianceGame} in the file {\tt GameSolver.hh}, to synthesize a controller
+solve\_invariance\_game} in the file {\tt GameSolver.hh}, to synthesize a controller
 that solves the control problem $(S_2,\Sigma_2)$.  
 Alg.~\ref{a:safety} runs in $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
 triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$, since each state is added to the queue
 of bad states $Q$ at most once.
 
 \begin{algorithm}[h]
-\caption{Controller synthesis for invariance specs associated with $I_2$ and $Z_2$}\label{a:safety}
+\caption{Controller synthesis for invariance specs associated  $Z_2$}\label{a:safety}
   \begin{algorithmic}[1]
     \Input{$Z_2$, $S_2=(X_2,U_2,F_2)$}
     \Require{$F_2(X_2,U_2)\subseteq \bar X_2$ and $Z_2\subseteq \bar X_2$}
@@ -819,10 +836,9 @@ point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
 \begin{IEEEeqnarray}{c}\label{e:theory:fp:safety}
   G(Y):=Z_2\cap\pre(Y).
 \end{IEEEeqnarray}
-The maximal fixed point of~\eqref{e:theory:fp:safety}
-characterizes the largest set of initial states from which the invariance
-condition can be enforced and it follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
-if $I_2\subseteq D^{-1}(U_2)$. 
+The maximal fixed point of~\eqref{e:theory:fp:safety} corresponds to the winning domain
+of $(S_2,\Sigma_2)$ and it follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $X_{2,0}\subseteq D^{-1}(U_2)$. 
 
 %\begin{lemma}
 %Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$
@@ -879,7 +895,7 @@ if $I_2\subseteq D^{-1}(U_2)$.
 %\end{proof}
 
 
-Suppose that $I_2\subseteq D^{-1}(U_2)$ holds, then we obtain a controller
+Suppose that $X_{2,0}\subseteq D^{-1}(U_2)$ holds, then we obtain a controller
 $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
 that solves $(S_2,\Sigma_2)$ by  
 \begin{IEEEeqnarray}{rCl}\label{e:controller}
@@ -903,10 +919,10 @@ explained in Section~\ref{s:usage:simulation}.
 
 \subsection{Reachability}
 
-Let $\Sigma_2$ be a reachability specification associated with $I_2$ and
+Let $\Sigma_2$ be a reachability specification associated with
 $Z_2\subseteq \bar X_2$. 
 We use Alg.~\ref{a:reach}, which is implemented in the function 
-{\tt solveReachabilityGame} in the file {\tt GameSolver.hh}, to synthesize a controller
+{\tt solve\_reachability\_game} in the file {\tt GameSolver.hh}, to synthesize a controller
 that solves the control problem $(S_2,\Sigma_2)$. The algorithm is a variant of
 Dijkstra's shortest path algorithm for hyper-graphs taken
 from~\cite{GalloLongoPallotinoNguyen93}. It runs in $O(m)$ time, where $m$ is
@@ -914,7 +930,7 @@ the number of transitions, i.e., the number of elements in $X_2\times U_2\times
 X_2$ that satisfy $x_2'\in F_2(x_2,u)$.
 
 \begin{algorithm}[h]
-  \caption{Controller synthesis for reachability specs associated with $I_2$ and $Z_2$}
+  \caption{Controller synthesis for reachability specs associated with $Z_2$}
   \label{a:reach}
   \begin{algorithmic}[1]
     \Input{ $Z_2$, $S_2=(X_2,U_2,F_2)$, $u_0\in U_2$}
@@ -956,11 +972,9 @@ the \emph{minimal fixed point} of the map $G:\wp(X_2)\to \wp(X_2)$ defined by
 \begin{IEEEeqnarray}{c}\label{e:theory:fp:reach}
   G(Y):=Z_2\cup\pre(Y).
 \end{IEEEeqnarray}
-The minimal fixed point of~\eqref{e:theory:fp:reach} characterizes the largest
-set from which every element of the behavior of the system $S_2$ can be forced
-to reach the set $Z_2$.
-It follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
-if $I_2\subseteq D^{-1}(U_2)$. 
+The minimal fixed point of~\eqref{e:theory:fp:reach} corresponds to the winning
+domain of $(S_2,\Sigma_2)$ and it follows that the synthesis problem $(S_2,\Sigma_2)$ is solvable if and only
+if $X_{2,0}\subseteq D^{-1}(U_2)$. 
 
 %\begin{lemma}
 %Let $S_2=(X_2,U_2,F_2)$ be a finite simple system with $\bar X_2\subseteq X_2$,
@@ -1010,7 +1024,7 @@ if $I_2\subseteq D^{-1}(U_2)$.
 %$Y_\infty=Y_{i^*}$ and $Y_\infty\subseteq \bar Y$ follows.
 %\end{proof}
 
-Given that $I_2\subseteq D^{-1}(U_2)$ holds, a controller
+Given that $X_{2,0}\subseteq D^{-1}(U_2)$ holds, a controller
 $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ that solves $(S_2,\Sigma_2)$ is identical
 to the controller that solves the invariance problem, i.e., $F_c$ and $H_c$ are
 given by~\eqref{e:controller}.
@@ -1020,7 +1034,7 @@ implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
 explained in Section~\ref{s:usage:simulation}.
 
 \subsection{Reach-Avoid}
-Let $\Sigma_2$ be a reach-avoid specification associated with $I_2$ and $A_2,Z_2\subseteq \bar X_2$. 
+Let $\Sigma_2$ be a reach-avoid specification associated with $A_2$, $Z_2\subseteq \bar X_2$. 
 {\tt SCOTS} provides two alternatives on how to synthesize controller to enforce
 reach-avoid specifications. In the first method, the avoid set $A_2$ is
 accounted for in the transition function, i.e.,
@@ -1030,11 +1044,11 @@ accounted for in the transition function, i.e.,
 In this way we can reduce a reach-avoid problem to a reachability problem. 
 Given that the transition function satisfies \eqref{e:theory:tf:avoid}, any
 controller that solves the control problem $(S_2,\Sigma_2')$, where $\Sigma_2'$
-is the reachability specification associated with $I_2$ and $Z_2$, also solves the
+is the reachability specification associated with $Z_2$, also solves the
 control problem $(S_2,\Sigma_2)$. In order to enforce the
 equation~\eqref{e:theory:tf:avoid} in the computation of the transition function
 $F_2$ the user can optionally supply the avoid set to the function {\tt
-AbstractionGB::computeTransitionRelation}, see Section~\ref{s:usage:abs}.
+AbstractionGB::compute}, see Section~\ref{s:usage:abs}.
 
 For the second method, the computation of the transition function is left
 unchanged, but Alg.~\ref{a:reach} is modified to account for the avoid set. To
@@ -1043,7 +1057,7 @@ this end the condition in line~\ref{a:reach:conditions} in Alg.~\ref{a:reach} is
  F_2(x_2,u) \subseteq E& and &V(x_2) > 1+M(x_2,u)& and & x_2\not\in A_2.
 \end{IEEEeqnarray}
 Again the user can optionally supply the avoid set to the function {\tt
-solveReachabilityGame}, see Section~\ref{s:usage:synthesis}.
+solve\_reachability\_game}, see Section~\ref{s:usage:synthesis}.
 
 
 %\subsection{Customized Synthesis Algorithms}
