@@ -5,7 +5,7 @@ and symbolic controllers!
 Please consult the manual in ./manual/manual.pdf for installation instructions,
 usage description and background information.
 
-For implementation details please have a look in the C++ documentation ./doc/
+For implementation details please have a look in the C++ documentation ./doc/html/index.html
 
 Bug reports and feature request are happily received at matthias.rungger@tum.de 
 
