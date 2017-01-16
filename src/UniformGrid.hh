@@ -208,7 +208,7 @@ public:
         for(int i=0; i<m_dim; i++) {
           os << x[i] << " ";
         }
-        os << " is outside uniform grid.";
+        os << "is outside uniform grid.";
         throw std::runtime_error(os.str().c_str());
       }
       idx += static_cast<abs_type>((d_idx+eta_h )/m_eta[k])*m_NN[k];

@@ -15,6 +15,7 @@
 #include <sstream>
 #include <cstring>
 #include <vector>
+#include <cstdint>
 
 /** @namespace scots **/ 
 namespace scots {
@@ -23,13 +24,13 @@ namespace scots {
  * @brief abs_type defines type of abstract state (default = uint32_t) \n
  * determinse implicitely an upper bound on the number of states (default = 2^32-1)
  **/
-using abs_type=std::uint32_t;
+using abs_type=std::uint_fast32_t;
 
 /**
  * @brief abs_ptr_type defines type used to point to the array m_pre (default = uint64_t) \n
  * determinse implicitely an upper bound on the number of transitions (default = * 2^64-1)
  **/
-using abs_ptr_type=std::uint64_t;
+using abs_ptr_type=std::uint_fast64_t;
 
 /**
  * @class TransitionFunction
@@ -163,7 +164,7 @@ public:
       for(abs_type k=0; k<m_no_states; k++) {
         if(m_no_pre[k*m_no_inputs+j]) {
           for(abs_type no=0; no<m_no_pre[k*m_no_inputs+j]; no++) {
-            abs_type pos=m_pre_ptr[k*m_no_inputs+j]+no;
+            abs_ptr_type pos=m_pre_ptr[k*m_no_inputs+j]+no;
             if(m_pre[pos]==i) {
               post.push_back(k);
             }

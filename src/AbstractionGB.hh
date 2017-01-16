@@ -253,7 +253,7 @@ public:
     if(m_verbose)
       std::cout << "100" << std::endl;
     /* compute pre_ptr */
-    abs_type sum=0;
+    abs_ptr_type sum=0;
     for(abs_type i=0; i<N; i++) {
       for(abs_type j=0; j<M; j++) {
         sum+=no_pre[i*M+j];

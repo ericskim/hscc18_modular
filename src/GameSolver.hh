@@ -90,7 +90,6 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
   /* keep track of the values (corresponds to M in Alg.2)*/
   double*  edge_val = new double[N*M];
 
-  abs_type count=0;
   /* init fifo */
   std::queue<abs_type> fifo;
   for(abs_type i=0; i<N; i++) {
@@ -100,7 +99,6 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
       value[i]=0; 
       /* states in the target are added to the fifo */
       fifo.push(i);
-      count++;
     }
     for(abs_type j=0; j<M; j++) {
       edge_val[i*M+j]=0;
@@ -116,7 +114,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
     /* loop over each input */
     for(abs_type j=0; j<M; j++) {
       /* loop over pre's associated with this input */
-      for(abs_type v=0; v<trans_function.m_no_pre[q*M+j]; v++) {
+      for(abs_ptr_type v=0; v<trans_function.m_no_pre[q*M+j]; v++) {
         abs_type i=trans_function.m_pre[trans_function.m_pre_ptr[q*M+j]+v];
         if(avoid(i))
           continue;
@@ -127,7 +125,6 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
         edge_val[i*M+j]=(edge_val[i*M+j]>=1+value[q] ? edge_val[i*M+j] : 1+value[q]);
         /* check if for node i and input j all posts are processed */
         if(!K[i*M+j] && value[i]>edge_val[i*M+j]) {
-          count++;
           fifo.push(i);
           value[i]=edge_val[i*M+j]; 
           win_domain[i]=j;
@@ -137,8 +134,6 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
   }  /* fifo is empty */
   delete[] K;
   delete[] edge_val;
-
-  std::cout << count << std::endl;
 
   return WinningDomain(N,M,std::move(win_domain));
 }
@@ -198,7 +193,7 @@ WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F&
     /* loop over all inputs */
     for(abs_type j=0; j<M; j++) {
       /* loop over all pre states of (k,j) */
-      for(abs_type p=0; p<trans_function.m_no_pre[k*M+j]; p++) {
+      for(abs_ptr_type p=0; p<trans_function.m_no_pre[k*M+j]; p++) {
         /* (i,j,k) is a transition */
         abs_type i=trans_function.m_pre[trans_function.m_pre_ptr[k*M+j]+p];
         /* check if input j at state i is considered safe */

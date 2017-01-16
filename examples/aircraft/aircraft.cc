@@ -36,11 +36,8 @@ const int input_dim=2;
 /* sampling time */
 const double tau = 0.25;
 
-/*
- * data types of the state space elements and input 
- * space elements used in uniform grid and ode solver
- *
- */
+/* data types of the state space elements and input 
+ * space elements used in uniform grid and ode solver */
 using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 
@@ -63,23 +60,12 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
   /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
   double L[3][2];
-  //L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
-  //L[0][1]=9.81;
-  //L[1][0]=0.002933+0.004802*u[1];
-  //L[1][1]=0.00361225;
-  //L[2][0]=0.07483;
-  //L[2][1]=83.22;
-  /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
   L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
   L[0][1]=9.81;
-
-  L[1][0]=0.00294+0.00481*u[1];
-  L[1][1]=0.003526;
-
-  L[2][0]=0.074252;
-  L[2][1]=83.2;
-
-
+  L[1][0]=0.002933+0.004802*u[1];
+  L[1][1]=0.00361225;
+  L[2][0]=0.07483;
+  L[2][1]=83.22;
   /* to account for input disturbances */
   state_type w={{.108,0.002,0}};
   /* the ode for the growth bound */
