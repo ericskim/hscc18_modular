@@ -229,23 +229,23 @@ The three most easy-to-compile examples are found in
 The examples can be run without any additional software and require only a
 \Cpp compiler with \Cpp{\tt11} support. 
 
-\subsection{Persistence and Recurrence} In the examples in
-\begin{lstlisting}[basicstyle=\small\ttfamily]
-./examples/dcdc_bdd        	/* reach-and-stay spec for a DCDC boost converter */ 
-./examples/unicycle_bdd  	/* recurrence spec involving a unicycle dynamics */ 
-\end{lstlisting}
-we write customized controller synthesis algorithms to enforce persistence and recurrence specifications.
-%using a binary decision diagram representation of the
-%atomic propositions and transition relation. In order to run the examples, an
-%installation of the 
-%{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
-
-\subsection{GR(1) specifications}
-An example that demonstrates the usage of {\tt SCOTS} in combination with {\tt
-slugs} is provided in the directory
-\begin{lstlisting}[basicstyle=\small\ttfamily]
-./examples/slugs        	/* the usage of SCOTS in combination with slugs  */ 
-\end{lstlisting}
+%\subsection{Persistence and Recurrence} In the examples in
+%\begin{lstlisting}[basicstyle=\small\ttfamily]
+%./examples/dcdc_bdd        	/* reach-and-stay spec for a DCDC boost converter */ 
+%./examples/unicycle_bdd  	/* recurrence spec involving a unicycle dynamics */ 
+%\end{lstlisting}
+%we write customized controller synthesis algorithms to enforce persistence and recurrence specifications.
+%%using a binary decision diagram representation of the
+%%atomic propositions and transition relation. In order to run the examples, an
+%%installation of the 
+%%{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
+%
+%\subsection{GR(1) specifications}
+%An example that demonstrates the usage of {\tt SCOTS} in combination with {\tt
+%slugs} is provided in the directory
+%\begin{lstlisting}[basicstyle=\small\ttfamily]
+%./examples/slugs        	/* the usage of SCOTS in combination with slugs  */ 
+%\end{lstlisting}
 
 \subsection{A Priori Enclosure and Growth Bound}
 The directory 
@@ -290,52 +290,67 @@ For various reasons, one might consider to use additional software in combinatio
   \item MATLAB: for closed loop simulation and visualization options.\\
 	See \url{http://www.mathworks.com} for installation instructions.
 
-	To access the BDD files produced by {\tt SCOTS} from the MATLAB workspace the
-  mex file {\tt mexSymbolicSet.mex} needs to be compiled:
+	To access the controllers produced by {\tt SCOTS} from the MATLAB workspace
+  the mex file {\tt mexStaticController.mex}  needs to be compiled:
 	\begin{enumerate}
-  \item install the {\tt CUDD} library (see item~\ref{i:cudd})
  	\item setup the mex compiler with the MATLAB command
 	\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
 	>> mex -setup C++
 	\end{lstlisting}
 	\item In a terminal, navigate to {\tt\small ./mfiles/mexfiles}:
 	\begin{itemize}
-		\item edit the {\tt makefile} and adjust the {\tt MATLABPATH} and {\tt CUDDPATH}
-		\item run  {\tt make}
+		\item edit the {\tt makefile} and adjust the {\tt MATLABPATH} 
+		\item run  {\tt make sparse}
 	 \end{itemize}
  \end{enumerate}
 
-  \item
-  \label{i:cudd}
-  {\tt CUDD}: {\bf  a)} to combine {\tt SCOTS} with {\tt slugs}, {\bf b)} to save atomic propositions
-  and transition relations as BDD to file and {\bf c)} to write customized
-  synthesis algorithms.\\
-  {\tt SCOTS} uses {\tt CUDD} with the following configuration options:
-     \begin{itemize}
-      \item the \Cpp{} object-oriented wrapper
-      \item the dddmp library and
-      \item the shared library 
-    \end{itemize}
-   The package (available at \url{http://vlsi.colorado.edu/~fabio/})
- follows the usual installation routine of {\tt \small configure}, {\tt
-   \small make} and
-   {\tt \small make install}. We use {\tt \small cudd-3.0.0}, with the
-   configuration
-  \begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
-  ./configure --enable-shared --enable-obj --enable-dddmp --prefix=CUDDPATH
-  \end{lstlisting}
-  where {\tt CUDDPATH} is the desired installation directory, e.g., {\tt ./external/cudd}.
 
-  On some linux machines we experienced that the header files {\tt \small util.h} and
-  {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
-  copied them to {\tt \small CUDDPATH/include}.
+%	To access the BDD files produced by {\tt SCOTS} from the MATLAB workspace the
+%  mex file {\tt mexSymbolicSet.mex} needs to be compiled:
+%	\begin{enumerate}
+%  \item install the {\tt CUDD} library (see item~\ref{i:cudd})
+% 	\item setup the mex compiler with the MATLAB command
+%	\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
+%	>> mex -setup C++
+%	\end{lstlisting}
+%	\item In a terminal, navigate to {\tt\small ./mfiles/mexfiles}:
+%	\begin{itemize}
+%		\item edit the {\tt makefile} and adjust the {\tt MATLABPATH} and {\tt CUDDPATH}
+%		\item run  {\tt make bdd}
+%	 \end{itemize}
+% \end{enumerate}
 
-
-
-  \item {\tt slugs}: for GR(1) synthesis. 
-  
-  Please visit \url{https://github.com/VerifiableRobotics/slugs} for
-  installation notes.
+%  \item
+%  \label{i:cudd}
+%  {\tt CUDD}: {\bf  a)} to combine {\tt SCOTS} with {\tt slugs}, {\bf b)} to save atomic propositions
+%  and transition relations as BDD to file and {\bf c)} to write customized
+%  synthesis algorithms.\\
+%  {\tt SCOTS} uses {\tt CUDD} with the following configuration options:
+%     \begin{itemize}
+%      \item the \Cpp{} object-oriented wrapper
+%      \item the dddmp library and
+%      \item the shared library 
+%    \end{itemize}
+%   The package (available at \url{http://vlsi.colorado.edu/~fabio/})
+% follows the usual installation routine of {\tt \small configure}, {\tt
+%   \small make} and
+%   {\tt \small make install}. We use {\tt \small cudd-3.0.0}, with the
+%   configuration
+%  \begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
+%  ./configure --enable-shared --enable-obj --enable-dddmp --prefix=CUDDPATH
+%  \end{lstlisting}
+%  where {\tt CUDDPATH} is the desired installation directory, e.g., {\tt ./external/cudd}.
+%
+%  On some linux machines we experienced that the header files {\tt \small util.h} and
+%  {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
+%  copied them to {\tt \small CUDDPATH/include}.
+%
+%
+%
+%  \item {\tt slugs}: for GR(1) synthesis. 
+%  
+%  Please visit \url{https://github.com/VerifiableRobotics/slugs} for
+%  installation notes.
 
 
 \end{enumerate}
@@ -1157,7 +1172,6 @@ inputs.
 \subsection{Directly}
 \begin{enumerate}
   \item Atomic Propositions
-  \item Value Function
   \item StaticController
   \item UniformGrid
   \item TransitionFunction

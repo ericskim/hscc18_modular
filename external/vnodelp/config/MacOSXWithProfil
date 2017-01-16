@@ -6,7 +6,7 @@ GPP_LIBS =
 
 # interval package
 I_PACKAGE = PROFIL_VNODE
-PROFILPATH = $(HOME)/Documents/projects/scots/symsyn/external/
+PROFILPATH = $(HOME)/Documents/projects/scots/SCOTSv0.2/external/
 I_INCLUDE = 	$(PROFILPATH)/Profil-2.0.8/src		\
               $(PROFILPATH)/Profil-2.0.8/src/BIAS	\
               $(PROFILPATH)/Profil-2.0.8/src/Base
