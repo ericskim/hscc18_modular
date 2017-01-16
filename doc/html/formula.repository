@@ -1,0 +1,10 @@
+\form#0:$ S:=\{0,\ldots,N \}$
+\form#1:$ A:=\{0,\ldots,M \}$
+\form#2:$ (i,j,k) $
+\form#3:$i,k\in A$
+\form#4:$j\in A$
+\form#5:$i$
+\form#6:$k$
+\form#7:$j$
+\form#8:\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]
+\form#9:$ \xi(\tau) $
