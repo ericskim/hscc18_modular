@@ -104,7 +104,7 @@ int main() {
   /* lower bounds of the hyper rectangle */
   state_type s_lb={{58,-3*M_PI/180,0}};
   /* upper bounds of the hyper rectangle */
-  state_type s_ub={{83,0,10}}; 
+  state_type s_ub={{83,0,56}}; 
   scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.print_info();
@@ -122,6 +122,7 @@ int main() {
   /* transition function of symbolic model */
   scots::TransitionFunction tf;
 
+  /* setup object to compute the transition function */
   scots::AbstractionGB<state_type,input_type> abs(ss,is);
   /* measurement disturbances  */
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};

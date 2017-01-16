@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <queue>
 #include <memory>
+#include <utility>
 
 #include "TransitionFunction.hh"
 #include "WinningDomain.hh"
@@ -45,7 +46,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
 template<class F1, class F2>
 WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F1& target, F2& avoid) { 
   val_functionction_type value;
-  return solve_reachability_game<F1,F2>(trans_function, target, avoid, value);
+  return solve_reachability_game<F1,F2>(trans_function, target, std::forward<F2>(avoid), value);
 }
 /** @endcond **/
 
@@ -85,12 +86,11 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
   /* initialize value */
   value.resize(N,std::numeric_limits<double>::infinity());
   /* keep track of the number of processed post */
-  std::unique_ptr<abs_type[]> K (new abs_type[N*M]);
+  abs_type* K = new abs_type[N*M];
   /* keep track of the values (corresponds to M in Alg.2)*/
-  std::unique_ptr<double[]> edge_val (new double[N*M]);
-  /* keep track of number of valid inputs */
-  abs_type counter = 0;
+  double*  edge_val = new double[N*M];
 
+  abs_type count=0;
   /* init fifo */
   std::queue<abs_type> fifo;
   for(abs_type i=0; i<N; i++) {
@@ -100,7 +100,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
       value[i]=0; 
       /* states in the target are added to the fifo */
       fifo.push(i);
-      counter++;
+      count++;
     }
     for(abs_type j=0; j<M; j++) {
       edge_val[i*M+j]=0;
@@ -127,14 +127,18 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
         edge_val[i*M+j]=(edge_val[i*M+j]>=1+value[q] ? edge_val[i*M+j] : 1+value[q]);
         /* check if for node i and input j all posts are processed */
         if(!K[i*M+j] && value[i]>edge_val[i*M+j]) {
+          count++;
           fifo.push(i);
           value[i]=edge_val[i*M+j]; 
           win_domain[i]=j;
-          counter++;
         }
       }  /* end loop over all pres of state i under input j */
     }  /* end loop over all input j */
   }  /* fifo is empty */
+  delete[] K;
+  delete[] edge_val;
+
+  std::cout << count << std::endl;
 
   return WinningDomain(N,M,std::move(win_domain));
 }
