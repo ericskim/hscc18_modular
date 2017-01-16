@@ -24,13 +24,13 @@ namespace scots {
  * @brief abs_type defines type of abstract state (default = uint32_t) \n
  * determinse implicitely an upper bound on the number of states (default = 2^32-1)
  **/
-using abs_type=std::uint_fast32_t;
+using abs_type=std::uint32_t;
 
 /**
  * @brief abs_ptr_type defines type used to point to the array m_pre (default = uint64_t) \n
  * determinse implicitely an upper bound on the number of transitions (default = * 2^64-1)
  **/
-using abs_ptr_type=std::uint_fast64_t;
+using abs_ptr_type=std::uint64_t;
 
 /**
  * @class TransitionFunction
