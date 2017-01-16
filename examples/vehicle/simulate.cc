@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <array>
+#include <cmath>
 
 /* SCOTS header */
 #include "scots.hh"
@@ -34,7 +35,7 @@ const double tau = 0.3;
 using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 
-/* we integrate the vehicle ode by 0.3 sec (the result is stored in x)  */
+/* we integrate the vehicle ode by tau sec (the result is stored in x)  */
 auto  vehicle_post = [](state_type &x, const input_type &u) {
   /* the ode describing the vehicle */
   auto rhs =[](state_type& xx,  const state_type &x, const input_type &u) {
@@ -65,10 +66,11 @@ int main() {
   
   std::cout << "\nSimulation:\n " << std::endl;
 
-  state_type x={{.2, 0.2, 0}};
+  state_type x={{.6, 0.6, 0}};
   while(1) {
     std::vector<input_type> u = con.get_control<state_type,input_type>(x);
-    std::cout << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;
+    std::cout << x[0] <<  " "  << x[1] << " " << x[2] << "\n";
+    //std::cout << u[0][0] <<  " "  << u[0][1] << "\n";
     vehicle_post(x,u[0]);
     if(target(x)) {
       std::cout << "Arrived: " << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;

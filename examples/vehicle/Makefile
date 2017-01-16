@@ -21,7 +21,7 @@ vehicle:
 	$(CC) $(CXXFLAGS) $(SCOTSINC) vehicle.cc -o vehicle
 
 simulate: 
-	$(CC) $(CXXFLAGS) $(SCOTSINC) simulate.cc -o simulate
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(BOOSTINC) simulate.cc -o simulate
 
 clean:
 	rm vehicle simulate

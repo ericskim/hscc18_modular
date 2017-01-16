@@ -1,16 +1,15 @@
 %
 % dcdc.m
 %
-% created on: 09.10.2015
-%     author: rungger
+% created: Jan 2017
+%  author: Matthias Rungger
 %
 % see readme file for more information on the safety example
 %
-% you need to run ./dcdc binary first 
+% you need to 1. have the mexfiles compiled 
+%             2. run the ./dcdc binary first 
 %
-% so that the files: safe.scs
-%
-% is created
+% so that the file: controller.scs is created
 %
 
 function dcdc
@@ -24,8 +23,8 @@ x0=[1.35 5.755];
 tau_s=0.5;
 
 % load controller from file
-controller=Controller('safe.scs');
-domainsize=size(controller.domain);
+controller=StaticController('controller.scs');
+
 % simulate closed loop system
 y=x0;
 v=[];
@@ -33,14 +32,15 @@ loop=100;
 while(loop>0)
 	loop=loop-1;
 
-  u=controller.input(y(end,:));
+  u=controller.control(y(end,:));
   
   %-------------here choose your controller input-------------%
-  in=u(1,:);
+  %in=u(end,:);
+  in=u(end,:);
   %-----------------------------------------------------------%
   
   v=[v; in];
-  [t x]=ode45(@unicycle_ode,[0 tau_s], y(end,:), odeset('abstol',1e-4,'reltol',1e-4),in');
+  [t x]=ode45(@unicycle_ode,[0 tau_s], y(end,:), odeset('abstol',1e-10,'reltol',1e-10),in');
 
   y=[y; x(end,:)];
 end
@@ -50,10 +50,9 @@ end
 % colors
 colors=get(groot,'DefaultAxesColorOrder');
 
-
-% load the symbolic set containig the abstract state space
-set=UniformGrid('safedomain.scs');
-plot(set,'.')
+% plot controller domain
+dom=controller.domain;
+plot(dom(:,1),dom(:,2),'.','color',0.6*ones(3,1))
 hold on
 
 % plot initial state  and trajectory
@@ -62,17 +61,19 @@ hold on
 plot(y(1,1),y(1,2),'.','color',colors(5,:),'markersize',20)
 
 % plot safe set
-v=[1.15 5.45; 1.55 5.45; 1.15 5.85; 1.55 5.85 ];
+eta_half=1.0/4e3;
+v=[1.15-eta_half 5.45-eta_half;...
+   1.55+eta_half 5.45-eta_half;...
+   1.15-eta_half 5.85+eta_half;...
+   1.55+eta_half 5.85+eta_half ];
 patch('vertices',v,'faces',[1 2 4 3],'facecolor','none','edgec',colors(2,:),'linew',1)
 hold on
-
 
 box on
 axis([1.1 1.6 5.4 5.9])
 
 
 %set(gcf,'paperunits','centimeters','paperposition',[0 0 16 10],'papersize',[16 10])
-
 
 end
 

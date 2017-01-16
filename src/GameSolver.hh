@@ -143,12 +143,11 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
  * @brief solve invariance game according to Algorithm 1 in  <a href="./../../manual/manual.pdf">manual</a>
  * 
  * @param[in] trans_function - TransitionFunction of the symbolic model
- * @param[in] issafe - lambda function with signature  
- *                      \verbatim [] (abs_type &i) -> bool \endverbatim 
- *                     returns true if state i is in safe set and false otherwise
+ * @param[in] safe - lambda function with signature  
+ *                    \verbatim [] (abs_type &i) -> bool \endverbatim 
+ *                   returns true if state i is in safe set and false otherwise
  * @return -  WinningDomain that contains the set of winning states and valid inputs 
  **/
-
 template<class F>
 WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F& safe) {
   /* size of state alphabet */

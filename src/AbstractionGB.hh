@@ -493,11 +493,11 @@ public:
     return z;
   }
   /** @brief activate console output **/
-  void set_verbose_on() {
+  void verbose_on() {
     m_verbose=true;
   }
   /** @brief deactivate console output **/
-  void set_verbose_off() {
+  void verbose_off() {
     m_verbose=false;
   }
 };

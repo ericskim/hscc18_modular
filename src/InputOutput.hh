@@ -8,7 +8,7 @@
 /** @file **/
 
 #ifndef InputOutput_HH_
-#define IInputOutputO_HH_
+#define InputOutput_HH_
 
 #include <string>
 
@@ -51,6 +51,7 @@
 namespace scots {
 
 /** @brief write WinningDomain to a file via a FileWriter **/
+inline
 bool write_to_file(const WinningDomain& wd, const std::string& filename) {
   FileWriter writer(filename);
   if(writer.open()) {
@@ -68,6 +69,7 @@ bool write_to_file(const WinningDomain& wd, const std::string& filename) {
 }
 
 /** @brief write StaticController to a file via a FileWriter **/
+inline
 bool write_to_file(const StaticController& sc, const std::string& filename) {
   FileWriter writer(filename);
   if(writer.create()) {
@@ -99,6 +101,7 @@ bool write_to_file(const StaticController& sc, const std::string& filename) {
 }
 
 /** @brief write TransitionFunction to a file via a FileWriter **/
+inline
 bool write_to_file(const TransitionFunction& tf, const std::string& filename) {
   FileWriter writer(filename);
   if(writer.create()) {
@@ -123,6 +126,7 @@ bool write_to_file(const TransitionFunction& tf, const std::string& filename) {
 }
 
 /** @brief write UniformGrid to a file via a FileWriter **/
+inline
 bool write_to_file(const UniformGrid& grid, const std::string& filename) {
   FileWriter writer(filename);
   if(writer.create()) {
@@ -169,6 +173,7 @@ bool write_to_file(const UniformGrid& grid, F& atomic_prop, const std::string& f
 }
 
 /** @brief read WinningDomain from a file via a FileReader **/
+inline
 bool read_from_file(WinningDomain& wd, const std::string& filename, size_t offset=0) {
   FileReader reader(filename);
   if(!reader.open()) {
@@ -186,6 +191,7 @@ bool read_from_file(WinningDomain& wd, const std::string& filename, size_t offse
 }
 
 /** @brief read UniformGrid from a file via a FileReader **/
+inline
 bool read_from_file(UniformGrid& grid, const std::string& filename, size_t offset = 0) {
   FileReader reader(filename);
   if(!reader.open()) {
@@ -218,6 +224,7 @@ bool read_from_file(UniformGrid& grid, const std::string& filename, size_t offse
 }
 
 /** @brief read StaticController from a file via a FileReader **/
+inline
 bool read_from_file(StaticController& sc, const std::string& filename) {
   FileReader reader(filename);
   if(!reader.open()) {
@@ -248,9 +255,9 @@ bool read_from_file(StaticController& sc, const std::string& filename) {
   sc=StaticController(ss,is,std::move(wd));
   return true;
 }
- 
 
 /** @brief read TransitionFunction from a file via a FileReader **/
+inline
 bool read_from_file(TransitionFunction& tf, const std::string& filename) {
   FileReader reader(filename);
   if(!reader.open()) {

@@ -44,7 +44,7 @@ using input_type = std::array<double,input_dim>;
 /* abbrev of the type for abstract states and inputs */
 using abs_type = scots::abs_type;
 
-/* we integrate the vehicle ode by 0.3 sec (the result is stored in x)  */
+/* we integrate the vehicle ode by tau sec (the result is stored in x)  */
 auto  vehicle_post = [](state_type &x, const input_type &u) {
   /* the ode describing the vehicle */
   auto rhs =[](state_type& xx,  const state_type &x, const input_type &u) {
@@ -83,7 +83,7 @@ int main() {
   /* lower bounds of the hyper rectangle */
   input_type i_lb={{-1,-1}};
   /* upper bounds of the hyper rectangle */
-  input_type i_ub={{1,1}};
+  input_type i_ub={{ 1, 1}};
   /* grid node distance diameter */
   input_type i_eta={{.3,.3}};
   scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
@@ -133,11 +133,11 @@ int main() {
   abs.compute(tf,vehicle_post, radius_post, avoid);
   //abs.compute(tf,vehicle_post, radius_post);
   tt.toc();
-  std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
 
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
 
+  std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
   /* define target set */
   auto target = [&](abs_type idx) {
     ss.itox(idx,x);

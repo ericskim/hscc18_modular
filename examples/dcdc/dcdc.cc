@@ -44,7 +44,6 @@ using input_type = std::array<double,input_dim>;
 /* abbrev of the type for abstract states and inputs */
 using abs_type = scots::abs_type;
 
-
 /* parameters for system dynamics */
 const double xc=70;
 const double xl=3;
@@ -108,7 +107,7 @@ int main() {
   /* transition function of symbolic model */
   scots::TransitionFunction tf;
   scots::AbstractionGB<state_type,input_type> abs(ss,is);
-  abs.set_verbose_off();
+  abs.verbose_off();
 
   tt.tic();
   abs.compute(tf,system_post, radius_post);

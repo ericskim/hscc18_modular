@@ -24,7 +24,6 @@ close all
 % target set
 lb=[9 0];
 ub=lb+0.5;
-v=[9 0; 9.5  0; 9 0.5; 9.5 .5];
 % initial state
 x0=[0.6 0.6 0];
 
@@ -36,6 +35,10 @@ controller=StaticController('controller.scs');
 y=x0;
 v=[];
 loop=3000;
+
+% tau
+tau=0.3;
+
 while(loop>0)
     loop=loop-1;
   
@@ -47,8 +50,10 @@ while(loop>0)
   u=controller.control(y(end,:));
   v=[v; u];
 
-  [t x]=ode45(@unicycle_ode,[0 .2], y(end,:), odeset('abstol',1e-10,'reltol',1e-10),u);
+  [t x]=ode45(@unicycle_ode,[0 tau], y(end,:), odeset('abstol',1e-12,'reltol',1e-12),u);
+  
   y=[y; x(end,:)];
+
 end
 
 %% plot the vehicle domain
@@ -83,12 +88,11 @@ end
 function dxdt = unicycle_ode(t,x,u)
 
   dxdt = zeros(3,1);
-  c=atan(tan(u(2)/2));
+  c=atan(tan(u(2))/2);
 
   dxdt(1)=u(1)*cos(c+x(3))/cos(c);
   dxdt(2)=u(1)*sin(c+x(3))/cos(c);
   dxdt(3)=u(1)*tan(u(2));
-
 
 end
 

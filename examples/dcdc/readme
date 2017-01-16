@@ -2,15 +2,15 @@
 Controller synthesis for a DC DC boost converter to enforce a safety
 specification
 
-1. Edit the makefile 
+1. edit the makefile 
 
   Adjust the compiler to your programming environment
 
-2. Compile the dcdc.cc and simualte.cc file by typing in the command line
+2. compile the dcdc.cc and simualte.cc file by typing in the command line
 
   $ make
 
-3. Execute 
+3. execute 
 
   $./dcdc     
   Computes the symbolic model and synthesizes the controller. The result is
@@ -19,7 +19,16 @@ specification
   $./simulate
   Reads the controller from file and performs the closed loop simulation.
 
-4. Information on the example is found in
+4. simulate the closed loop in MATLAB 
+
+  a) you need to compile the mexfile first (see the readme in $(SCOTSROOT)/mfiles/mexfiles )
+
+  b) in Matlab add the path and run the simulation 
+
+   >> addpath(genpath('../../../mfiles'))
+   >> dcdc
+
+5. information on the example is found in
 
 - A. Girard, G. Pola, and P. Tabuada. “Approximately bisimilar symbolic models
   for incrementally stable switched systems”. In: IEEE TAC 55.1 (2010), pp. 116–126.
