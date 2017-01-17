@@ -1,77 +1,30 @@
 \documentclass[a4paper]{amsart}
-
+% basics
 \usepackage{a4wide} %A4 paper border
-
 \usepackage[utf8]{inputenc}
 
-
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
-
-\algnewcommand\algorithmicinput{\textbf{Input:}}
-\algnewcommand\Input{\item[\algorithmicinput]}
-\algnewcommand\algorithmicoutput{\textbf{Output:}}
-\algnewcommand\Output{\item[\algorithmicoutput]}
-
-\usepackage{graphicx}
-\usepackage{wrapfig}
-\usepackage[usenames, dvipsnames, pdftex]{xcolor}
+% hyperref
 \usepackage[colorlinks=true,
             raiselinks=true,
             linkcolor=MidnightBlue,
             citecolor=ForestGreen,
             urlcolor=RoyalPurple,
             plainpages=false]{hyperref}
+            
+% bib 
+\usepackage[
+bibencoding=utf8,
+sorting=none,
+style=numeric-comp,
+maxnames=3,
+backend=biber]{biblatex}
+\addbibresource{refs.bib}
 
-%% code snippets
-\usepackage{listings}
-
-\definecolor{classes}{HTML}{476A97}
-\definecolor{methods}{HTML}{476A97}
-\definecolor{comment}{HTML}{435138}
-\definecolor{keywords}{HTML}{262C6A}
-\definecolor{numbers}{HTML}{702C51}
-\definecolor{strings}{HTML}{702C51}
-
-\lstset{emph=[1]{%  
-  computeTransitionRelation,
-  xtoi,
-  itox,
-  },emphstyle=[1]{\color{methods}}%
-}%
-
-\lstset{emph=[3]{%
-      size_t,input_t,state_t,%
-    },emphstyle=[3]{\color{keywords}}%
-}%
-
-\lstset{emph=[2]{%
-      UniformGrid,
-      AbstractionGB,
-      TransitionSystem%
-    },emphstyle=[2]{\color{classes}}%
-}%
-
-% set the default code style
-\lstset{
-    columns=flexible,
-    basicstyle=\ttfamily,
-    frame=tb, % draw a frame at the top and bottom of the code block
-    tabsize=2, % tab space width
-    showstringspaces=false, % don't mark spaces in strings
-    numbers=none, % display line numbers on the left
-    commentstyle=\color{Gray}, % comment color
-    keywordstyle=\color{keywords}, % keyword color
-    stringstyle=\color{strings}, % string color
-    language=C++,
-}
-
-\lstset{literate=%
-    {scots::}{{{\color{classes}scots::}}}7
-}
-
-
-%\usepackage{parskip} % no paragraph indent
+% graphics/color
+\usepackage{graphicx}
+\usepackage[usenames, dvipsnames, pdftex]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
 
 % math things
 \usepackage{IEEEtrantools}
@@ -80,25 +33,6 @@
 \usepackage{amsfonts}
 \usepackage{amsthm}
 
-% tikz
-\usepackage{tikz}
-\usetikzlibrary{arrows}
-%\usetikzlibrary{calc,positioning}
-
-
-%% bibliography bibtex %.aux
-\usepackage[
-bibencoding=utf8,
-sorting=none,
-style=numeric-comp,
-maxnames=3,
-backend=biber
-]{biblatex}
-%\renewcommand*{\bibfont}{\raggedright}
-\addbibresource{refs.bib}
-%\renewcommand*{\bibfont}{\small}
-
-%\theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
@@ -108,9 +42,7 @@ backend=biber
 \newtheorem{fact}{Fact}
 \newtheorem{proposition}{Proposition}
 
-
-
-%% custom commands 
+% custom commands 
 %C plus plus
 \newcommand\Cpp{C\texttt{++} }
 
@@ -128,19 +60,61 @@ backend=biber
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
-\newcommand{\ul}{\underline}
-\newcommand{\ol}{\overline}
-
 
 \newcommand{\pre}{{\mathrm{pre}}}
-\newcommand{\co}{{\mathrm{co}}}
 \renewcommand{\emptyset}{{\varnothing}}
-\DeclareMathOperator*{\argmin}{argmin} 
-%% end: some math stuff
 
+% algorithm stuff
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+% code snippets
+\usepackage{listings}
+\definecolor{classes}{HTML}{476A97}
+\definecolor{methods}{HTML}{476A97}
+\definecolor{comment}{HTML}{435138}
+\definecolor{keywords}{HTML}{262C6A}
+\definecolor{numbers}{HTML}{702C51}
+\definecolor{strings}{HTML}{702C51}
+\lstset{emph=[1]{%  
+  compute,
+  xtoi,
+  itox,
+  },emphstyle=[1]{\color{methods}}%
+}%
+\lstset{emph=[3]{%
+      size_t,input_t,state_t,%
+    },emphstyle=[3]{\color{keywords}}%
+}%
+\lstset{emph=[2]{%
+      UniformGrid,
+      AbstractionGB,
+      TransitionSystem%
+    },emphstyle=[2]{\color{classes}}%
+}%
+% set the default code style
+\lstset{
+    columns=flexible,
+    basicstyle=\ttfamily,
+    frame=tb, % draw a frame at the top and bottom of the code block
+    tabsize=2, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    numbers=none, % display line numbers on the left
+    commentstyle=\color{Gray}, % comment color
+    keywordstyle=\color{keywords}, % keyword color
+    stringstyle=\color{strings}, % string color
+    language=C++,
+}
+\lstset{literate=%
+    {scots::}{{{\color{classes}scots::}}}7
+}
 
-
-
+% tabular column width
+\usepackage{array}
+\newcolumntype{C}{>{\centering\arraybackslash}p{2cm}}
 
 \title{SCOTS (0.2) -- User Manual}
 
@@ -1126,27 +1100,41 @@ solve\_reachability\_game}, see Section~\ref{s:usage:synthesis}.
 \section{Computation of Symbolic Models}
 \label{s:usage:abs}
 
-Let $S_1=(X_1,U_1,F_1)$ be a simple system that represents the $\tau$-sampled
-behavior of continuous-time system~\eqref{e:sys:ct} as defined in
-Section~\ref{s:theory:control_problems}. In order to compute a symbolic model
-$S_2=(X_2,U_2,F_2)$ of $S_1$, i.e., the relation $Q$ in~\ref{e:theory:quantizer} is a feedback
-refinement relation from $S_1$ to $S_2$, the following ingredients are needed:
+Let $S_1$ be a simple system that represents the $\tau$-sampled
+behavior of continuous-time system~\eqref{e:sys:ct} as defined in~\eqref{e:sys}.
+In order to compute the transition function $F_2$ of a symbolic model
+$S_2=(X_2,X_{2,0},U_2,F_2)$ of $S_1$ the following ingredients are needed:
 \begin{enumerate}
+  \item the solution $\varphi(\tau,p,u)$ of the IVP $\dot \xi = f(\xi,u)$, $\xi(0)=p$ at time $\tau$;
+  \item a growth bound $\beta(r,u)$;
   \item the set of real quantizer symbols $\bar X_2$;
-  \item the input alphabet $U_2$;
-  \item the solution $\varphi(\tau,p,u)$ of the IVP $\dot \xi = f(\xi,u)$,
-  $\xi(0)=p$ at time $\tau$;
-  \item a growth bound $\beta(r,u)$.
+  \item the input alphabet $U_2$.
 \end{enumerate}
 Subsequently, we demonstrate the usage of {\tt SCOTS} to compute a symbolic
 model of the $\tau$-sampled aircraft dynamics used
 in~\cite[Sec.~IX.B]{ReissigWeberRungger15}. 
 
-First, we define the set of real quantizer symbols $\bar X_2$ (defined
-in~\eqref{e:theory:ss}) and the input
-alphabet $U_2$. To this end, {\tt SCOTS} provides the class {\tt UniformGrid}. T  parameterized by the
-grid parameter $\eta\in \R^n_{>0}$ and the confining vectors  $a,b\in \R^n$. An
-instance is created by
+%First, we define the set of real quantizer symbols $\bar X_2$ (defined
+%in~\eqref{e:theory:ss}) and the input
+%alphabet $U_2$. To this end, {\tt SCOTS} provides the class {\tt UniformGrid}.  parameterized by the
+%grid parameter $\eta\in \R^n_{>0}$ and the confining vectors  $a,b\in \R^n$. An
+%instance is created by
+%
+
+\begin{table}[h]
+\begin{tabular}{C|C|C|C|C}
+  \multicolumn{3}{c|}{adaptive step size {\tt runge\_kutta\_dopri5}} &
+  \multicolumn{2}{c}{fixed step size {\tt runge\_kutta\_4} } \\
+  \multicolumn{3}{c|}{{\tt abs\_tol/rel\_tol}} &
+  \multicolumn{2}{c}{\# intermediate steps} \\
+  $10^{-10}$/$10^{-10}$ & $10^{-12}$/$10^{-12}$& $10^{-16}$/$10^{-16}$ &  5 & 10\\\hline
+  252$\;sec$ & 370$\;sec$ & 1036 $\;sec$ & 233 $\;sec$ & 335 $\;sec$
+\end{tabular}
+\caption{Run times to compute a symbolic transition function of the aircraft
+dynamics  with varying ode solvers and solver parameters. All computations
+resulted in an identical transition function with $5.86\cdot10^9$ transitions.} 
+\end{table}
+
 
 \section{Controller Synthesis}
 \label{s:usage:synthesis}

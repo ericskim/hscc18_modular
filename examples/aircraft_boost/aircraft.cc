@@ -41,8 +41,8 @@ using input_type = std::array<double,input_dim>;
 
 /* setup boost ode solver */
 #include <boost/numeric/odeint.hpp>
-const double abs_tol = 1E-12;
-const double rel_tol = 1E-12;
+const double abs_tol = 1E-16;
+const double rel_tol = 1E-16;
 
 /* ode solver alias */
 using stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state_type>;

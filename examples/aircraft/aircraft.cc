@@ -53,7 +53,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
     xx[2] = x[0]*std::sin(x[1]);
   };
   /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,5);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
@@ -75,7 +75,7 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
   /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,5);
 };
 
 int main() {
@@ -122,6 +122,9 @@ int main() {
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
 
+  tt.tic();
+  write_to_file(tf,"tf.scs");
+  tt.toc();
 
   /* define target set */
   state_type x;
