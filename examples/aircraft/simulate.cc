@@ -26,17 +26,17 @@ using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
-double mg = 60000.0*9.81;
-double mi = 1.0/60000;
 auto aircraft_post = [] (state_type &x, const input_type &u) {
   /* the ode describing the aircraft */
   auto rhs =[] (state_type& xx,  const state_type &x, const input_type &u) {
+    double mg = 60000.0*9.81;
+    double mi = 1.0/60000;
     double c=(1.25+4.2*u[1]);
     xx[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
     xx[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
     xx[2] = x[0]*std::sin(x[1]);
   };
-  /* use 10 intermediate steps (check ./helper/ode_test to find parameters) */
+  /* use 10 intermediate steps */
   scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
 };
 

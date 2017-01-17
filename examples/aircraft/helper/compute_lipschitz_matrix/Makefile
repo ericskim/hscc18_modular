@@ -2,7 +2,7 @@
 # compiler
 #
 CC       	  = clang++
-CXXFLAGS 		= -O3 -Wextra -Wall -std=c++14 -DPROFIL_VNODE -DMAXORDER=50
+CXXFLAGS 		= -O3 -Wextra -Wall -std=c++11 -DPROFIL_VNODE -DMAXORDER=50
 
 LDFLAGS 		= 
 
@@ -26,19 +26,15 @@ VNODELPLIB = -L$(SCOTSROOT)/external/vnodelp/lib \
 
 LIBS = -lvnode -lProfil -lBias -llr
 
-TARGET = comp_growth_bound comp_growth_bound_per_input
+TARGET = comp_lipschitz_matrix
 
 all: $(TARGET)
 
 %.o: %.cc
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(VNODELPINC) -c -o $@ $<
 
-comp_growth_bound:  comp_growth_bound.o
-	$(CC) $(LDFLAGS) -o comp_growth_bound  comp_growth_bound.o $(VNODELPLIB) $(LIBS) 
-
-comp_growth_bound_per_input:  comp_growth_bound_per_input.o
-	$(CC) $(LDFLAGS) -o comp_growth_bound_per_input  comp_growth_bound_per_input.o $(VNODELPLIB) $(LIBS) 
-
+comp_lipschitz_matrix:  comp_lipschitz_matrix.o
+	$(CC) $(LDFLAGS) -o comp_lipschitz_matrix  comp_lipschitz_matrix.o $(VNODELPLIB) $(LIBS) 
 
 clean:
-	rm comp_growth_bound.o comp_growth_bound comp_growth_bound_per_input.o comp_growth_bound_per_input
+	rm comp_lipschitz_matrix.o comp_lipschitz_matrix 

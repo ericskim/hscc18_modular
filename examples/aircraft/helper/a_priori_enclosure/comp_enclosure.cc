@@ -45,12 +45,17 @@ int main(){
 
   /* sampling time */
   double tau = 0.25;
+  /* set measurement errors */
+  vnodelp::iVector z(state_dim);
+  z[0] = vnodelp::interval(-0.0125,.0125);
+  z[1] = vnodelp::interval(-0.0025,0.0025)*pi()/180.0;
+  z[2] = vnodelp::interval(-0.05,0.05);
   /* set state space bounds */
   vnodelp::iVector x(state_dim);
   vnodelp::interval p = -3.0*pi()/180.0;
-  x[0] = vnodelp::interval(58.0,83.0);
-  x[1] = vnodelp::interval(inf(p),0);
-  x[2] = vnodelp::interval(0,56);
+  x[0] = vnodelp::interval(58.0,83.0)+z[0];
+  x[1] = vnodelp::interval(inf(p),0)+z[1];
+  x[2] = vnodelp::interval(0,56)+z[2];
   /* set input space bounds */
   param_t* param = new param_t;
   param->u1 = vnodelp::interval(0,32000);

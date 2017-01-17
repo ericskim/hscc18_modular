@@ -42,28 +42,28 @@ using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
-double mg = 60000.0*9.81;
-double mi = 1.0/60000;
 auto aircraft_post = [] (state_type &x, const input_type &u) {
   /* the ode describing the aircraft */
   auto rhs =[] (state_type& xx,  const state_type &x, const input_type &u) {
+    double mg = 60000.0*9.81;
+    double mi = 1.0/60000;
     double c=(1.25+4.2*u[1]);
     xx[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
     xx[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
     xx[2] = x[0]*std::sin(x[1]);
   };
   /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,5);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
   /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
   double L[3][2];
-  L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
+  L[0][0]=-0.00191867*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
   L[0][1]=9.81;
   L[1][0]=0.002933+0.004802*u[1];
-  L[1][1]=0.00361225;
+  L[1][1]=0.003623;
   L[2][0]=0.07483;
   L[2][1]=83.22;
   /* to account for input disturbances */
@@ -75,7 +75,7 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
   /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,5);
+  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,10);
 };
 
 int main() {

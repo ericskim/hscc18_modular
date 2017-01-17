@@ -7,17 +7,8 @@ the C++ package vnodelp available at
 http://www.cas.mcmaster.ca/~nedialk/vnodelp/
 
 
-There are two programs
-
-  - comp_enclosure.cc
-
-    computes an a priori enclosure valid for all inputs within the given input
-    space bounds
-
-  - comp_enclosure_per_input.cc
-
-    computes for each input an a priori enclosure
-
+The program comp_enclosure.cc computes an a priori enclosure valid for all
+inputs within the given input space bounds
 
 How to use:
 
@@ -48,6 +39,7 @@ How to use:
    - the sampling time
    - the state space bounds
    - the input space bounds
+   - disturbances
 
 4. compile comp_enclosure.cc and comp_enclosure_per_input.cc via make
 

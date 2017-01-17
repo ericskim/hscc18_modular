@@ -16,7 +16,6 @@
 bibencoding=utf8,
 sorting=none,
 style=numeric-comp,
-maxnames=3,
 backend=biber]{biblatex}
 \addbibresource{refs.bib}
 
@@ -74,9 +73,10 @@ backend=biber]{biblatex}
 % code snippets
 \usepackage{listings}
 \definecolor{classes}{HTML}{476A97}
+\definecolor{types}{HTML}{476A97}
 \definecolor{methods}{HTML}{476A97}
 \definecolor{comment}{HTML}{435138}
-\definecolor{keywords}{HTML}{262C6A}
+\definecolor{keywords}{HTML}{702C51}
 \definecolor{numbers}{HTML}{702C51}
 \definecolor{strings}{HTML}{702C51}
 \lstset{emph=[1]{%  
@@ -86,8 +86,8 @@ backend=biber]{biblatex}
   },emphstyle=[1]{\color{methods}}%
 }%
 \lstset{emph=[3]{%
-      size_t,input_t,state_t,%
-    },emphstyle=[3]{\color{keywords}}%
+      abs_type,input_type,state_type,%
+    },emphstyle=[3]{\color{types}}%
 }%
 \lstset{emph=[2]{%
       UniformGrid,
@@ -109,6 +109,26 @@ backend=biber]{biblatex}
     language=C++,
 }
 \lstset{literate=%
+   *{.0}{{{\color{numbers}.0}}}2
+    {.1}{{{\color{numbers}.1}}}2
+    {.2}{{{\color{numbers}.2}}}2
+    {.3}{{{\color{numbers}.3}}}2
+    {.4}{{{\color{numbers}.4}}}2
+    {.5}{{{\color{numbers}.5}}}2
+    {.6}{{{\color{numbers}.6}}}2
+    {.7}{{{\color{numbers}.7}}}2
+    {.8}{{{\color{numbers}.8}}}2
+    {.9}{{{\color{numbers}.9}}}2
+    {0}{{{\color{numbers}0}}}1
+    {1}{{{\color{numbers}1}}}1
+    {2}{{{\color{numbers}2}}}1
+    {3}{{{\color{numbers}3}}}1
+    {4}{{{\color{numbers}4}}}1
+    {5}{{{\color{numbers}5}}}1
+    {6}{{{\color{numbers}6}}}1
+    {7}{{{\color{numbers}7}}}1
+    {8}{{{\color{numbers}8}}}1
+    {9}{{{\color{numbers}9}}}1
     {scots::}{{{\color{classes}scots::}}}7
 }
 
@@ -168,21 +188,23 @@ cyber-physical systems. The implementation does not use validated numerics or si
 methods for rigorous implementations and such is prone to ODE solver
 inaccuracies and rounding errors.
 
+This manual gives an overview of {\tt SCOTS} and contains installation
+notes, usage details and a brief theoretical background. For implementation
+details please see the {\tt doxygen} documentation in {\tt ./doc}.
+
 Although, there are no compelling reasons, why {\tt SCOTS} should not work
 under Windows, we developed and tested the code only under Linux and macOS
 environments. As a result, the installation notes apply to
 Linux/macOS systems only. 
 
-This manual gives an overview of {\tt SCOTS} and contains installation
-notes, usage details and a brief theoretical background. For implementation
-details please see the {\tt doxygen} documentation in {\tt ./doc}.
+
 
 Bug reports and feature requests should be mailed to \href{mailto:matthias.rungger@tum.de}{matthias.rungger@tum.de}. 
 
 \section{Quickstart}
 
 The best way to try {\tt SCOTS} is to clone the source code from
-\url{https://gitlab.lrz.de/hcs/SCOTS} and run one of the examples. Each of the
+\url{https://gitlab.lrz.de/matthias/SCOTSv0.2} and run one of the examples. Each of the
 example directories contains a {\tt readme} file that provides some background
 information on the example itself and explains the compilation
 process. 
@@ -227,8 +249,8 @@ The directory
 ./examples/aircraft/helper        	
 \end{lstlisting}
 contains various programs that 
-use the interval-arithmetic based ODE solver {\tt vnodelp} to obtain: {\bf a)} high
-confidence ODE solver parameters; {\bf b)} an a priori enclosure and {\bf c)} a growth
+use the interval-arithmetic based ODE solver {\tt vnodelp} to obtain:
+{\bf a)} an a priori enclosure and {\bf b)} a growth
 bound.
 
 
@@ -250,16 +272,6 @@ For various reasons, one might consider to use additional software in combinatio
 \label{s:installation:cudd}
 \begin{enumerate}
 
-  \item {\tt vnodelp}: to compute a priori enclosures as well as growth bounds.
-
-  {\tt vnodelp} is an open source software tool to compute validated solutions
-  of initial value problems based on  interval arithmetic. It is available at
-  \url{http://www.cas.mcmaster.ca/~nedialk/vnodelp/}.
-
-  Please see {\tt ./examples/aircraft/helper/readme} for 
-  installation notes.
-
-
 
   \item MATLAB: for closed loop simulation and visualization options.\\
 	See \url{http://www.mathworks.com} for installation instructions.
@@ -273,10 +285,24 @@ For various reasons, one might consider to use additional software in combinatio
 	\end{lstlisting}
 	\item In a terminal, navigate to {\tt\small ./mfiles/mexfiles}:
 	\begin{itemize}
-		\item edit the {\tt makefile} and adjust the {\tt MATLABPATH} 
+    \item edit the {\tt makefile} and adjust the {\tt MATLABPATH} 
 		\item run  {\tt make sparse}
-	 \end{itemize}
- \end{enumerate}
+  \end{itemize}
+  \end{enumerate}
+
+  \item {\tt boost}: to use advance ode solvers. 
+
+  For Linux {\tt boost} is usually
+  distributed via the package management system. On macOS {\tt MacPorts}
+  \url{https://www.macports.org/} or {\tt Homebrew} \url{http://brew.sh/} provide an easy way to install
+  {\tt boost}.
+
+  \item {\tt vnodelp}: to compute a priori enclosures and growth bounds.
+
+  {\tt vnodelp} is an open source software tool to compute validated solutions
+  of initial value problems based on  interval arithmetic. It is available at
+  \url{http://www.cas.mcmaster.ca/~nedialk/vnodelp/}.
+
 
 
 %	To access the BDD files produced by {\tt SCOTS} from the MATLAB workspace the
@@ -575,7 +601,7 @@ Additionally to the perturbations on the right-hand-side
 of~\eqref{e:sys:ct}, it is possible to account for measurement errors
 modeled by a set-valued map $P \colon \mathbb{R}^n \rightrightarrows
 \mathbb{R}^n$ given by
-\begin{IEEEeqnarray}{c't'c}\label{e:perturbation}
+\begin{IEEEeqnarray}{c't'c}\label{e:theory:perturbation}
   P(x):=x+\segcc{-z,z} & with & z\in\R_+^n.
 \end{IEEEeqnarray}
 Please see~\cite[Sec.~VI.B]{ReissigWeberRungger15} and~\cite{RunggerZamani16}
@@ -653,7 +679,7 @@ Here, $|x|$ for $x\in\R^n$, denotes the component-wise absolute value.
 Essentially, a growth bound can be obtained by bounding
 the Jacobian of $f$. Let
 $L \colon U' \to \mathbb{R}^{n \times n}$ satisfy
-\begin{IEEEeqnarray}{c}\label{e:lipschitz}
+\begin{IEEEeqnarray}{c}\label{e:theory:lipschitz}
 L_{i,j}(u)
 \geq
 \begin{cases}
@@ -676,7 +702,7 @@ w
 \end{IEEEeqnarray}
 is a growth bound on $\intcc{0,\tau}$, $K$, $U'$
 associated with \eqref{e:sys:ct}. The set $K'$ on
-which~\eqref{e:lipschitz} needs to hold, is a so-called \emph{a priori
+which~\eqref{e:theory:lipschitz} needs to hold, is a so-called \emph{a priori
 enclosure}, i.e., $K'$  is assumed to be convex and contain any
 solution $\xi$ on $\intcc{0,\tau}$ of~\eqref{e:sys:ct} with $u\in U'$ and
 $\xi(0)\in K$,
@@ -684,7 +710,7 @@ see~\cite[Thm.~VIII.5]{ReissigWeberRungger15}.
 
 In order to use {\tt SCOTS}, the user needs to provide a growth bound, which for
 nonlinear control systems can be provided in terms of the parameterized matrix
-$L(u)$ whose entries satisfy~\eqref{e:lipschitz}. A priori enclosures as well
+$L(u)$ whose entries satisfy~\eqref{e:theory:lipschitz}. A priori enclosures as well
 as growth bounds can be computed automatically using interval arithmetic based
 ODE solvers. See Section~\ref{s:usage:abs} for more details on how to
 automatically obtain a priori enclosures and growth bounds.
@@ -696,12 +722,13 @@ automatically obtain a priori enclosures and growth bounds.
 
 
 \subsection{The Transition Function}
+\label{s:theory:tf}
 
 Recall that the state alphabet $X_2$ of the symbolic model \eqref{e:abs:sys} is composed of the real quantizer symbols $\bar X_2$, which are cells aligned on a
 uniform grid, and the overflow symbols $X_2\smallsetminus \bar X_2$. For $x_2\in
 X_2\smallsetminus \bar X_2$ the transition function is defined for all $u\in
 U_2$ by
-\begin{IEEEeqnarray}{c}
+\begin{IEEEeqnarray}{c}\label{e:theory:tf1}
   F_2(x_2,u):=\emptyset.
 \end{IEEEeqnarray}
 In order to determine the successors $x_2'\in F_2(x_2,u)$ for 
@@ -743,8 +770,7 @@ correct controller refinement under measurement errors~\cite[Sec.~VI.B]{ReissigW
 perturbation parameter $z\in\R_{>0}^n$ in {\tt SCOTS} is explained in detail in 
 Section~\ref{s:usage:abs}.
 
-In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver
-to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
+In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 
 \section{Controller Synthesis}
 \label{s:theory:alg}
@@ -1024,7 +1050,7 @@ explained in Section~\ref{s:usage:simulation}.
 
 \subsection{Reach-Avoid}
 Let $\Sigma_2$ be a reach-avoid specification associated with $A_2$, $Z_2\subseteq \bar X_2$. 
-{\tt SCOTS} provides two alternatives on how to synthesize controller to enforce
+{\tt SCOTS} provides two alternatives to synthesize controllers to enforce
 reach-avoid specifications. In the first method, the avoid set $A_2$ is
 accounted for in the transition function, i.e.,
 \begin{IEEEeqnarray}{c'c}\label{e:theory:tf:avoid}
@@ -1103,25 +1129,173 @@ solve\_reachability\_game}, see Section~\ref{s:usage:synthesis}.
 Let $S_1$ be a simple system that represents the $\tau$-sampled
 behavior of continuous-time system~\eqref{e:sys:ct} as defined in~\eqref{e:sys}.
 In order to compute the transition function $F_2$ of a symbolic model
-$S_2=(X_2,X_{2,0},U_2,F_2)$ of $S_1$ the following ingredients are needed:
+$S_2=(X_2,X_{2,0},U_2,F_2)$ of $S_1$ the following ingredients are needed.
 \begin{enumerate}
-  \item the solution $\varphi(\tau,p,u)$ of the IVP $\dot \xi = f(\xi,u)$, $\xi(0)=p$ at time $\tau$;
-  \item a growth bound $\beta(r,u)$;
-  \item the set of real quantizer symbols $\bar X_2$;
-  \item the input alphabet $U_2$.
+  \item The solution $\varphi(\tau,x,u)$ of the IVP $\dot \xi = f(\xi,u)$,
+  $\xi(0)=x$ at time $\tau$, which is provided in terms of a lambda function
+  with signature 
+  \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+    [](state_type& x, const input_type& u)  -> void {}
+  \end{lstlisting}
+  The state solution of the IVP at time $\tau$, i.e., $\varphi(\tau,x,u)$ is
+  expected to be stored in the variable~{\tt x}. The {\tt state\_type} and
+  {\tt\small input\_type} are aliases for {\tt\small std::array<double,dim>} in the appropriate
+  dimension.
+
+  \item a growth bound $\beta(r,u)$, which is provided by a lambda function with
+  signature 
+  \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+    [](state_type& r, const state_type& c, const input_type& u)  -> void {}
+  \end{lstlisting}
+  Again, the value of the growth bound $r'=\beta(r,u)$ is assumed to be stored
+  in the variable {\tt r}. In the implementation, the growth bound is allowed
+  to depend the center of the cell {\tt c}. See~\cite{WeberRunggerReissig17} for
+  details.
+
+  \item the set of real quantizer symbols $\bar X_2$ as defined
+  in~\eqref{e:theory:ss}, which are provided in terms of instantiations of the class with constructor
+  \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+    template<class grid_point_t>
+    UniformGrid(const int dim,
+                  const grid_point_t& lb,
+                  const grid_point_t& ub,
+                  const grid_point_t& eta)
+  \end{lstlisting}
+  where the variables {\tt dim}, {\tt lb}, {\tt ub} and {\tt eta} represent the
+  state space dimension, the lower and upper bound of the hyper-interval
+  confining the set $\bar X_2$, and the grid parameter, respectively.
+  \item the input alphabet $U_2$, which is again provided by an instance
+  of a {\tt UniformGrid};
+  \item optionally, it is possible to provide a measurement error bound using the
+  member function of 
+  \begin{lstlisting}[basicstyle=\small\ttfamily]
+    scots::AbstractionGB::set_measurement_error_bound(const state_type& z)
+  \end{lstlisting}
 \end{enumerate}
 Subsequently, we demonstrate the usage of {\tt SCOTS} to compute a symbolic
 model of the $\tau$-sampled aircraft dynamics used
-in~\cite[Sec.~IX.B]{ReissigWeberRungger15}. 
+in~\cite[Sec.~IX.B]{ReissigWeberRungger15}. The system consists of three states $x_1,x_2,x_3$, which respectively correspond to the velocity, the flight path angle and the altitude of the
+aircraft. The input alphabet is given by $U =
+\intcc{0,160\cdot 10^3} \times \intcc{0^\circ,10^\circ}$ 
+and represents the thrust of the engines (in Newton) and the angle of attack.
+Additionally, we use the disturbance vectors $z=(0.0125,0.0025^\circ,0.05)^\top$
+in~\eqref{e:theory:perturbation} and $w=(0.108,0.002,0)^\top$
+in~\eqref{e:sys:ct} to model possible measurement errors, respectively, input
+disturbances.
 
-%First, we define the set of real quantizer symbols $\bar X_2$ (defined
-%in~\eqref{e:theory:ss}) and the input
-%alphabet $U_2$. To this end, {\tt SCOTS} provides the class {\tt UniformGrid}.  parameterized by the
-%grid parameter $\eta\in \R^n_{>0}$ and the confining vectors  $a,b\in \R^n$. An
-%instance is created by
-%
+First, we define the aliases for the {\tt state\_type} and {\tt input\_type} by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+/* state space dim */
+const int state_dim=3;
+/* input space dim */
+const int input_dim=2;
+using state_type = std::array<double,state_dim>;
+using input_type = std::array<double,input_dim>;
+\end{lstlisting}
+Afterwards, we define the lambda for the solution of the IVP for a
+sampling time of $\tau=0.25$ by
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+auto aircraft_post = [] (state_type &x, const input_type &u) {
+  /* the ode describing the aircraft */
+  auto rhs =[] (state_type& xx,  const state_type &x, const input_type &u) {
+    double mg = 60000.0*9.81;
+    double mi = 1.0/60000;
+    double c=(1.25+4.2*u[1]);
+    xx[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
+    xx[1] = (mi/x[0])*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
+    xx[2] = x[0]*std::sin(x[1]);
+  };
+  /* use 10 intermediate steps */
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
+};
+\end{lstlisting}
+where we use the fixed step-size ODE solver {\tt scots::runge\_kutta\_fixed4} that
+ships with {\tt SCOTS}. An implementation, where we use more advanced ODE solvers like the
+adaptive step-size solvers with error control implemented in {\tt boost} can be found in {\tt ./examples/aircraft\_boost}.
 
-\begin{table}[h]
+We continue with the definition of the growth bound, for which we determine the
+matrix $L(u)$ in~\eqref{e:theory:lipschitz}. First, we compute an a priori
+enclosure $K'$ of~\eqref{e:sys:ct} with respect to $\tau=0.25$, $U'=U$ and the
+hyper-interval
+\begin{IEEEeqnarray*}{c}
+  K=\intcc{58,83}\times\intcc{-3^\circ,0}\times \intcc{0,56}
+\end{IEEEeqnarray*}
+that confines the set of real quantizer symbols. We use 
+interval arithmetic based ODE solver {\tt vnodelp} and obtain 
+\begin{IEEEeqnarray*}{c}
+  K'=\intcc{57.55,83.23}\times\intcc{-4.29^\circ,1.22^\circ}\times \intcc{-1.38,56.28}.
+\end{IEEEeqnarray*}
+The implementation of the computation of the a priori enclosure can be found in
+the example directory 
+{\tt ./examples/aircraft/helper/a\_priori\_enclosure}.
+Given the a priori enclosure, we maximize the partial derivatives of $f(\cdot,u)$ over the set $K'$
+to obtain the matrix $L(u)$. The solution of the linear ODE 
+\begin{IEEEeqnarray*}{c}
+\dot r = L(u) r+ w
+\end{IEEEeqnarray*}
+provides the growth bound \eqref{e:GrowthBoundComputation}, which we define by
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
+  /* the ode for the growth bound */
+  auto rhs =[&] (state_type& rr,  const state_type &r, const input_type &) {
+    /* lipschitz matrix */
+    double L[3][2];
+    L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
+    L[0][1]=9.81;
+    L[1][0]=0.002933+0.004802*u[1];
+    L[1][1]=0.00361225;
+    L[2][0]=0.07483;
+    L[2][1]=83.22;
+    /* to account for input disturbances */
+    state_type w={{0.108,0.002,0}};
+    rr[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; 
+    rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; 
+    rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; 
+  };
+  /* use 10 intermediate steps */
+  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,10);
+};
+\end{lstlisting}
+The real quantizer symbols $\bar X_2$ and the input
+alphabet $U_2$ are introduced as instances of the class {\tt UniformGrid} by
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+  state_type s_lb={{58,-3*M_PI/180,0}};
+  state_type s_ub={{83,0,56}}; 
+  state_type s_eta={{25.0/362,3*M_PI/180/66,56.0/334}}; 
+  scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
+
+  input_type i_lb={{0,0}};
+  input_type i_ub={{32000,8*M_PI/180}};
+  input_type i_eta={{32000,8.0/9.0*M_PI/180}};
+  scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
+\end{lstlisting}
+The grid parameter {\tt\small s\_eta} for the real quantizer symbols $\bar X_2$
+has been determined according to the optimization procedure
+in~\cite{WeberRunggerReissig17}.
+
+For the computation of the symbolic transition function $F_2$ we instantiate  the
+class {\tt\small AbstractionGB} and set the measurement error bound $z$
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  state_type z={{0.0125,0.0025/180*M_PI,0.05}};
+  abs.set_measurement_error_bound(z);
+\end{lstlisting}
+The computation of $F_2$ itself is invoked by
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+  abs.compute(tf,aircraft_post,radius_post);
+\end{lstlisting}
+
+Note that, due to the numerical errors in the computation of the solution of the
+IVP $\varphi(\tau,x,u)$ it is possible that the computed transition function $F_2$ does not satisfies
+the requirements in Sectin~\ref{s:theory:tf}. Similarly, the
+computation of the growth bound $\beta(r,u)$ might be erroneous. 
+Therefore, it is crucial to pick adequate ODE solver parameters to obtain 
+high confidence in the correctness of the computation. We list some runtimes of
+the computation of $F_2$ for two different solvers for various parameters in
+Table~\ref{t:runtimes:tf}. The implementations can be found in {\tt ./exampels/aircraft} 
+and {\tt./examples/aircraft\_boost}.
+
+\begin{table}[h]\label{t:runtimes:tf}
 \begin{tabular}{C|C|C|C|C}
   \multicolumn{3}{c|}{adaptive step size {\tt runge\_kutta\_dopri5}} &
   \multicolumn{2}{c}{fixed step size {\tt runge\_kutta\_4} } \\
@@ -1130,8 +1304,8 @@ in~\cite[Sec.~IX.B]{ReissigWeberRungger15}.
   $10^{-10}$/$10^{-10}$ & $10^{-12}$/$10^{-12}$& $10^{-16}$/$10^{-16}$ &  5 & 10\\\hline
   252$\;sec$ & 370$\;sec$ & 1036 $\;sec$ & 233 $\;sec$ & 335 $\;sec$
 \end{tabular}
-\caption{Run times to compute a symbolic transition function of the aircraft
-dynamics  with varying ode solvers and solver parameters. All computations
+\caption{Runtimes to compute a symbolic transition function of the aircraft
+dynamics  with varying ODE solvers and solver parameters. All computations
 resulted in an identical transition function with $5.86\cdot10^9$ transitions.} 
 \end{table}
 

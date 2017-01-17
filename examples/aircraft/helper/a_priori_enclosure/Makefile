@@ -26,7 +26,7 @@ VNODELPLIB = -L$(SCOTSROOT)/external/vnodelp/lib \
 
 LIBS = -lvnode -lProfil -lBias -llr
 
-TARGET = comp_enclosure comp_enclosure_per_input 
+TARGET = comp_enclosure 
 
 all: $(TARGET)
 
@@ -35,10 +35,6 @@ all: $(TARGET)
 
 comp_enclosure:  comp_enclosure.o
 	$(CC) $(LDFLAGS) -o comp_enclosure  comp_enclosure.o $(VNODELPLIB) $(LIBS) 
-
-comp_enclosure_per_input:  comp_enclosure_per_input.o
-	$(CC) $(LDFLAGS) -o comp_enclosure_per_input  comp_enclosure_per_input.o $(VNODELPLIB) $(LIBS) 
-
 
 clean:
 	rm comp_enclosure.o comp_enclosure comp_enclosure_per_input.o comp_enclosure_per_input

@@ -65,10 +65,10 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
   /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
   double L[3][2];
-  L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
+  L[0][0]=-0.00191867*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
   L[0][1]=9.81;
   L[1][0]=0.002933+0.004802*u[1];
-  L[1][1]=0.00361225;
+  L[1][1]=0.003623;
   L[2][0]=0.07483;
   L[2][1]=83.22;
   /* the ode for the growth bound */
