@@ -1,0 +1,34 @@
+
+An aircraft landing maneuver taken from https://arxiv.org/abs/1503.03715 which
+uses and ode solver from the boost library with an adaptive step size
+
+0. for a successful execution of the this example you should have 32GB memory
+   available
+
+1. install the boost library  www.boost.org
+
+2. compile the aircraft.cc and simulate.cc file   
+   
+   edit the Makefile and adjust the boot library path
+
+   compile the programs with
+   $ make
+
+3. execute 
+
+  $./aircraft
+
+  which produces
+
+  ./controller.scs
+
+4. simulate the closed loop by running
+
+  $./simulate
+
+5. information on the example are found in
+
+- Reissig, G., Weber, A., & Rungger, M. (2015). Feedback Refinement Relations
+  for the Synthesis of Symbolic Controllers. arXiv preprint arXiv:1503.03715.
+- doi: 10.1109/CDC.2015.7403185
+- doi: 10.1109/TAC.2016.2642794

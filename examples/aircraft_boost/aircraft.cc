@@ -1,8 +1,8 @@
 /*
  * aircraft.cc
  *
- *  created: Oct 2016
- *  author: Matthias Rungger
+ *  created: Jan 2016
+ *   author: Matthias Rungger
  *
  */
 
@@ -19,8 +19,6 @@
 
 /* SCOTS header */
 #include "scots.hh"
-/* ode solver */
-#include "RungeKutta4.hh"
 
 /* time profiling */
 #include "TicToc.hh"
@@ -41,19 +39,26 @@ const double tau = 0.25;
 using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 
+/* setup boost ode solver */
+#include <boost/numeric/odeint.hpp>
+const double abs_tol = 1E-12;
+const double rel_tol = 1E-12;
+
+/* ode solver alias */
+using stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state_type>;
+
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 double mg = 60000.0*9.81;
 double mi = 1.0/60000;
 auto aircraft_post = [] (state_type &x, const input_type &u) {
   /* the ode describing the aircraft */
-  auto rhs =[] (state_type& xx,  const state_type &x, const input_type &u) {
+  auto rhs = [&](const state_type& x,  state_type &dxdt, const double) {
     double c=(1.25+4.2*u[1]);
-    xx[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
-    xx[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
-    xx[2] = x[0]*std::sin(x[1]);
+    dxdt[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
+    dxdt[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
+    dxdt[2] = x[0]*std::sin(x[1]);
   };
-  /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
+  boost::numeric::odeint::integrate_adaptive(make_controlled(abs_tol,rel_tol,stepper_type()),rhs,x,0.0,tau,tau);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
@@ -66,16 +71,15 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
   L[1][1]=0.00361225;
   L[2][0]=0.07483;
   L[2][1]=83.22;
-  /* to account for input disturbances */
-  state_type w={{.108,0.002,0}};
   /* the ode for the growth bound */
-  auto rhs =[&] (state_type& rr,  const state_type &r, const input_type &) {
-    rr[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; /* L[0][2]=0 */
-    rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
-    rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
+  auto rhs = [&](const state_type& r,  state_type &drdt, const double) {
+    /* to account for input disturbances */
+    const state_type w={{.108,0.002,0}};
+    drdt[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; /* L[0][2]=0 */
+    drdt[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
+    drdt[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
-  /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,10);
+  boost::numeric::odeint::integrate_adaptive(make_controlled(abs_tol,rel_tol,stepper_type()),rhs,r,0.0,tau,tau);
 };
 
 int main() {
