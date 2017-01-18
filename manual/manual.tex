@@ -72,27 +72,28 @@ backend=biber]{biblatex}
 \algnewcommand\Output{\item[\algorithmicoutput]}
 % code snippets
 \usepackage{listings}
-\definecolor{classes}{HTML}{476A97}
-\definecolor{types}{HTML}{476A97}
-\definecolor{methods}{HTML}{476A97}
-\definecolor{comment}{HTML}{435138}
-\definecolor{keywords}{HTML}{702C51}
-\definecolor{numbers}{HTML}{702C51}
-\definecolor{strings}{HTML}{702C51}
-\lstset{emph=[1]{%  
-  compute,
-  xtoi,
-  itox,
-  },emphstyle=[1]{\color{methods}}%
-}%
-\lstset{emph=[3]{%
-      abs_type,input_type,state_type,%
-    },emphstyle=[3]{\color{types}}%
+\definecolor{classes}{named}{MidnightBlue}
+\definecolor{types}{named}{MidnightBlue}
+\definecolor{keywords}{named}{ForestGreen}
+\definecolor{strings}{named}{RoyalPurple}
+%\definecolor{numbers}{HTML}{702C51}
+%\lstset{emph=[1]{%  
+%  compute,
+%  xtoi,
+%  itox,
+%  },emphstyle=[1]{\color{methods}}%
+%}%
+\lstset{emph=[1]{%
+      uint32_t,abs_type,input_type,state_type,%
+    },emphstyle=[1]{\color{types}}%
 }%
 \lstset{emph=[2]{%
       UniformGrid,
+      StaticController,
       AbstractionGB,
-      TransitionSystem%
+      WinningDomain,
+      TransitionFunction%
+      %
     },emphstyle=[2]{\color{classes}}%
 }%
 % set the default code style
@@ -109,26 +110,6 @@ backend=biber]{biblatex}
     language=C++,
 }
 \lstset{literate=%
-   *{.0}{{{\color{numbers}.0}}}2
-    {.1}{{{\color{numbers}.1}}}2
-    {.2}{{{\color{numbers}.2}}}2
-    {.3}{{{\color{numbers}.3}}}2
-    {.4}{{{\color{numbers}.4}}}2
-    {.5}{{{\color{numbers}.5}}}2
-    {.6}{{{\color{numbers}.6}}}2
-    {.7}{{{\color{numbers}.7}}}2
-    {.8}{{{\color{numbers}.8}}}2
-    {.9}{{{\color{numbers}.9}}}2
-    {0}{{{\color{numbers}0}}}1
-    {1}{{{\color{numbers}1}}}1
-    {2}{{{\color{numbers}2}}}1
-    {3}{{{\color{numbers}3}}}1
-    {4}{{{\color{numbers}4}}}1
-    {5}{{{\color{numbers}5}}}1
-    {6}{{{\color{numbers}6}}}1
-    {7}{{{\color{numbers}7}}}1
-    {8}{{{\color{numbers}8}}}1
-    {9}{{{\color{numbers}9}}}1
     {scots::}{{{\color{classes}scots::}}}7
 }
 
@@ -150,16 +131,11 @@ backend=biber]{biblatex}
 
 \section{ToDo}
 
-{\color{red} a lot...}
-%\begin{enumerate}
-%  \item correction of a-priori enclosure and computation of growth bound
-%  \item Constructor/Destructor/copy con/move con/copy assign/move assign
-%  \begin{itemize}
-%    \item UniformGrid $\checkmark$
-%    \item TransitionSystem $\checkmark$
-%    \item TicToc $\checkmark$
-%  \end{itemize}
-%\end{enumerate}
+\begin{enumerate}
+  \item Explain MATLAB interface
+  \item Implement and explain support for BDD representation
+  \item Demonstrate customized synthesis algorithms
+\end{enumerate}
 
 \newpage
 
@@ -249,7 +225,7 @@ The directory
 ./examples/aircraft/helper        	
 \end{lstlisting}
 contains various programs that 
-use the interval-arithmetic based ODE solver {\tt vnodelp} to obtain:
+use the interval-arithmetic based ODE solver {\tt vnode-lp} to obtain:
 {\bf a)} an a priori enclosure and {\bf b)} a growth
 bound.
 
@@ -297,11 +273,11 @@ For various reasons, one might consider to use additional software in combinatio
   \url{https://www.macports.org/} or {\tt Homebrew} \url{http://brew.sh/} provide an easy way to install
   {\tt boost}.
 
-  \item {\tt vnodelp}: to compute a priori enclosures and growth bounds.
+  \item {\tt vnode-lp}: to compute a priori enclosures and growth bounds.
 
-  {\tt vnodelp} is an open source software tool to compute validated solutions
+  {\tt vnode-lp} is an open source software tool to compute validated solutions
   of initial value problems based on  interval arithmetic. It is available at
-  \url{http://www.cas.mcmaster.ca/~nedialk/vnodelp/}.
+  \href{http://www.cas.mcmaster.ca/~nedialk/vnodelp}.
 
 
 
@@ -466,7 +442,7 @@ In the context of Linear Temporal Logic, the sets $A_1$ and $Z_1$ are often
 identified with \emph{atomic propositions}. In this sense, \texttt{SCOTS} allows to define arbitrary sets as atomic propositions. 
 
 \subsection{Auxiliary Control Problems}
-\label{ss:symbolicmodel}
+\label{s:theory:aux}
 
 Given a simple system \eqref{e:sys} representing the $\tau$-sampled
 behavior of~\eqref{e:sys:ct} and a specification $\Sigma_1$ for \eqref{e:sys},
@@ -483,7 +459,7 @@ a subset of $U_1$. The set $X_2$ contains a subset $\bar X_2$, representing the 
 while the remaining symbols $X_2\smallsetminus \bar X_2$ are interpreted as
 ``overflow'' symbols. The set of real quantizer symbols $\bar X_2$ are given by
 congruent hyper-rectangles aligned on a uniform grid 
-\begin{IEEEeqnarray}{c}
+\begin{IEEEeqnarray}{c}\label{e:theory:grid}
 \label{e:grid}
   \eta\Z^n=\{c\in \R^n\mid \exists_{k\in\Z^n}\forall_{i\in\intcc{1;n}}\; c_i=k_i\eta_i\}
 \end{IEEEeqnarray}
@@ -500,7 +476,12 @@ The elements of the real quantizer symbols are also referred to as
 \emph{cells}. Each cell
 $x_2=c+\segcc{-\eta/2,\eta/2}$ is associated with a \emph{center} $c\in \R^n$
 (which is also a \emph{grid point} $c\in \eta\Z^n$) and a \emph{radius}
-$r\in\R^n_{\ge0}$.
+$r\in\R^n_{\ge0}$. 
+The initial state alphabet $X_{2,0}$ is defined by the cells that are needed to
+cover $X_{1,0}$, i.e.,
+\begin{IEEEeqnarray}{c}\label{e:theory:abs:initial}
+X_{2,0}:=\{x_2\in X_2\mid x_2\cap X_{1,0}\neq\emptyset\}.
+\end{IEEEeqnarray}
 
 
 
@@ -518,7 +499,7 @@ relation
   Q:=\{ (x_1,x_2) \mid x_1 \in x_2\}.
 \end{IEEEeqnarray}
 Given an invariance (reachability) specification $\Sigma_1$ for \eqref{e:sys} associated
-with $Z_1$, then an \emph{abstract specification} is given by the
+with $Z_1$, then an \emph{abstract specification} associated with $S_1$, $S_2$ and $Q$ is given by the
 invariance (reachability) specification for $S_2=(X_2,X_{2,0},U_2,F_2)$ associated with 
 \begin{IEEEeqnarray}{c}\label{e:abs:spec}
   Z_2=\{ x_2 \in
@@ -715,7 +696,7 @@ as growth bounds can be computed automatically using interval arithmetic based
 ODE solvers. See Section~\ref{s:usage:abs} for more details on how to
 automatically obtain a priori enclosures and growth bounds.
 %An implementation of such computations using the interval ODE
-%solver {\tt vnodelp} for the aircraft example can be found in the directory
+%solver {\tt vnode-lp} for the aircraft example can be found in the directory
 %\begin{lstlisting}[basicstyle=\small\ttfamily]
 %./examples/aircraft/helper        	
 %\end{lstlisting}
@@ -802,8 +783,7 @@ We use the Weierstrass symbol $\wp$ to denote the power set and define $\pre:\wp
 \subsection{Invariance}
 
 Let $\Sigma_2$ be an invariance specification associated with $Z_2$. 
-We use Alg.~\ref{a:safety}, which is implemented in the function {\tt
-solve\_invariance\_game} in the file {\tt GameSolver.hh}, to synthesize a controller
+We use Alg.~\ref{a:safety}, which is implemented in the function {\tt solve\_invariance\_game} in the file {\tt GameSolver.hh}, to synthesize a controller
 that solves the control problem $(S_2,\Sigma_2)$.  
 Alg.~\ref{a:safety} runs in $O(m)$ time, where $m$ is the number of transitions, i.e., the number of
 triples $(x_2,u,x'_2)$ with $x'_2\in F_2(x_2,u)$, since each state is added to the queue
@@ -913,7 +893,7 @@ if $X_{2,0}\subseteq D^{-1}(U_2)$.
 Suppose that $X_{2,0}\subseteq D^{-1}(U_2)$ holds, then we obtain a controller
 $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$
 that solves $(S_2,\Sigma_2)$ by  
-\begin{IEEEeqnarray}{rCl}\label{e:controller}
+\begin{IEEEeqnarray}{rCl}\label{e:theory:controller}
 \begin{IEEEeqnarraybox}[][c]{rCl}
 H_c(q,x_2)&=&
 \begin{cases}
@@ -927,8 +907,15 @@ F_c(q,x_2)&=&
 \end{cases}
 \end{IEEEeqnarraybox}
 \end{IEEEeqnarray}
-The refined controller $C\circ Q$ that is feedback composed with $S_1$ is
-implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
+The refined controller that solves $(S_1,\Sigma_1)$ is given by $C\circ Q$.
+Note that the definition of the initial state alphabet $X_{2,0}$
+in~\eqref{e:theory:abs:initial} and the condition $X_{2,0}\subseteq
+D^{-1}(U_2)$ imply that the initial state alphabet of $S_1$ satisfies
+\begin{IEEEeqnarray}{c}\label{e:theory:refinement:initial}
+X_{1,0}\subseteq \cup_{x_2\in D^{-1}(U_2)} x_2. 
+\end{IEEEeqnarray}
+The controller $C\circ Q$ is implemented in {\tt SCOTS} in the {\tt StaticController} class. 
+The details are
 explained in Section~\ref{s:usage:simulation}.
 
 
@@ -1042,7 +1029,7 @@ if $X_{2,0}\subseteq D^{-1}(U_2)$.
 Given that $X_{2,0}\subseteq D^{-1}(U_2)$ holds, a controller
 $C=(\{q\},\{q\},X_2,X_2,U_2,F_c,H_c)$ that solves $(S_2,\Sigma_2)$ is identical
 to the controller that solves the invariance problem, i.e., $F_c$ and $H_c$ are
-given by~\eqref{e:controller}.
+given by~\eqref{e:theory:controller}.
 
 Again, the refined controller $C\circ Q$ that is feedback composed with $S_1$ is
 implemented in {\tt SCOTS} in the {\tt StaticController} class. The details are
@@ -1114,90 +1101,107 @@ solve\_reachability\_game}, see Section~\ref{s:usage:synthesis}.
 %\end{IEEEeqnarray}
 
 
-
-
 \newpage
 
 
 \part{USAGE}
 
-{\color{red} Work in progress...}
-
 \section{Computation of Symbolic Models}
 \label{s:usage:abs}
 
 Let $S_1$ be a simple system that represents the $\tau$-sampled
-behavior of continuous-time system~\eqref{e:sys:ct} as defined in~\eqref{e:sys}.
-In order to compute the transition function $F_2$ of a symbolic model
-$S_2=(X_2,X_{2,0},U_2,F_2)$ of $S_1$ the following ingredients are needed.
+behavior of the continuous-time system~\eqref{e:sys:ct} as defined in~\eqref{e:sys}.
+In order to compute the transition function $F_2$ of a symbolic
+model~\eqref{e:abs:sys} of $S_1$ in {\tt SCOTS}, the following ingredients are
+needed.
 \begin{enumerate}
   \item The solution $\varphi(\tau,x,u)$ of the IVP $\dot \xi = f(\xi,u)$,
   $\xi(0)=x$ at time $\tau$, which is provided in terms of a lambda function
   with signature 
-  \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-    [](state_type& x, const input_type& u)  -> void {}
-  \end{lstlisting}
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+[](state_type& x, const input_type& u)  -> void {}
+\end{lstlisting}
   The state solution of the IVP at time $\tau$, i.e., $\varphi(\tau,x,u)$ is
   expected to be stored in the variable~{\tt x}. The {\tt state\_type} and
   {\tt\small input\_type} are aliases for {\tt\small std::array<double,dim>} in the appropriate
   dimension.
 
-  \item a growth bound $\beta(r,u)$, which is provided by a lambda function with
+  \item A growth bound $\beta(r,u)$, which is provided by a lambda function with
   signature 
-  \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-    [](state_type& r, const state_type& c, const input_type& u)  -> void {}
-  \end{lstlisting}
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+[](state_type& r, const state_type& c, const input_type& u)  -> void {}
+\end{lstlisting}
   Again, the value of the growth bound $r'=\beta(r,u)$ is assumed to be stored
   in the variable {\tt r}. In the implementation, the growth bound is allowed
   to depend the center of the cell {\tt c}. See~\cite{WeberRunggerReissig17} for
   details.
 
-  \item the set of real quantizer symbols $\bar X_2$ as defined
-  in~\eqref{e:theory:ss}, which are provided in terms of instantiations of the class with constructor
-  \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-    template<class grid_point_t>
-    UniformGrid(const int dim,
-                  const grid_point_t& lb,
-                  const grid_point_t& ub,
-                  const grid_point_t& eta)
-  \end{lstlisting}
+  \item The set of real quantizer symbols $\bar X_2$ as defined
+  in~\eqref{e:theory:ss}, which is defined as instantiation of the class with constructor
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+template<class grid_point_t>
+scots::UniformGrid(const int dim,
+                     const grid_point_t& lb,
+                     const grid_point_t& ub,
+                     const grid_point_t& eta)
+\end{lstlisting}
   where the variables {\tt dim}, {\tt lb}, {\tt ub} and {\tt eta} represent the
   state space dimension, the lower and upper bound of the hyper-interval
   confining the set $\bar X_2$, and the grid parameter, respectively.
-  \item the input alphabet $U_2$, which is again provided by an instance
-  of a {\tt UniformGrid};
-  \item optionally, it is possible to provide a measurement error bound using the
-  member function of 
-  \begin{lstlisting}[basicstyle=\small\ttfamily]
-    scots::AbstractionGB::set_measurement_error_bound(const state_type& z)
-  \end{lstlisting}
+
+	Internally, each cell $x_2=c+\segcc{-\eta/2,\eta/2}\in\bar X_2$ is represented
+  as an unsigned integer of type {\tt abs\_type}. In the default setting, {\tt abs\_type} is an alias set in {\tt TransitionFunction.hh} to 
+\begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
+using abs_type=std::uint32_t;
+\end{lstlisting}
+  which limits the size of $\bar X_2$ to $2^{32}-1$. The template member functions 
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<class grid_point_t>
+scots::UniformGrid::itox(abs_type id, state_type& x)
+template<class grid_point_t>
+scots::UniformGrid::abs_type xtoi(const grid_point_t& x) const 
+\end{lstlisting}
+  are useful in mapping an abstract state $c+\segcc{-\eta/2,\eta/2}\in
+  \bar X_2$, represented by its unsinged integer ID {\tt id}, to its center
+  $c\in \R^n$ aligned on the uniform grid~\eqref{e:theory:grid}. Similarly, {\tt
+  xtoi} can be used to map a state $x\in \R^n$ to the {\tt id} of the cell
+  $x_2\in\bar X_2$ containing it, i.e., $x\in x_2$.
+
+  \item The input alphabet $U_2$, which is again represented by an instance
+  of a {\tt UniformGrid}.
+
+  \item Optionally, it is possible to provide a measurement error bound to
+  account for measurement errors as defined in~\eqref{e:theory:perturbation} using the
+  member function
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+scots::AbstractionGB::set_measurement_error_bound(const state_type& z)
+\end{lstlisting}
 \end{enumerate}
-Subsequently, we demonstrate the usage of {\tt SCOTS} to compute a symbolic
-model of the $\tau$-sampled aircraft dynamics used
+
+We demonstrate the usage of {\tt SCOTS} to compute a symbolic
+model of the sampled dynamics of an aircraft used
 in~\cite[Sec.~IX.B]{ReissigWeberRungger15}. The system consists of three states $x_1,x_2,x_3$, which respectively correspond to the velocity, the flight path angle and the altitude of the
 aircraft. The input alphabet is given by $U =
 \intcc{0,160\cdot 10^3} \times \intcc{0^\circ,10^\circ}$ 
 and represents the thrust of the engines (in Newton) and the angle of attack.
-Additionally, we use the disturbance vectors $z=(0.0125,0.0025^\circ,0.05)^\top$
-in~\eqref{e:theory:perturbation} and $w=(0.108,0.002,0)^\top$
-in~\eqref{e:sys:ct} to model possible measurement errors, respectively, input
-disturbances.
+Additionally, we use the disturbance vectors $w=(0.108,0.002,0)^\top$
+in~\eqref{e:sys:ct} and  $z=(0.0125,0.0025^\circ,0.05)^\top$
+in~\eqref{e:theory:perturbation} to model possible input
+disturbances, respectively, measurement errors.
 
-First, we define the aliases for the {\tt state\_type} and {\tt input\_type} by
+For the computation of the transition function, we begin with the aliases for the {\tt state\_type} and {\tt input\_type} by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
-/* state space dim */
-const int state_dim=3;
-/* input space dim */
-const int input_dim=2;
+const int state_dim=3; /* state space dim */
+const int input_dim=2; /* input space dim */
 using state_type = std::array<double,state_dim>;
 using input_type = std::array<double,input_dim>;
 \end{lstlisting}
 Afterwards, we define the lambda for the solution of the IVP for a
 sampling time of $\tau=0.25$ by
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-auto aircraft_post = [] (state_type &x, const input_type &u) {
+auto aircraft_post = [](state_type &x, const input_type &u) {
   /* the ode describing the aircraft */
-  auto rhs =[] (state_type& xx,  const state_type &x, const input_type &u) {
+  auto rhs = [](state_type& xx,  const state_type &x, const input_type &u) {
     double mg = 60000.0*9.81;
     double mi = 1.0/60000;
     double c=(1.25+4.2*u[1]);
@@ -1210,34 +1214,33 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 };
 \end{lstlisting}
 where we use the fixed step-size ODE solver {\tt scots::runge\_kutta\_fixed4} that
-ships with {\tt SCOTS}. An implementation, where we use more advanced ODE solvers like the
+ships with {\tt SCOTS}. An implementation that uses a more advanced ODE solver like the
 adaptive step-size solvers with error control implemented in {\tt boost} can be found in {\tt ./examples/aircraft\_boost}.
 
 We continue with the definition of the growth bound, for which we determine the
 matrix $L(u)$ in~\eqref{e:theory:lipschitz}. First, we compute an a priori
 enclosure $K'$ of~\eqref{e:sys:ct} with respect to $\tau=0.25$, $U'=U$ and the
-hyper-interval
-\begin{IEEEeqnarray*}{c}
-  K=\intcc{58,83}\times\intcc{-3^\circ,0}\times \intcc{0,56}
-\end{IEEEeqnarray*}
-that confines the set of real quantizer symbols. We use 
-interval arithmetic based ODE solver {\tt vnodelp} and obtain 
+hyper-interval $P(K)$ where 
+  $K=\intcc{58,83}\times\intcc{-3^\circ,0}\times \intcc{0,56}$
+is the hyper-interval 
+that confines the set of real quantizer symbols. To this end, we employ
+the interval arithmetic based ODE solver implemented in
+\href{http://www.cas.mcmaster.ca/~nedialk/vnodelp}{vnode-lp} to obtain 
 \begin{IEEEeqnarray*}{c}
   K'=\intcc{57.55,83.23}\times\intcc{-4.29^\circ,1.22^\circ}\times \intcc{-1.38,56.28}.
 \end{IEEEeqnarray*}
 The implementation of the computation of the a priori enclosure can be found in
 the example directory 
 {\tt ./examples/aircraft/helper/a\_priori\_enclosure}.
-Given the a priori enclosure, we maximize the partial derivatives of $f(\cdot,u)$ over the set $K'$
-to obtain the matrix $L(u)$. The solution of the linear ODE 
-\begin{IEEEeqnarray*}{c}
-\dot r = L(u) r+ w
-\end{IEEEeqnarray*}
-provides the growth bound \eqref{e:GrowthBoundComputation}, which we define by
+To obtain the matrix $L(u)$, we maximize the partial derivatives of $f(\cdot,u)$ over the set $K'$
+. The solution of the linear IVP
+$\dot r(t) = L(u) r(t)+ w$, $r(0)=r_0$, at time $\tau$
+provides the growth bound \eqref{e:GrowthBoundComputation} that we access
+through the lambda
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
+auto radius_post = [](state_type &r, const state_type &, const input_type &u) {
   /* the ode for the growth bound */
-  auto rhs =[&] (state_type& rr,  const state_type &r, const input_type &) {
+  auto rhs =[](state_type& rr,  const state_type &r, const input_type &) {
     /* lipschitz matrix */
     double L[3][2];
     L[0][0]=-0.001919*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
@@ -1274,7 +1277,7 @@ has been determined according to the optimization procedure
 in~\cite{WeberRunggerReissig17}.
 
 For the computation of the symbolic transition function $F_2$ we instantiate  the
-class {\tt\small AbstractionGB} and set the measurement error bound $z$
+class {\tt\small AbstractionGB} and set the measurement error bound to $z$
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
   scots::AbstractionGB<state_type,input_type> abs(ss,is);
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};
@@ -1290,10 +1293,12 @@ IVP $\varphi(\tau,x,u)$ it is possible that the computed transition function $F_
 the requirements in Sectin~\ref{s:theory:tf}. Similarly, the
 computation of the growth bound $\beta(r,u)$ might be erroneous. 
 Therefore, it is crucial to pick adequate ODE solver parameters to obtain 
-high confidence in the correctness of the computation. We list some runtimes of
+high confidence in the correctness of the computation.
+
+We list the runtimes of
 the computation of $F_2$ for two different solvers for various parameters in
-Table~\ref{t:runtimes:tf}. The implementations can be found in {\tt ./exampels/aircraft} 
-and {\tt./examples/aircraft\_boost}.
+Table~\ref{t:runtimes:tf}. The implementations can be found in the directories
+{\tt ./exampels/aircraft\_boost} and {\tt./examples/aircraft}.
 
 \begin{table}[h]\label{t:runtimes:tf}
 \begin{tabular}{C|C|C|C|C}
@@ -1313,42 +1318,196 @@ resulted in an identical transition function with $5.86\cdot10^9$ transitions.}
 \section{Controller Synthesis}
 \label{s:usage:synthesis}
 
-\section{Closed Loop Simulation}
-\label{s:usage:simulation}
-The
-function {\tt StaticController::control} takes as input a state $x_1\in X_1$ and
-rounds it to the nearest grid point in $\eta\Z$ in order to determine a
-symbolic state $x_2\in Q(x_1)$. If there does not exist a valid input $u\in U_2$
-associated with $x_2$, i.e., $x_2\not\in \pi_{X_2}(D)$, then the
-$F_c(q,x_2)=\emptyset$ and function returns the error message
-\begin{lstlisting}[basicstyle=\small\ttfamily]
-scots::StaticController::control: no progress possible at state <values> 
-\end{lstlisting}
-Otherwise, {\tt StaticController::control} returns the set of valid control
-inputs.
-
-
-
-\section{Writing To and Reading From Hard Disk}
-
-\subsection{Directly}
+Let $\Sigma_2$ be an invariance or reachability specification associated with $Z_2\subseteq \bar
+X_2$ for~\eqref{e:abs:sys}.
+The algorithms Alg.~\ref{a:safety} and Alg.~\ref{a:reach} to compute the winning
+domain $D^{-1}(U_2)$ associated with the control problem $(S_2,\Sigma_2)$
+are implemented in the following functions.
 \begin{enumerate}
-  \item Atomic Propositions
-  \item StaticController
-  \item UniformGrid
-  \item TransitionFunction
+  \item Alg.~\ref{a:safety} is implemented {\tt solve\_invariance\_game} with signature 
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<class F> 
+WinningDomain solve_reachability_game(const TransitionFunction& tf, F& ap)
+\end{lstlisting}
+  where the set $Z_2$ is defined as lambda function {\tt ap} with the signature
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+[](const scots::abs_type& abs_state) -> bool {}
+\end{lstlisting}
+  {\tt ap(abs\_state)} returns {\tt true} if and only if the abstract state $x_2\in\bar X_2$, represented by
+  the ID {\tt abs\_state}, is  an element of the safe set $Z_2$.
+
+  \item Alg.~\ref{a:reach} is implemented in {\tt solve\_reachability\_game} with signature 
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<class F>
+WinningDomain solve_reachability_game(const TransitionFunction& tf, F& ap)
+\end{lstlisting}
+  where the target set $Z_2$ is defined as lambda function {\tt ap} with the signature
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+[](const scots::abs_type& abs_state) -> bool {}
+\end{lstlisting}
+  {\tt ap(abs\_state)} returns {\tt true} if and only if the abstract state $x_2\in\bar X_2$, represented by
+  the ID {\tt abs\_state}, is  an element of the safe set $Z_2$.
+
+  \item Optionally, the IDs of the cells contained in the set $Z_2$ together
+  with the uniform grid information can be stored to a file using the function
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<class F>
+bool write_to_file(const UniformGrid& g, F& ap, const std::string& filename)
+\end{lstlisting}
+The grid points associated with the stored IDs are accessible from the MATLAB
+workspace using the command
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+>> GridPoints('filename')
+\end{lstlisting}
+In order to use this MATLAB command, the mex-file {\tt GridPoints.mex} needs to
+be compiled. Please see the installation notes for details.
+
 \end{enumerate}
 
+We illustrate the usage of those functions again by 
+the aircraft example studied in the previous section. Let~\eqref{e:sys} represent the $\tau$-sampled
+behavior of the aircraft dynamics and consider the reachability specification $\Sigma_1$ for
+$S_1$ associated with the set
+\begin{IEEEeqnarray*}{c}
+	Z_1:= (\intcc{63,75} \times \intcc{-3^\circ,0^\circ} \times \intcc{0,2.5}) \cap \{x \in \R^3 | x_1 \sin x_2 \geq -0.91 \}.
+\end{IEEEeqnarray*}
+Consider the system~\eqref{e:abs:sys}, the quantizer~\eqref{e:theory:quantizer}
+and the perturbation map~\eqref{e:theory:perturbation}. As outlined in Section~\ref{s:theory:aux}, an
+abstract specification associated with $S_1$, $S_2$ and $Q\circ P$%
+\footnote{In the computation of the abstraction specification, we replace $Q$
+with $Q\circ P$ to account for the measurement errors, see~\cite[Sec.~VI.B]{ReissigWeberRungger15}.}
+is a reachability specification for $S_2$ associated with $Z_2$, where $Z_2$ is required to be a subset of
+	$\{ x_2\in X_2\mid P(x_2)\subseteq Z_1\}$.
+We represent $Z_2$ as lambda function {\tt target} as follows
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+  /* define target set */
+  state_type t_lb = {{63,-3*M_PI/180,0}};
+  state_type t_ub = {{75,0,2.5}};
+  state_type c_lb;
+  state_type c_ub;
+  state_type x;
+  auto target = [&](const scots::abs_type abs_state) {
+    /* compute the center of cell associated with abs_state */
+    ss.itox(abs_state,x);
+    /* hyper-interval of the quantizer symbol with perturbation */
+    for(int i=0; i<state_dim; i++) {
+      c_lb[i] = x[i]-s_eta[i]/2.0-z[i];
+      c_ub[i] = x[i]+s_eta[i]/2.0+z[i];
+    }
+    if( t_lb[0]<=c_lb[0] && c_ub[0]<=t_ub[0] &&
+        t_lb[1]<=c_lb[1] && c_ub[1]<=t_ub[1] &&
+        t_lb[2]<=c_lb[2] && c_ub[2]<=t_ub[2]) {
+        if(-0.91<=(x[0]*std::sin(x[1])- 
+                    s_eta[0]/2.0-z[0]-(c_ub[0])*(s_eta[1]/2.0-z[1]))) {
+        return true;
+      }
+    }
+    return false;
+  };
+\end{lstlisting}
+Once we have the lambda function {\tt target} representing the target set, we compute the winning domain of $(S_2,\Sigma_2)$ by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+  WinningDomain win=solve_reachability_game(tf,target);
+\end{lstlisting}
+The number of states in the winning domain and the winning domain itself is obtainable by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+  abs_type domain = win.get_size();
+  std::vector<abs_type> domain = win.get_winning_domain();
+\end{lstlisting}
+It is possible to store the result as {\tt StaticController} to a file. The syntax for
+storing the controller to the file {\tt controller.scs} is given by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+write_to_file(StaticController(ss,is,std::move(win)),"controller.scs");
+\end{lstlisting}
+
+\section{Controller Implementation}
+\label{s:usage:simulation}
+Let $C$ be the static controller defined in~\eqref{e:theory:controller} that
+solves $(S_2,\Sigma_2)$. For the implementation of the refined controller $C\circ Q$
+illustrated in Fig.~\ref{f:closedloop} (or Fig.~\ref{f:closedloop:pert}),  {\tt
+SCOTS} provides the class {\tt StaticController}. The class can be instantiated with two {\tt UniformGrids} and a {\tt
+WinningDomain} according to
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+scots::StaticController(const UniformGrid& state_grid,
+                           const UniformGrid& input_grid,
+                           WinningDomain&& winning_domain)
+\end{lstlisting}
+Alternatively, it is possible to instantiate the {\tt StaticController} class with the
+default constructor and subsequently read the content of the controller from file by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+inline
+bool read_from_file(StaticController& sc, const std::string& filename) 
+\end{lstlisting}
+To extract the control inputs associated with a state $x\in X_1$ {\tt SCOTS}
+provides the member function
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+template<class state_type, class input_type>
+std::vector<input_type> scots::StaticController::get_control(const state_type &x)
+\end{lstlisting}
+Internally, the mapping $Q$ in Fig.~\ref{f:closedloop}
+is implemented by the member function {\tt
+UniformGrid::xtoi}, which maps $x$ to the ID {\tt abs\_state} of the nearest
+grid point $c\in \R^n$. The cell that is
+associated with that grid point $c$ contains $x$, i.e., $x\in
+c+\segcc{-\eta/2,\eta/2}$. If $x$ is not an element of the winning domain $\cup_{x_2\in
+D^{-1}(U_2)}x_2$, then $F_c(q,Q(x))=\emptyset$ and no progress is possible. This
+is indicated by the error message
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+scots::StaticController: state <x> is out of winning domain: no progress possible.
+\end{lstlisting}
+
+For the aircraft example, we implemented a closed loop simulation in the file
+{./aircraft/simulate.cc}. We read the controller from file and simulate the
+system until the target is reached
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+  /* read controller from file */
+  scots::StaticController con;
+  if(!read_from_file(con,"controller.scs")) {
+    std::cout << "Could not read controller from controller.scs\n";
+    return 0;
+  }
+  /* initial state */
+  state_type x={{81, -1*M_PI/180, 55}};
+  while(1) {
+    std::vector<input_type> u = con.get_control<state_type,input_type>(x);
+    std::cout << x[0] <<  " "  << x[1] << " " << x[2] << "\n";
+    aircraft_post(x,u[0]);
+    if(target(x)) 
+      break;
+  }
+  return 0;
+\end{lstlisting}
 
 
-\subsection{Using the CUDD Library}
+In order to access the {\tt StaticController} from the MATLAB workspace {\tt
+SCOTS} provides the MATLAB class {\tt StaticController}. The data can be loaded
+by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+>> con = StaticController('controller.scs')
+\end{lstlisting}
+The inputs associated with a state $x\in \R^n$ and the center of cells in the
+winning domain $D^{-1}(U_2)$ are accessed by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+>> u = con.control(x);
+>> Y = con.domain;
+\end{lstlisting}
+In order to be able to use those commands, you need to add the directory {\tt
+./mfiles} to your MATLAB path.
+A demonstration of the usage of the {\tt StaticController} from the MATLAB
+workspace can be found in the various m-files in the example directories.
 
-\section{MATLAB Interface}
-
-\section{Customized Synthesis Algorithms}
 
 
-\newpage
+%\section{MATLAB Interface}
+%
+%See the MATLAB commands {\tt StaticController} and {\tt GridPoints} 
+
+%Things to come:
+%\subsection{Using the CUDD Library}
+%
+%\section{Customized Synthesis Algorithms}
+%
+
 
 
 

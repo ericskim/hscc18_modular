@@ -78,12 +78,26 @@ int main() {
   scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.print_info();
+  
+  state_type xx={{8.3,5+M_PI,1/3}};
+
+  abs_type idx = ss.xtoi(xx);
+
+  std::cout << idx << " " << xx[0] << " " << xx[1] << " " << xx[2] << "\n" ;
+
+  ss.itox(idx,xx);
+
+  idx = ss.xtoi(xx);
+
+  std::cout << idx << " " << xx[0] << " " << xx[1] << " " << xx[2] << "\n" ;
+
+  return 0;
 
   /* construct grid for the input space */
   /* lower bounds of the hyper rectangle */
-  input_type i_lb={{-1,-1}};
+  input_type i_lb={{-1,-2}};
   /* upper bounds of the hyper rectangle */
-  input_type i_ub={{ 1, 1}};
+  input_type i_ub={{ 1, 2}};
   /* grid node distance diameter */
   input_type i_eta={{.3,.3}};
   scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);

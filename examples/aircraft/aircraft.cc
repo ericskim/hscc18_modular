@@ -122,24 +122,29 @@ int main() {
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
 
-  tt.tic();
-  write_to_file(tf,"tf.scs");
-  tt.toc();
-
   /* define target set */
+  state_type t_lb = {{63,-3*M_PI/180,0}};
+  state_type t_ub = {{75,0,2.5}};
+  state_type c_lb;
+  state_type c_ub;
   state_type x;
-  auto target = [&](const scots::abs_type idx) {
-    ss.itox(idx,x);
-    /* function returns 1 if cell associated with x is in target set  */
-    if(         63 <= (x[0]-s_eta[0]/2.0) &&  (x[0]+s_eta[0]/2.0) <=  75 &&
-       -3*M_PI/180 <= (x[1]-s_eta[1]/2.0) &&  (x[1]+s_eta[1]/2.0) <=   0 &&
-                 0 <= (x[2]-s_eta[2]/2.0) &&  (x[2]+s_eta[2]/2.0) <= 2.5 &&
-             -0.91 <= ((x[0]+s_eta[0]/2.0) * std::sin(x[1]-s_eta[1]/2.0) )) {
-      return true;
+  auto target = [&](const scots::abs_type abs_state) {
+    /* center of cell associated with abs_state is stored in x */
+    ss.itox(abs_state,x);
+    /* hyper-interval of the quantizer symbol with perturbation */
+    for(int i=0; i<state_dim; i++) {
+      c_lb[i] = x[i]-s_eta[i]/2.0-z[i];
+      c_ub[i] = x[i]+s_eta[i]/2.0+z[i];
+    }
+    if( t_lb[0]<=c_lb[0] && c_ub[0]<=t_ub[0] &&
+        t_lb[1]<=c_lb[1] && c_ub[1]<=t_ub[1] &&
+        t_lb[2]<=c_lb[2] && c_ub[2]<=t_ub[2]) {
+      if(-0.91<=(x[0]*std::sin(x[1])-s_eta[0]/2.0-z[0]-(c_ub[0])*(s_eta[1]/2.0-z[1]))) {
+        return true;
+      }
     }
     return false;
   };
-
  
   std::cout << "\nSynthesis: " << std::endl;
   tt.tic();

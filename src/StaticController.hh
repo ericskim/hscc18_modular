@@ -52,10 +52,10 @@ public:
   /** @brief controller constructor **/
   StaticController(const UniformGrid& state_grid,
 									 const UniformGrid& input_grid,
-                   WinningDomain&& wining_domain) {
+                   WinningDomain&& winning_domain) {
     m_state_grid = state_grid;
     m_input_grid = input_grid;
-		m_winning_domain = std::move(wining_domain);
+		m_winning_domain = std::forward<WinningDomain>(winning_domain);
   }
 
   /** @brief get a std::vector containing the valid control inputs at state x **/

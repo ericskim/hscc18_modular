@@ -41,6 +41,14 @@ namespace scots {
  * - the origin is a grid point (not necessarily contained in the set) 
  * - the distance of the grid points in each dimension i is defined by eta[i] 
  *
+ * Each grid point is associated with an ID of type abs_type (default
+ * abs_type=uint32_t). 
+ * Given that the UnfiormGrid is used to represent a subset of the abstract
+ * state alphabet, then each grid point represents the center of a cell of
+ * readius eta/2. 
+ * The member functions itox and xtoi can be used to map between the ID and the
+ * grid point/center of the cell.
+ *
  * See 
  * - the manual in <a href="./../../manual/manual.pdf">manual</a>
  * - http://arxiv.org/abs/1503.03715 for theoretical background 
@@ -194,15 +202,15 @@ public:
   /** @brief compute the index associated with a grid point **/
   template<class grid_point_t>
   abs_type xtoi(const grid_point_t& x) const {
-    abs_type idx = 0;
-    double d_idx;
+    abs_type id = 0;
+    double d_id;
     double eta_h;
 
     for(int k=0; k<m_dim; k++) {
-      d_idx = x[k]-m_first[k];
+      d_id = x[k]-m_first[k];
       eta_h = m_eta[k]/2.0;
 
-      if ( d_idx <= -eta_h || d_idx >= m_no_grid_points[k]*m_eta[k]+eta_h ) {
+      if ( d_id <= -eta_h || d_id >= m_no_grid_points[k]*m_eta[k]+eta_h ) {
         std::ostringstream os;
         os << "\nscots::UniformGrid: state ";
         for(int i=0; i<m_dim; i++) {
@@ -211,36 +219,36 @@ public:
         os << "is outside uniform grid.";
         throw std::runtime_error(os.str().c_str());
       }
-      idx += static_cast<abs_type>((d_idx+eta_h )/m_eta[k])*m_NN[k];
+      id += static_cast<abs_type>((d_id+eta_h )/m_eta[k])*m_NN[k];
     }
-    return idx;
+    return id;
   }
 
   /** @brief compute the grid point associated with a index **/
   template<class grid_point_t>
-  void itox(abs_type idx, grid_point_t& x) const {
-    /* map index idx to grid point */
+  void itox(abs_type id, grid_point_t& x) const {
+    /* map index id to grid point */
     abs_type num;
     for(abs_type k = m_dim-1; k > 0; k--) {
-      num=idx/m_NN[k];
-      idx=idx%m_NN[k];
+      num=id/m_NN[k];
+      id=id%m_NN[k];
       x[k]=m_first[k]+num*m_eta[k];
     }
-    num=idx;
+    num=id;
     x[0]=m_first[0]+num*m_eta[0];
   }
 
   /** @brief compute the grid point associated with a index **/
-  void itox(abs_type idx, std::vector<double>& x) const {
+  void itox(abs_type id, std::vector<double>& x) const {
     x.resize(m_dim);
-    /* map index idx to grid point */
+    /* map index id to grid point */
     abs_type num;
     for(abs_type k = m_dim-1; k > 0; k--) {
-      num=idx/m_NN[k];
-      idx=idx%m_NN[k];
+      num=id/m_NN[k];
+      id=id%m_NN[k];
       x[k]=m_first[k]+num*m_eta[k];
     }
-    num=idx;
+    num=id;
     x[0]=m_first[0]+num*m_eta[0];
   }
 
