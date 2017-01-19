@@ -430,7 +430,7 @@ public:
     for(abs_type v=0; v<k.size(); v++) {
       post.push_back(m_state_alphabet.itox<state_type>(k[v]));
     }
-    return std::move(post);
+    return post;
   }
 
   /** @brief print the center of cells that are used to over-approximated the
