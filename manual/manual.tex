@@ -76,29 +76,21 @@ backend=biber]{biblatex}
 \definecolor{types}{named}{MidnightBlue}
 \definecolor{keywords}{named}{ForestGreen}
 \definecolor{strings}{named}{RoyalPurple}
-%\definecolor{numbers}{HTML}{702C51}
-%\lstset{emph=[1]{%  
-%  compute,
-%  xtoi,
-%  itox,
-%  },emphstyle=[1]{\color{methods}}%
-%}%
-\lstset{emph=[1]{%
-      uint32_t,abs_type,input_type,state_type,%
-    },emphstyle=[1]{\color{types}}%
+%
+\lstset{emph=[1]{uint32_t,abs_type,input_type,state_type},%
+        emphstyle=[1]{\color{types}}%
 }%
-\lstset{emph=[2]{%
-      UniformGrid,
-      StaticController,
-      AbstractionGB,
-      WinningDomain,
-      TransitionFunction%
-      %
-    },emphstyle=[2]{\color{classes}}%
+\lstset{emph=[2]{UniformGrid, 
+                 AbstractionGB, 
+                 WinningDomain, 
+                 TransitionFunction, 
+                 StaticController},
+        emphstyle=[2]{\color{classes}}%
 }%
+\lstset{literate={scots::}{{{\color{classes}scots::}}}7}
 % set the default code style
 \lstset{
-    columns=flexible,
+    columns=fullflexible,
     basicstyle=\ttfamily,
     frame=tb, % draw a frame at the top and bottom of the code block
     tabsize=2, % tab space width
@@ -108,9 +100,6 @@ backend=biber]{biblatex}
     keywordstyle=\color{keywords}, % keyword color
     stringstyle=\color{strings}, % string color
     language=C++,
-}
-\lstset{literate=%
-    {scots::}{{{\color{classes}scots::}}}7
 }
 
 % tabular column width
@@ -132,7 +121,6 @@ backend=biber]{biblatex}
 \section{ToDo}
 
 \begin{enumerate}
-  \item Explain MATLAB interface
   \item Implement and explain support for BDD representation
   \item Demonstrate customized synthesis algorithms
 \end{enumerate}
@@ -1232,8 +1220,7 @@ the interval arithmetic based ODE solver implemented in
 The implementation of the computation of the a priori enclosure can be found in
 the example directory 
 {\tt ./examples/aircraft/helper/a\_priori\_enclosure}.
-To obtain the matrix $L(u)$, we maximize the partial derivatives of $f(\cdot,u)$ over the set $K'$
-. The solution of the linear IVP
+To obtain the matrix $L(u)$, we maximize the partial derivatives of $f(\cdot,u)$ over the set $K'$. The solution of the linear IVP
 $\dot r(t) = L(u) r(t)+ w$, $r(0)=r_0$, at time $\tau$
 provides the growth bound \eqref{e:GrowthBoundComputation} that we access
 through the lambda
@@ -1357,7 +1344,7 @@ bool write_to_file(const UniformGrid& g, F& ap, const std::string& filename)
 The grid points associated with the stored IDs are accessible from the MATLAB
 workspace using the command
 \begin{lstlisting}[basicstyle=\small\ttfamily]
->> GridPoints('filename')
+>> p = GridPoints('filename');
 \end{lstlisting}
 In order to use this MATLAB command, the mex-file {\tt GridPoints.mex} needs to
 be compiled. Please see the installation notes for details.
@@ -1419,14 +1406,25 @@ storing the controller to the file {\tt controller.scs} is given by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
 write_to_file(StaticController(ss,is,std::move(win)),"controller.scs");
 \end{lstlisting}
+For various reasons it might be helpful to visualize the target set. To this
+end, we write the IDs of the grid points in the target set together with the
+uniform grid information to a file
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+write_to_file(ss,target,"target.scs");
+\end{lstlisting}
+Subsequently, we access and plot the grid points in the MATLAB workspace by
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+>> p = GridPoints('target.scs');
+>> plot3(p(:,1),p(:,2),p(:,3),'.');
+\end{lstlisting}
 
 \section{Controller Implementation}
 \label{s:usage:simulation}
 Let $C$ be the static controller defined in~\eqref{e:theory:controller} that
 solves $(S_2,\Sigma_2)$. For the implementation of the refined controller $C\circ Q$
 illustrated in Fig.~\ref{f:closedloop} (or Fig.~\ref{f:closedloop:pert}),  {\tt
-SCOTS} provides the class {\tt StaticController}. The class can be instantiated with two {\tt UniformGrids} and a {\tt
-WinningDomain} according to
+SCOTS} provides the class {\tt StaticController}. The class can be instantiated with two {\tt UniformGrid}s and a {\tt
+WinningDomain} according to the constructor
 \begin{lstlisting}[basicstyle=\small\ttfamily]
 scots::StaticController(const UniformGrid& state_grid,
                            const UniformGrid& input_grid,
@@ -1435,8 +1433,7 @@ scots::StaticController(const UniformGrid& state_grid,
 Alternatively, it is possible to instantiate the {\tt StaticController} class with the
 default constructor and subsequently read the content of the controller from file by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
-inline
-bool read_from_file(StaticController& sc, const std::string& filename) 
+inline bool read_from_file(StaticController& sc, const std::string& filename) 
 \end{lstlisting}
 To extract the control inputs associated with a state $x\in X_1$ {\tt SCOTS}
 provides the member function

@@ -145,6 +145,8 @@ int main() {
     }
     return false;
   };
+  /* write grid point IDs with uniform grid information to file */
+  write_to_file(ss,target,"target.scs");
  
   std::cout << "\nSynthesis: " << std::endl;
   tt.tic();

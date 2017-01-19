@@ -4,22 +4,21 @@ An aircraft landing maneuver taken from https://arxiv.org/abs/1503.03715
 0. for a successful execution of the this example you should have 32GB memory
    available
 
-1. compile the aircraft.cc file 
-   you should be able to compile the program simply by
+1. edit the Makefile 
+   adjust the compiler to your programming environment
 
-  $ make
+1. compile the aircraft.cc file 
+   you should be able to compile the program simply by running 
+   $ make
+   in a terminal
 
 2. execute 
-
   $./aircraft
-
   which produces
-
   ./controller.scs
 
 3. simulate the closed loop by running
-
-  $./simulate
+   $./simulate
 
 5. information on the example are found in
 

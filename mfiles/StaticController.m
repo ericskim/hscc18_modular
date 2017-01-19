@@ -41,7 +41,7 @@ classdef StaticController < handle
       % return control input associated with grid point x  
       u=mexStaticController('control',obj.handle,x(:));
       if(isempty(u))
-        error(['StaticController: state ',...
+        error(['scots::StaticController: state ',...
                 mat2str(x(:)), ' is out of winning domain: no progress possible.'])
       end
     end

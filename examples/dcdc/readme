@@ -2,30 +2,25 @@
 Controller synthesis for a DC DC boost converter to enforce a safety
 specification
 
-1. edit the makefile 
-
-  Adjust the compiler to your programming environment
+1. edit the Makefile 
+   adjust the compiler to your programming environment
 
 2. compile the dcdc.cc and simualte.cc file by typing in the command line
-
-  $ make
+   $ make
 
 3. execute 
 
   $./dcdc     
-  Computes the symbolic model and synthesizes the controller. The result is
-  stored in controller.scs.
+  computes the symbolic model and synthesizes the controller; the result is
+  stored in controller.scs
 
   $./simulate
-  Reads the controller from file and performs the closed loop simulation.
+  reads the controller from file and performs the closed loop simulation.
 
 4. simulate the closed loop in MATLAB 
-
   a) you need to compile the mexfile first (see the readme in $(SCOTSROOT)/mfiles/mexfiles )
-
   b) in Matlab add the path and run the simulation 
-
-   >> addpath(genpath('../../../mfiles'))
+   >> addpath(genpath('../../mfiles'))
    >> dcdc
 
 5. information on the example is found in

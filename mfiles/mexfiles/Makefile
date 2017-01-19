@@ -6,7 +6,6 @@ MATLABROOT	= /Applications/MATLAB_R2016b.app/
 #
 # compiler
 #
-#CC        = g++
 CC       	  = $(MATLABROOT)/bin/mex
 CXXFLAGS 		= -g -Wall -Wextra -std=c++11 -O3 
 

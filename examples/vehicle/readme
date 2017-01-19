@@ -1,12 +1,16 @@
 
 A path planning problem for a vehicle using the bycicle model
 
-1. compile the vehicle.cc file 
-   you should be able to compile the program simply by
+1. edit the Makefile 
+   adjust the compiler to your programming environment
 
-  $ make
 
-2. execute 
+2. compile the vehicle.cc file 
+   you should be able to compile the program simply by running 
+   $ make
+   in a terminal
+
+3. execute 
 
   $./vehicle
 
@@ -15,17 +19,14 @@ A path planning problem for a vehicle using the bycicle model
   ./controller.scs
   ./obstacles.scs
 
-3. simulate the closed loop by running
+4. simulate the closed loop by running
 
   $./simulate
 
-4. simulate the closed loop in MATLAB 
-
+5. simulate the closed loop in MATLAB 
   a) you need to compile the mexfile first (see the readme in $(SCOTSROOT)/mfiles/mexfiles )
-
   b) in Matlab add the path and run the simulation 
-
-   >> addpath(genpath('../../../mfiles'))
+   >> addpath(genpath('../../mfiles'))
    >> vehicle
 
 5. information on the example are found in

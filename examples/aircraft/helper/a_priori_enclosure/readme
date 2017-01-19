@@ -1,14 +1,13 @@
 
 
-Helper programs to compute an apriori enclosure of the aircraft ode. The
+Helper programs to compute an apriori enclosure of the aircraft ODE. The
 computation uses the interval arithmetic based solution of ODEs implemented in
 the C++ package vnodelp available at 
 
 http://www.cas.mcmaster.ca/~nedialk/vnodelp/
 
 
-The program comp_enclosure.cc computes an a priori enclosure valid for all
-inputs within the given input space bounds
+The program comp_enclosure.cc computes an a priori enclosure.
 
 How to use:
 
@@ -22,7 +21,7 @@ How to use:
 
   Alternatively, vnodelp can also be installed with Filib++.
 
-2. edit the Makefile and adjust header and library paths
+2. edit the Makefile and adjust it to your programming environemnt, adjust header and library paths
 
   the current makefile is supposed to be used with vnodelp in combination with
   BIAS/Profil
@@ -33,15 +32,16 @@ How to use:
   Note: the MAXORDER number must coincide with the MAXORDER number used in the
   compilation of the vnodelp package
 
-3. the a priori enclosure depends on the following parameters which you should 
-   adjust to your needs
+3. the a priori enclosure depends on the following parameters which you can 
+   adapt to your needs
 
    - the sampling time
    - the state space bounds
    - the input space bounds
    - disturbances
+   - measurment error bound
 
-4. compile comp_enclosure.cc and comp_enclosure_per_input.cc via make
+4. compile comp_enclosure.cc via make
 
    Successfully tested on macOS Sierra 10.12.1 with 
    - Apple LLVM version 8.0.0 (clang-800.0.42.1), Target: x86_64-apple-darwin16.1.0

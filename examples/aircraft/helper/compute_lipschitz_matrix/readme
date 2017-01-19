@@ -6,7 +6,8 @@ the C++ package vnodelp available at
 http://www.cas.mcmaster.ca/~nedialk/vnodelp/
 
 The program comp_lipschitz_matrix.cc computes a bound on the partial derivatives
-of the rhs of the differential equation, see (13) in the manual.
+of the rhs of the differential equation, see \eqref{e:theory:lipschitz} in the
+manual.
 
 How to use:
 
@@ -20,8 +21,7 @@ How to use:
 
   Alternatively, vnodelp can also be installed with Filib++.
 
-
-2. edit the Makefile and adjust header and library paths
+2. edit the Makefile and adjust it to your programming environemnt, adjust header and library paths
 
   the current makefile is supposed to be used with vnodelp in combination with
   BIAS/Profil
@@ -35,8 +35,11 @@ How to use:
 3. the lipschitz matrix depends on the following parameters which you should 
    adjust to your needs
 
+   - the sampling time
    - the state space bounds
    - the input space bounds
+   - disturbances
+   - measurment error bound
 
 4. compile comp_lipschitz_matrix.cc via make
 

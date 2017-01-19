@@ -7,26 +7,24 @@ uses and ode solver from the boost library with an adaptive step size
 
 1. install the boost library  www.boost.org
 
-2. compile the aircraft.cc and simulate.cc file   
-   
+2. edit the Makefile 
+   adjust the compiler to your programming environment
+
+3. compile the aircraft.cc and simulate.cc file   
    edit the Makefile and adjust the boot library path
-
-   compile the programs with
+   compile the programs by running
    $ make
+   in a terminal
 
-3. execute 
-
+4. execute 
   $./aircraft
-
   which produces
-
   ./controller.scs
 
-4. simulate the closed loop by running
-
+5. simulate the closed loop by running
   $./simulate
 
-5. information on the example are found in
+6. information on the example are found in
 
 - Reissig, G., Weber, A., & Rungger, M. (2015). Feedback Refinement Relations
   for the Synthesis of Symbolic Controllers. arXiv preprint arXiv:1503.03715.
