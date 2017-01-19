@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['reachabilitygame',['ReachabilityGame',['../classscots_1_1_reachability_game.html',1,'scots']]]
+  ['staticcontroller',['StaticController',['../classscots_1_1_static_controller.html',1,'scots']]]
 ];

@@ -113,15 +113,15 @@ template&lt;class grid_point_t &gt; </td></tr>
 <tr class="memitem:afc7bace3d47c1407b3b539d211554195"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html#afc7bace3d47c1407b3b539d211554195">xtoi</a> (const grid_point_t &amp;x) const </td></tr>
 <tr class="memdesc:afc7bace3d47c1407b3b539d211554195"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the index associated with a grid point <br /></td></tr>
 <tr class="separator:afc7bace3d47c1407b3b539d211554195"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a155bc692ae1d7e52ba6187fdf7851670"><td class="memTemplParams" colspan="2"><a class="anchor" id="a155bc692ae1d7e52ba6187fdf7851670"></a>
+<tr class="memitem:a860edfce745852f43ccd2fb0643f3e69"><td class="memTemplParams" colspan="2"><a class="anchor" id="a860edfce745852f43ccd2fb0643f3e69"></a>
 template&lt;class grid_point_t &gt; </td></tr>
-<tr class="memitem:a155bc692ae1d7e52ba6187fdf7851670"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html#a155bc692ae1d7e52ba6187fdf7851670">itox</a> (<a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> idx, grid_point_t &amp;x) const </td></tr>
-<tr class="memdesc:a155bc692ae1d7e52ba6187fdf7851670"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the grid point associated with a index <br /></td></tr>
-<tr class="separator:a155bc692ae1d7e52ba6187fdf7851670"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae03de44441c8ada3e75d9f951661a8d6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae03de44441c8ada3e75d9f951661a8d6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html#ae03de44441c8ada3e75d9f951661a8d6">itox</a> (<a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> idx, std::vector&lt; double &gt; &amp;x) const </td></tr>
-<tr class="memdesc:ae03de44441c8ada3e75d9f951661a8d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the grid point associated with a index <br /></td></tr>
-<tr class="separator:ae03de44441c8ada3e75d9f951661a8d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a860edfce745852f43ccd2fb0643f3e69"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69">itox</a> (<a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> id, grid_point_t &amp;x) const </td></tr>
+<tr class="memdesc:a860edfce745852f43ccd2fb0643f3e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the grid point associated with a index <br /></td></tr>
+<tr class="separator:a860edfce745852f43ccd2fb0643f3e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe53c83f0a6f9add9e8722b4081c5b5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe53c83f0a6f9add9e8722b4081c5b5e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html#afe53c83f0a6f9add9e8722b4081c5b5e">itox</a> (<a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> id, std::vector&lt; double &gt; &amp;x) const </td></tr>
+<tr class="memdesc:afe53c83f0a6f9add9e8722b4081c5b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the grid point associated with a index <br /></td></tr>
+<tr class="separator:afe53c83f0a6f9add9e8722b4081c5b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a628bac6bfb2160ee96970e894fc53a4b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a628bac6bfb2160ee96970e894fc53a4b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html#a628bac6bfb2160ee96970e894fc53a4b">print_info</a> (void) const </td></tr>
 <tr class="memdesc:a628bac6bfb2160ee96970e894fc53a4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">creates console output with grid information <br /></td></tr>
@@ -160,6 +160,7 @@ std::vector&lt; <a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e50
 <li>the origin is a grid point (not necessarily contained in the set)</li>
 <li>the distance of the grid points in each dimension i is defined by eta[i]</li>
 </ul>
+<p>Each grid point is associated with an ID of type abs_type (default abs_type=uint32_t). Given that the UnfiormGrid is used to represent a subset of the abstract state alphabet, then each grid point represents the center of a cell of readius eta/2. The member functions itox and xtoi can be used to map between the ID and the grid point/center of the cell.</p>
 <p>See</p><ul>
 <li>the manual in <a href="./../../manual/manual.pdf">manual</a></li>
 <li><a href="http://arxiv.org/abs/1503.03715">http://arxiv.org/abs/1503.03715</a> for theoretical background </li>
