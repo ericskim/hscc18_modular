@@ -19,5 +19,11 @@
 #include "InputOutput.hh"
 
 
+/* if scots is used in connection with the cudd library */
+#ifdef  SCOTS_BDD
+#include "IndexSet.hh"
+#include "SymbolicModelGB.hh"
+#endif
+
 #endif /* SCOTS_HH_ */
 

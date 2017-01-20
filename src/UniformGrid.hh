@@ -11,14 +11,10 @@
 #ifndef UNIFORMGRID_HH_
 #define UNIFORMGRID_HH_
 
-#include <vector>
-#include <array>
-#include <cmath>
-#include <sstream>
-#include <string>
-#include <exception>
 #include <iostream>
-#include <fstream>
+#include <vector>
+#include <cmath>
+#include <exception>
 #include <algorithm>
 #include <climits>
 
@@ -229,7 +225,7 @@ public:
   void itox(abs_type id, grid_point_t& x) const {
     /* map index id to grid point */
     abs_type num;
-    for(abs_type k = m_dim-1; k > 0; k--) {
+    for(int k = m_dim-1; k > 0; k--) {
       num=id/m_NN[k];
       id=id%m_NN[k];
       x[k]=m_first[k]+num*m_eta[k];
@@ -243,7 +239,7 @@ public:
     x.resize(m_dim);
     /* map index id to grid point */
     abs_type num;
-    for(abs_type k = m_dim-1; k > 0; k--) {
+    for(int k = m_dim-1; k > 0; k--) {
       num=id/m_NN[k];
       id=id%m_NN[k];
       x[k]=m_first[k]+num*m_eta[k];

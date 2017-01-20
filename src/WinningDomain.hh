@@ -78,7 +78,8 @@ public:
   /* @endcond */
 
   /** @brief construct WinningDomain with number of states and number of abstract inputs **/
-  WinningDomain(const abs_type no_states, const abs_type no_inputs) :
+  WinningDomain(const abs_type no_states,
+                const abs_type no_inputs) :
                 m_no_states(no_states), m_no_inputs(no_inputs) {}
 
   /** @brief construct WinningDomain with array of winning states **/

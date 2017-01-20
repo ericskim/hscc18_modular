@@ -81,9 +81,9 @@ int main() {
   
   /* construct grid for the input space */
   /* lower bounds of the hyper rectangle */
-  input_type i_lb={{-1,-2}};
+  input_type i_lb={{-1,-1}};
   /* upper bounds of the hyper rectangle */
-  input_type i_ub={{ 1, 2}};
+  input_type i_ub={{ 1, 1}};
   /* grid node distance diameter */
   input_type i_eta={{.3,.3}};
   scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
@@ -109,7 +109,7 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  auto avoid = [&H,&ss,&s_eta](const size_t idx) {
+  auto avoid = [&H,ss,s_eta](const size_t idx) {
     state_type x;
     ss.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
