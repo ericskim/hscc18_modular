@@ -123,7 +123,7 @@ int main() {
   BDD tf = sym_model.compute(aircraft_post, radius_post);
   tt.toc();
 
-  unsigned int no_var = pre_bdd.m_no_bdd_var+in_bdd.m_no_bdd_var+post_bdd.m_no_bdd_var;
+  unsigned int no_var = pre_bdd.get_no_bdd_var()+in_bdd.get_no_bdd_var()+post_bdd.get_no_bdd_var();
   size_t T = tf.CountMinterm(no_var);
   std::cout << "No of Transitions " << T  << "\n";
 

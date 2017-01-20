@@ -218,10 +218,9 @@ public:
     return m_manager.bddOne();
   }
 
+  DdManager* get_manager() const {
     return m_manager.getManager();
   }
-
-
 
   unsigned int get_no_bdd_var(void) const {
     return m_no_bdd_var;
