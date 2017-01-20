@@ -88,7 +88,7 @@ int main() {
 
   /* setup the workspace of the synthesis problem and the uniform grid */
    /* grid node distance diameter */
-  state_type eta={{2.0/4e3,2.0/4e3}};
+  state_type eta={{2.0/4e3/4.0,2.0/4e3/4.0}};
  /* lower bounds of the hyper-rectangle */
   state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
   /* upper bounds of the hyper-rectangle */
@@ -107,7 +107,7 @@ int main() {
   /* transition function of symbolic model */
   scots::TransitionFunction tf;
   scots::AbstractionGB<state_type,input_type> abs(ss,is);
-  abs.verbose_off();
+  //abs.verbose_off();
 
   tt.tic();
   abs.compute(tf,system_post, radius_post);
@@ -116,6 +116,8 @@ int main() {
 
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << "\n";
+
+  write_to_file(tf,"dcdc.scs");
 
   /* continue with synthesis */
   /* define function to check if the cell is in the safe set  */

@@ -21,6 +21,7 @@
 
 /* if scots is used in connection with the cudd library */
 #ifdef  SCOTS_BDD
+#include "dddmp.h"
 #include "IndexSet.hh"
 #include "SymbolicModelGB.hh"
 #endif

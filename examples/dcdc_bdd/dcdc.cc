@@ -87,10 +87,15 @@ int main() {
   TicToc tt;
   /* BDD manager */
   Cudd manager;
+
+
+  manager.AutodynEnable();
+  //manager.AutodynEnable(CUDD_REORDER_RANDOM);
+  //manager.AutodynDisable();
   
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
-  state_type eta={{2.0/4e3,2.0/4e3}};
+  state_type eta={{2.0/4e3/4.0,2.0/4e3/4.0}};
   /* lower bounds of the hyper-rectangle */
   state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
   /* upper bounds of the hyper-rectangle */
@@ -106,18 +111,17 @@ int main() {
 
   
   std::cout << "Creating BDD representation of abstract state and input alphabet:\n";
-  tt.tic();
   /* BDD variables to represent the grid point IDs of the state alphabet and input alphabet */
   scots::IndexSet pre_bdd(manager,ss.get_no_gp_per_dim());
   scots::IndexSet in_bdd(manager,is.get_no_gp_per_dim());
   scots::IndexSet post_bdd(manager,ss.get_no_gp_per_dim());
-  tt.toc();
 
   /* compute transition function of symbolic model */
   std::cout << "Computing the transition function:\n";
   /* SymbolicModelGB class to compute the BDD encoding the transition function */ 
   scots::SymbolicModelGB<state_type,input_type> sym_model(ss,is,pre_bdd,in_bdd,post_bdd);
 
+  tt.tic();
   BDD tf = sym_model.compute(system_post, radius_post);
   tt.toc();
 
@@ -129,6 +133,47 @@ int main() {
     std::cout << "Memory in MB: " << (((unsigned)usage.ru_maxrss)>>20u)<< "\n";
     std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)T<< "\n";
   }
+
+  std::cout << "Writing to file: " << "\n";
+  tt.tic();
+  FILE *file = fopen ("dcdc4_enab.bdd","w");
+  Dddmp_cuddBddStore(
+    manager.getManager(),
+    NULL,
+    tf.getNode(),
+    //(char**)varnameschar, // char ** varnames, IN: array of variable names (or NULL)
+    NULL, // char ** varnames, IN: array of variable names (or NULL)
+    NULL,
+    DDDMP_MODE_TEXT,
+    //DDDMP_MODE_BINARY,
+    // DDDMP_VARNAMES,
+    DDDMP_VARIDS,
+    NULL,
+    file
+  );
+  fclose(file);
+
+  std::cout << "Writing compressed to file: " << "\n";
+  tt.tic();
+  FILE *nfile = fopen ("dcdc_comp4_enab.bdd","w");
+  Dddmp_cuddBddStore(
+    manager.getManager(),
+    NULL,
+    tf.getNode(),
+    //(char**)varnameschar, // char ** varnames, IN: array of variable names (or NULL)
+    NULL, // char ** varnames, IN: array of variable names (or NULL)
+    NULL,
+    //DDDMP_MODE_TEXT,
+    DDDMP_MODE_BINARY,
+    // DDDMP_VARNAMES,
+    DDDMP_VARIDS,
+    NULL,
+    nfile
+  );
+  fclose(nfile);
+  tt.toc();
+
+  fclose(file);
 
   return 1;
 }
