@@ -90,7 +90,7 @@ int main() {
   
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
-  state_type eta={{2.0/4e3/2.0,2.0/4e3}};
+  state_type eta={{2.0/4e3,2.0/4e3}};
   /* lower bounds of the hyper-rectangle */
   state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
   /* upper bounds of the hyper-rectangle */
@@ -121,7 +121,7 @@ int main() {
   BDD tf = sym_model.compute(system_post, radius_post);
   tt.toc();
 
-  unsigned int no_var = pre_bdd.m_no_bdd_var+in_bdd.m_no_bdd_var+post_bdd.m_no_bdd_var;
+  unsigned int no_var = pre_bdd.get_no_bdd_var()+in_bdd.get_no_bdd_var()+post_bdd.get_no_bdd_var();
   size_t T = tf.CountMinterm(no_var);
   std::cout << "No of Transitions " << T  << "\n";
 

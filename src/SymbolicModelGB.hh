@@ -74,6 +74,13 @@ public:
                 m_pre(bdd_pre),
                 m_input(bdd_input),
                 m_post(bdd_post) {
+
+    /* TODO check manager  */
+    if((m_pre.get_manager()!=m_input.get_manager()) ||
+       (m_input.get_manager()!=m_post.get_manager())) {
+      /* error std exception ... */
+    }
+
     m_z = new double[state_alphabet.get_dim()];
     for(int i=0; i<state_alphabet.get_dim(); i++) {
       m_z[i]=0;
@@ -116,8 +123,6 @@ public:
     /* variables for managing the post */
     std::vector<abs_type> lb(dim);  /* lower-left corner */
     std::vector<abs_type> ub(dim);  /* upper-right corner */
-    std::vector<abs_type> no(dim);  /* number of cells per dim */
-    std::vector<abs_type> cc(dim);  /* coordinate of current cell in the post */
     /* radius of hyper interval containing the attainable set */
     state_type eta;
     state_type r;
@@ -133,20 +138,20 @@ public:
       lower_left[i]=m_state_alphabet.get_lower_left()[i];
       upper_right[i]=m_state_alphabet.get_upper_right()[i];
     }
-
-    const Cudd* mgr=&m_pre.m_manager; 
-
-    BDD tf = mgr->bddZero();
+    
+    BDD tf = m_pre.get_zero();
     /* is post of (i,j) out of domain ? */
     bool out_of_domain;
     /* loop over all cells */
     for(abs_type i=0; i<N; i++) {
+      BDD i_bdd = m_pre.id_to_bdd(i);
       /* loop over all inputs */
       for(abs_type j=0; j<M; j++) {
         /* is i an element of the overflow symbols ? */
         if(!j & overflow(i)) {
           break;
         }
+        BDD j_bdd = m_input.id_to_bdd(j);
         /* get center x of cell */
         m_state_alphabet.itox(i,x);
         /* cell radius (including measurement errors) */
@@ -161,9 +166,7 @@ public:
         /* determine the cells which intersect with the attainable set: 
          * discrete hyper interval of cell indices 
          * [lb[0]; ub[0]] x .... x [lb[dim-1]; ub[dim-1]]
-         * covers attainable set 
-         */
-        abs_type npost=1;
+         * covers attainable set */
         for(int k=0; k<dim; k++) {
           /* check for out of bounds */
           double left = x[k]-r[k]-m_z[k];
@@ -176,40 +179,20 @@ public:
           lb[k] = static_cast<abs_type>((left-lower_left[k]+eta[k]/2.0)/eta[k]);
           /* integer coordinate of upper right corner of post */
           ub[k] = static_cast<abs_type>((right-lower_left[k]+eta[k]/2.0)/eta[k]);
-          /* number of grid points in each dimension in the post */
-          no[k]=(ub[k]-lb[k]+1);
-          /* totoal no of post of (i,j) */
-          npost*=no[k];
-          cc[k]=0;
         }
         if(out_of_domain) {
           out_of_domain=false;
           continue;
         }
-        /* get bdd for i and j */
-        BDD pre_input = m_pre.m_id_to_bdd[i] & m_input.m_id_to_bdd[j];
-        /* compute indices of post */
-        BDD post = mgr->bddZero();
-        for(abs_type k=0; k<npost; k++) {
-          abs_type q=0;
-          for(int l=0; l<dim; l++) 
-            q+=(lb[l]+cc[l])*NN[l];
-          cc[0]++;
-          for(int l=0; l<dim-1; l++) {
-            if(cc[l]==no[l]) {
-              cc[l]=0;
-              cc[l+1]++;
-            }
-          }
-          /* (i,j,q) is a transition */    
-          post = post | m_post.m_id_to_bdd[q];
-        }
-        tf = tf | (pre_input & post);
+        /* compute BDD of post */
+        BDD k_bdd = m_post.interval_to_bdd(lb,ub);
+        /* add to transition function */
+        tf = tf | (i_bdd & j_bdd & k_bdd);
       }
       /* print progress */
       if(m_verbose && ((double)i/(double)N*100)>counter){
         if(counter==0)
-          std::cout << "1st loop: ";
+          std::cout << "loop: ";
         if((counter%10)==0)
           std::cout << counter;
         else if((counter%2)==0) {
