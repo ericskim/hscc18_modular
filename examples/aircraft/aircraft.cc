@@ -58,18 +58,18 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
-  /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
-  double L[3][2];
-  L[0][0]=-0.00191867*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
-  L[0][1]=9.81;
-  L[1][0]=0.002933+0.004802*u[1];
-  L[1][1]=0.003623;
-  L[2][0]=0.07483;
-  L[2][1]=83.22;
-  /* to account for input disturbances */
-  state_type w={{.108,0.002,0}};
   /* the ode for the growth bound */
-  auto rhs =[&] (state_type& rr,  const state_type &r, const input_type &) {
+  auto rhs =[] (state_type& rr,  const state_type &r, const input_type &u) {
+    /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
+    double L[3][2];
+    L[0][0]=-0.00191867*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
+    L[0][1]=9.81;
+    L[1][0]=0.002933+0.004802*u[1];
+    L[1][1]=0.003623;
+    L[2][0]=0.07483;
+    L[2][1]=83.22;
+    /* to account for input disturbances */
+    state_type w={{.108,0.002,0}};
     rr[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; /* L[0][2]=0 */
     rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
@@ -123,13 +123,13 @@ int main() {
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
 
   /* define target set */
-  state_type t_lb = {{63,-3*M_PI/180,0}};
-  state_type t_ub = {{75,0,2.5}};
-  state_type c_lb;
-  state_type c_ub;
-  state_type x;
-  auto target = [&](const scots::abs_type abs_state) {
+  auto target = [&s_eta, &z, &ss](const scots::abs_type abs_state) {
+    state_type t_lb = {{63,-3*M_PI/180,0}};
+    state_type t_ub = {{75,0,2.5}};
+    state_type c_lb;
+    state_type c_ub;
     /* center of cell associated with abs_state is stored in x */
+    state_type x;
     ss.itox(abs_state,x);
     /* hyper-interval of the quantizer symbol with perturbation */
     for(int i=0; i<state_dim; i++) {

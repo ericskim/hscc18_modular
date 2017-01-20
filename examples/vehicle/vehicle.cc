@@ -79,20 +79,6 @@ int main() {
   std::cout << "Unfiorm grid details:" << std::endl;
   ss.print_info();
   
-  state_type xx={{8.3,5+M_PI,1/3}};
-
-  abs_type idx = ss.xtoi(xx);
-
-  std::cout << idx << " " << xx[0] << " " << xx[1] << " " << xx[2] << "\n" ;
-
-  ss.itox(idx,xx);
-
-  idx = ss.xtoi(xx);
-
-  std::cout << idx << " " << xx[0] << " " << xx[1] << " " << xx[2] << "\n" ;
-
-  return 0;
-
   /* construct grid for the input space */
   /* lower bounds of the hyper rectangle */
   input_type i_lb={{-1,-2}};
@@ -123,8 +109,8 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  state_type x;
-  auto avoid = [&](const size_t idx) {
+  auto avoid = [&H,&ss,&s_eta](const size_t idx) {
+    state_type x;
     ss.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
     double c2= s_eta[1]/2.0+1e-10;
@@ -153,7 +139,8 @@ int main() {
 
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
   /* define target set */
-  auto target = [&](const abs_type idx) {
+  auto target = [&ss,&s_eta](const abs_type idx) {
+    state_type x;
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
     if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 

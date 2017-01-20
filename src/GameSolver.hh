@@ -44,7 +44,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
 }
 
 template<class F1, class F2>
-WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F1& target, F2& avoid) { 
+WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F1& target, F2&& avoid) { 
   val_functionction_type value;
   return solve_reachability_game<F1,F2>(trans_function, target, std::forward<F2>(avoid), value);
 }

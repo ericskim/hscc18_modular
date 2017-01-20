@@ -50,9 +50,9 @@ using stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state_type>;
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 auto aircraft_post = [] (state_type &x, const input_type &u) {
   /* the ode describing the aircraft */
-  auto rhs = [&](const state_type& x,  state_type &dxdt, const double) {
-    double mg = 60000.0*9.81;
-    double mi = 1.0/60000;
+  auto rhs = [&u](const state_type& x,  state_type &dxdt, const double) {
+    const double mg = 60000.0*9.81;
+    const double mi = 1.0/60000;
     double c=(1.25+4.2*u[1]);
     dxdt[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
     dxdt[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
@@ -64,7 +64,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
 auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
   /* the ode for the growth bound */
-  auto rhs = [&](const state_type& r,  state_type &drdt, const double) {
+  auto rhs = [&u](const state_type& r,  state_type &drdt, const double) {
     /* lipschitz matrix computed with mupad/mathematica check the ./helper directory */
     double L[3][2];
     L[0][0]=-0.00191867*(2.7+3.08*(1.25+4.2*u[1])*(1.25+4.2*u[1]));
@@ -128,12 +128,12 @@ int main() {
 
 
   /* define target set */
-  state_type t_lb = {{63,-3*M_PI/180,0}};
-  state_type t_ub = {{75,0,2.5}};
-  state_type c_lb;
-  state_type c_ub;
-  state_type x;
-  auto target = [&](const scots::abs_type abs_state) {
+  auto target = [&ss, &s_eta, &z](const scots::abs_type abs_state) {
+    state_type t_lb = {{63,-3*M_PI/180,0}};
+    state_type t_ub = {{75,0,2.5}};
+    state_type c_lb;
+    state_type c_ub;
+    state_type x;
     /* center of cell associated with abs_state is stored in x */
     ss.itox(abs_state,x);
     /* hyper-interval of the quantizer symbol with perturbation */

@@ -51,7 +51,7 @@ auto  vehicle_post = [](state_type &x, const input_type &u) {
 int main() {
 
   /* define function to check if we are in target */
-  auto target = [&](const state_type& x) {
+  auto target = [](const state_type& x) {
     if (9 <= x[0] && x[0] <= 9.5 && 0 <= x[1] && x[1] <= 0.5)
       return true;
     return false;

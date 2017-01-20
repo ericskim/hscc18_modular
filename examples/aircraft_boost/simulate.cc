@@ -32,11 +32,11 @@ const double rel_tol = 1E-12;
 using stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state_type>;
 
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
-double mg = 60000.0*9.81;
-double mi = 1.0/60000;
 auto aircraft_post = [] (state_type &x, const input_type &u) {
   /* the ode describing the aircraft */
-  auto rhs = [&](const state_type& x,  state_type &dxdt, const double) {
+  auto rhs = [&u](const state_type& x,  state_type &dxdt, const double) {
+    const double mg = 60000.0*9.81;
+    const double mi = 1.0/60000;
     double c=(1.25+4.2*u[1]);
     dxdt[0] = mi*(u[0]*std::cos(u[1])-(2.7+3.08*c*c)*x[0]*x[0]-mg*std::sin(x[1]));
     dxdt[1] = (1.0/(60000*x[0]))*(u[0]*std::sin(u[1])+68.6*c*x[0]*x[0]-mg*std::cos(x[1]));
@@ -48,7 +48,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 int main() {
 
   /* define function to check if we are in target */
-  auto target = [&](const state_type& x) {
+  auto target = [](const state_type& x) {
     if(         63 <= (x[0]) &&  (x[0]) <=  75 &&
        -3*M_PI/180 <= (x[1]) &&  (x[1]) <=   0 &&
                  0 <= (x[2]) &&  (x[2]) <= 2.5 &&

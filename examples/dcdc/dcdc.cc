@@ -119,11 +119,12 @@ int main() {
 
   /* continue with synthesis */
   /* define function to check if the cell is in the safe set  */
-  state_type x;
-  auto safeset = [&](const size_t idx) noexcept {
+  auto safeset = [&lb, &ub, &ss, &eta](const size_t idx) noexcept {
+    state_type x;
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */
-    if (lb[0] <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= ub[0] && lb[1] <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= ub[1])
+    if (lb[0] <= (x[0]-eta[0]/2.0) && (x[0]+eta[0]/2.0)<= ub[0] && 
+        lb[1] <= (x[1]-eta[1]/2.0) &&  (x[1]+eta[1]/2.0) <= ub[1])
       return true;
     return false;
   };

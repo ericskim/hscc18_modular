@@ -43,7 +43,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
 int main() {
 
   /* define function to check if we are in target */
-  auto target = [&](const state_type& x) {
+  auto target = [](const state_type& x) {
     if(         63 <= (x[0]) &&  (x[0]) <=  75 &&
        -3*M_PI/180 <= (x[1]) &&  (x[1]) <=   0 &&
                  0 <= (x[2]) &&  (x[2]) <= 2.5 &&
