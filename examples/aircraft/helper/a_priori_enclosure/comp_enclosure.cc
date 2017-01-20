@@ -1,8 +1,8 @@
 /*
  * compute_enclosure.cc
  *
- *  created on: 07.12.2016
- *  author: rungger
+ *  created: Dec 2016
+ *   author: Matthias Rungger
  */
 
 /* 

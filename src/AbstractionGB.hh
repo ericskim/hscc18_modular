@@ -1,8 +1,8 @@
 /*
- * RungeKutta4.hh
+ * AbstractionGB.hh
  *
- *  created on: 22.04.2015
- *      author: rungger
+ *  created: Oct 2016
+ *   author: Matthias Rungger
  */
 
 /** @file **/
