@@ -25,10 +25,9 @@ namespace scots {
  * @brief abs_type defines type of abstract states (default = uint32_t) 
  *
  * It is required to be an integer type. It determines implicitely an upper
- * bound on the number of abstract states (default = 2^32-1)
+ * bound on the number of abstract states (default = 2^32-1). 
  **/
-using abs_type=std::uint32_t;
-
+using abs_type=std::uint64_t;
 
 /**
  * @class UniformGrid 
@@ -106,14 +105,30 @@ public:
       m_first = new double[m_dim];
       m_no_grid_points = new abs_type[m_dim];
       m_NN = new abs_type[m_dim];
-      for(int index=0; index<m_dim; index++) {
-        m_eta[index] = other.m_eta[index];
-        m_first[index]  = other.m_first[index];
-        m_no_grid_points[index]  = other.m_no_grid_points[index];
-        m_NN[index]  = other.m_NN[index];
+      for(int i=0; i<m_dim; i++) {
+        m_eta[i] = other.m_eta[i];
+        m_first[i]  = other.m_first[i];
+        m_no_grid_points[i]  = other.m_no_grid_points[i];
+        m_NN[i]  = other.m_NN[i];
       }
     } 
     return *this;
+  }
+  /* create UniformGrid from other by projection on the dimension specified in dim */
+  UniformGrid(const UniformGrid &other, const std::vector<int>& dim) : UniformGrid() {
+    m_dim=dim.size();
+    if(m_dim != 0) {
+      m_eta = new double[m_dim];
+      m_first = new double[m_dim];
+      m_no_grid_points = new abs_type[m_dim];
+      m_NN = new abs_type[m_dim];
+      for(int i=0; i<m_dim; i++) {
+        m_eta[i] = other.m_eta[dim[i]];
+        m_first[i]  = other.m_first[dim[i]];
+        m_no_grid_points[i]  = other.m_no_grid_points[dim[i]];
+      }
+      calc_nn();
+    } 
   }
   /* move assignment operator */
   UniformGrid& operator=(UniformGrid&& other) {
