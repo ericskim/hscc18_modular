@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['transitionfunction_2ehh',['TransitionFunction.hh',['../_transition_function_8hh.html',1,'']]]
+  ['scots_2ehh',['scots.hh',['../scots_8hh.html',1,'']]],
+  ['staticcontroller_2ehh',['StaticController.hh',['../_static_controller_8hh.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gamesolver_2ehh',['GameSolver.hh',['../_game_solver_8hh.html',1,'']]]
+  ['filehandler_2ehh',['FileHandler.hh',['../_file_handler_8hh.html',1,'']]]
 ];

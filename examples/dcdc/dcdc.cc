@@ -106,11 +106,11 @@ int main() {
   std::cout << "Computing the transition function:\n";
   /* transition function of symbolic model */
   scots::TransitionFunction tf;
-  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  scots::Abstraction<state_type,input_type> abs(ss,is);
   abs.verbose_off();
 
   tt.tic();
-  abs.compute(tf,system_post, radius_post);
+  abs.compute_gb(tf,system_post, radius_post);
   tt.toc();
   std::cout << "Number of transitions: " << tf.get_no_transitions() <<"\n";
 

@@ -1,13 +1,13 @@
 /*
- * AbstractionGB.hh
+ * Abstraction.hh
  *
- *  created: Oct 2016
+ *  created: Jan 2017
  *   author: Matthias Rungger
  */
 
 /** @file **/
-#ifndef ABSTRACTIONGB_HH_
-#define ABSTRACTIONGB_HH_
+#ifndef ABSTRACTION_HH_
+#define ABSTRACTION_HH_
 
 #include <iostream>
 #include <cstring>
@@ -20,9 +20,14 @@
 /** @namespace scots **/ 
 namespace scots {
 /**
- * @class AbstractionGB
+ * @class Abstraction
  * 
- * @brief Computation of the transition function of symbolic model based on a growth bound
+ * @brief Computation of the transition function of symbolic model/abstraction
+ *
+ * It implements in compute_gb the computation of the transition function based
+ * on a growth bound. Additionally, it provides the functions print_post and
+ * print_post_gb to print the center of the cells that cover the attainable set
+ * which is computed from the growth bound.
  *
  * See 
  * - the manual in <a href="./../../manual/manual.pdf">manual.pdf</a>
@@ -30,7 +35,7 @@ namespace scots {
  *
  **/
 template<class state_type, class input_type>
-class AbstractionGB {
+class Abstraction {
 private:
 	/** @brief measurement error bound **/
 	double* m_z;
@@ -41,16 +46,16 @@ private:
 public:
   /* @cond  EXCLUDE from doxygen*/
   /* destructor */
-  ~AbstractionGB() {
+  ~Abstraction() {
     delete[] m_z;
   }
   /* deactivate standard constructor */
-  AbstractionGB() = delete;
+  Abstraction() = delete;
   /* cannot be copied or moved */
-  AbstractionGB(AbstractionGB&&) = delete;
-  AbstractionGB(const AbstractionGB&) = delete;
-  AbstractionGB& operator=(AbstractionGB&&)=delete;
-  AbstractionGB& operator=(const AbstractionGB&)=delete;
+  Abstraction(Abstraction&&) = delete;
+  Abstraction(const Abstraction&) = delete;
+  Abstraction& operator=(Abstraction&&)=delete;
+  Abstraction& operator=(const Abstraction&)=delete;
   /* @endcond */
 
   /** @brief constructor with the abstract state alphabet and abstract input
@@ -59,13 +64,10 @@ public:
    *  @param state_alphabet - UniformGrid representing the abstract state alphabet
    *  @param input_alphabet - UniformGrid representing the abstract input alphabet
    **/
-  AbstractionGB(const UniformGrid& state_alphabet,
-                const UniformGrid& input_alphabet) :
-                m_state_alphabet(state_alphabet), m_input_alphabet(input_alphabet) {
-    m_z = new double[state_alphabet.get_dim()];
-    for(int i=0; i<state_alphabet.get_dim(); i++) {
-      m_z[i]=0;
-    }
+  Abstraction(const UniformGrid& state_alphabet,
+              const UniformGrid& input_alphabet) :
+              m_state_alphabet(state_alphabet), m_input_alphabet(input_alphabet) {
+    m_z = new double[state_alphabet.get_dim()] ();
   }
 
   /** 
@@ -73,13 +75,13 @@ public:
    *
    * @param transition_function - the result of the computation
    *
-   * @param system_post - lambda function with signature  
+   * @param system_post - lambda expression of the form
    *                      \verbatim [] (state_type &x, const input_type &u) ->  void  \endverbatim
    *                      system_post(x,u) provides a numerical approximation of ODE 
    *                      solution at time tau with initial state x and input u \n
    *                      the result is stored in x
    *
-   * @param radius_post - lambda function with signature
+   * @param radius_post - lambda expression of the form
    *                      \verbatim [] (state_type &r, const state_type& x, const input_type &u) -> void  \endverbatim
    *                      radius_post(x,u) provides a numerical approximation of
    *                      the growth bound for the cell (with center x, radius  r) and input u\n
@@ -94,8 +96,8 @@ public:
    * 
    **/
   template<class F1, class F2>
-  void compute(TransitionFunction& transition_function, F1& system_post, F2& radius_post) {
-    compute(transition_function,system_post, radius_post, [](const abs_type&) noexcept {return false;});
+  void compute_gb(TransitionFunction& transition_function, F1& system_post, F2& radius_post) {
+    compute_gb(transition_function,system_post, radius_post, [](const abs_type&) noexcept {return false;});
   }
 
   /** 
@@ -103,17 +105,17 @@ public:
    *
    * @param transition_function - the result of the computation
    *
-   * @param system_post - lambda function as above
+   * @param system_post - lambda expression  as above
    *
-   * @param radius_post - lambda function as above
+   * @param radius_post - lambda expression as above
    *
-   * @param overflow    - lambda function with signature
+   * @param avoid       - lambda of the form
    *                      \verbatim [] (abs_type &i) -> bool \endverbatim
    *                      returns true if the abstract state i is in the avoid
    *                      set; otherwise returns false
    **/
   template<class F1, class F2, class F3>
-  void compute(TransitionFunction& transition_function, F1& system_post, F2& radius_post, F3&& overflow) {
+  void compute_gb(TransitionFunction& transition_function, F1& system_post, F2& radius_post, F3&& avoid) {
     /* number of cells */
     abs_type N=m_state_alphabet.size(); 
     /* number of inputs */
@@ -163,16 +165,16 @@ public:
      */
     /* loop over all cells */
     for(abs_type i=0; i<N; i++) {
+      /* is i an element of the avoid symbols ? */
+      if(avoid(i)) {
+        for(abs_type j=0; j<M; j++) {
+          out_of_domain[i*M+j]=true;
+  			}
+        continue;
+      }
       /* loop over all inputs */
       for(abs_type j=0; j<M; j++) {
         out_of_domain[i*M+j]=false;
-        /* is i an element of the overflow symbols ? */
-        if(!j & overflow(i)) {
-          for(abs_type j=0; j<M; j++) {
-            out_of_domain[i*M+j]=true;
-  				}
-          break;
-        }
         /* get center x of cell */
         m_state_alphabet.itox(i,x);
         /* cell radius (including measurement errors) */
@@ -338,8 +340,8 @@ public:
    *  attainable set associated with cell (with center x) and input u
    *
    *  @returns std::vector<abs_type>
-   *  @param system_post - lambda function as in compute
-   *  @param radius_post - lambda function as in compute
+   *  @param system_post - lambda expression as in compute_gb
+   *  @param radius_post - lambda expression as in compute_gb
    *  @param x - center of cell 
    *  @param u - input
    **/
@@ -414,35 +416,16 @@ public:
   }
 
 
-  /** @brief get the center of cells that are used to over-approximated the
-   *  attainable set associated with cell with center x and input u
-   *
-   *  @returns std::vector<state_type>
-   *  @param transition_function - the transition function of the abstraction
-   *  @param x - center of cell 
-   *  @param u - input
-   **/
-  std::vector<state_type> get_post(const TransitionFunction& transition_function,
-                                   const state_type& x,
-                                   const input_type& u) const {
-    std::vector<state_type> post{};
-    std::vector<abs_type> k=transition_function.get_post(m_state_alphabet.xtoi(x),m_input_alphabet.xtoi(u));
-    for(abs_type v=0; v<k.size(); v++) {
-      post.push_back(m_state_alphabet.itox<state_type>(k[v]));
-    }
-    return post;
-  }
-
-  /** @brief print the center of cells that are used to over-approximated the
-   *  attainable set associated with cell with center x and input u
+  /** @brief print the center of cells that are stored in the transition
+   *  function as post of the cell with center x and input u
    *
    *  @param transition_function - the transition function of the abstraction
    *  @param x - center of cell 
    *  @param u - input
    **/
   void print_post(const TransitionFunction& transition_function,
-                                     const state_type& x,
-                                     const input_type& u) const {
+                  const state_type& x,
+                  const input_type& u) const {
     std::vector<state_type> post = get_post(transition_function, x, u);
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
@@ -455,18 +438,19 @@ public:
   }
 
   /** @brief print the center of cells that are used to over-approximated the
-   *  attainable set associated with cell (with center x) and input u
+   *  attainable set (computed according to the growth bound)
+   *  associated with the cell with center x and input u
    *
-   *  @param system_post - lambda function as in compute
-   *  @param radius_post - lambda function as in compute
+   *  @param system_post - lambda expression as in compute_gb
+   *  @param radius_post - lambda expression as in compute_gb
    *  @param x - center of cell 
    *  @param u - input
    **/
   template<class F1, class F2>
-  void print_post(F1& system_post,
-								  F2& radius_post,
-                  const state_type& x,
-                  const input_type& u) const {
+  void print_post_gb(F1& system_post,
+								     F2& radius_post,
+                     const state_type& x,
+                     const input_type& u) const {
     std::vector<state_type> post = get_post(system_post,radius_post,x,u);
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
@@ -503,4 +487,4 @@ public:
 };
 
 } /* close namespace */
-#endif /* ABSTRACTIONGB_HH_ */
+#endif /* ABSTRACTION_HH_ */

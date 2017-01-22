@@ -127,11 +127,11 @@ int main() {
   std::cout << "Computing the transition function: " << std::endl;
   /* transition function of symbolic model */
   scots::TransitionFunction tf;
-  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  scots::Abstraction<state_type,input_type> abs(ss,is);
 
   tt.tic();
-  abs.compute(tf,vehicle_post, radius_post, avoid);
-  //abs.compute(tf,vehicle_post, radius_post);
+  abs.compute_gb(tf,vehicle_post, radius_post, avoid);
+  //abs.compute_gb(tf,vehicle_post, radius_post);
   tt.toc();
 
   if(!getrusage(RUSAGE_SELF, &usage))

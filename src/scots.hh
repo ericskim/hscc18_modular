@@ -12,7 +12,7 @@
 
 #include "TransitionFunction.hh"
 #include "UniformGrid.hh"
-#include "AbstractionGB.hh"
+#include "Abstraction.hh"
 #include "GameSolver.hh"
 #include "WinningDomain.hh"
 #include "StaticController.hh"

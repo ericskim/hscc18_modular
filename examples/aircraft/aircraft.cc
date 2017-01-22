@@ -109,14 +109,14 @@ int main() {
   scots::TransitionFunction tf;
 
   /* setup object to compute the transition function */
-  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  scots::Abstraction<state_type,input_type> abs(ss,is);
   /* measurement disturbances  */
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};
   abs.set_measurement_error_bound(z);
 
   std::cout << "Computing the transition function: " << std::endl;
   tt.tic();
-  abs.compute(tf,aircraft_post,radius_post);
+  abs.compute_gb(tf,aircraft_post,radius_post);
   tt.toc();
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;

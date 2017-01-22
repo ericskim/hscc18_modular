@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['abstractiongb',['AbstractionGB',['../classscots_1_1_abstraction_g_b.html#a0b387a0701b3e8280595973b83350500',1,'scots::AbstractionGB']]]
+  ['abstraction',['Abstraction',['../classscots_1_1_abstraction.html#a4db798cb5d5570641e041199343f2c5e',1,'scots::Abstraction']]]
 ];
