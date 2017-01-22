@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['scots_2ehh',['scots.hh',['../scots_8hh.html',1,'']]],
-  ['staticcontroller_2ehh',['StaticController.hh',['../_static_controller_8hh.html',1,'']]]
+  ['rungekutta4_2ehh',['RungeKutta4.hh',['../_runge_kutta4_8hh.html',1,'']]]
 ];

@@ -90,72 +90,45 @@ int main() {
 
 
   manager.AutodynEnable();
-  //manager.AutodynEnable(CUDD_REORDER_RANDOM);
   //manager.AutodynDisable();
   
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
-  state_type eta={{2.0/4e3/4.0,2.0/4e3/4.0}};
+  state_type eta={{2.0/4e3,2.0/4e3}};
   /* lower bounds of the hyper-rectangle */
   state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
   /* upper bounds of the hyper-rectangle */
   state_type ub={{1.55+eta[0]/2,5.85+eta[1]/2}};
-  scots::UniformGrid ss(state_dim,lb,ub,eta);
+  scots::SymbolicSet ss_pre(manager,state_dim,lb,ub,eta);
+  scots::SymbolicSet ss_post(manager,state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:\n";
-  ss.print_info();
+  ss_pre.print_info();
 
   /* construct grid for the input alphabet */
   /* hyper-rectangle [1,2] with grid node distance 1 */
-  scots::UniformGrid is(input_dim,input_type{{.99}},input_type{{2.1}},input_type{{1}});
-  is.print_info();
+  scots::SymbolicSet ss_input(manager,input_dim,input_type{{.99}},input_type{{2.1}},input_type{{1}});
+  ss_input.print_info();
 
   
-  std::cout << "Creating BDD representation of abstract state and input alphabet:\n";
-  /* BDD variables to represent the grid point IDs of the state alphabet and input alphabet */
-  scots::IndexSet pre_bdd(manager,ss.get_no_gp_per_dim());
-  scots::IndexSet in_bdd(manager,is.get_no_gp_per_dim());
-  scots::IndexSet post_bdd(manager,ss.get_no_gp_per_dim());
-
   /* compute transition function of symbolic model */
   std::cout << "Computing the transition function:\n";
-  /* SymbolicModelGB class to compute the BDD encoding the transition function */ 
-  scots::SymbolicModelGB<state_type,input_type> sym_model(ss,is,pre_bdd,in_bdd,post_bdd);
+  /* SymbolicModel class to compute the BDD encoding the transition function */ 
+  scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
   tt.tic();
-  BDD tf = sym_model.compute(system_post, radius_post);
+  BDD tf;
+  size_t no_trans = sym_model.compute_gb(tf,system_post, radius_post);
   tt.toc();
 
-  unsigned int no_var = pre_bdd.get_no_bdd_var()+in_bdd.get_no_bdd_var()+post_bdd.get_no_bdd_var();
-  size_t T = tf.CountMinterm(no_var);
-  std::cout << "No of Transitions " << T  << "\n";
+  std::cout << "No of Transitions " << no_trans  << "\n";
 
   if(!getrusage(RUSAGE_SELF, &usage)) {
-    std::cout << "Memory in MB: " << (((unsigned)usage.ru_maxrss)>>20u)<< "\n";
-    std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)T<< "\n";
+    std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)no_trans<< "\n";
   }
 
   std::cout << "Writing to file: " << "\n";
   tt.tic();
-  FILE *file = fopen ("dcdc4_enab.bdd","w");
-  Dddmp_cuddBddStore(
-    manager.getManager(),
-    NULL,
-    tf.getNode(),
-    //(char**)varnameschar, // char ** varnames, IN: array of variable names (or NULL)
-    NULL, // char ** varnames, IN: array of variable names (or NULL)
-    NULL,
-    DDDMP_MODE_TEXT,
-    //DDDMP_MODE_BINARY,
-    // DDDMP_VARNAMES,
-    DDDMP_VARIDS,
-    NULL,
-    file
-  );
-  fclose(file);
-
-  std::cout << "Writing compressed to file: " << "\n";
-  tt.tic();
-  FILE *nfile = fopen ("dcdc_comp4_enab.bdd","w");
+  FILE *file = fopen ("dcdc.bdd","w");
   Dddmp_cuddBddStore(
     manager.getManager(),
     NULL,
@@ -168,12 +141,11 @@ int main() {
     // DDDMP_VARNAMES,
     DDDMP_VARIDS,
     NULL,
-    nfile
+    file
   );
-  fclose(nfile);
+  fclose(file);
   tt.toc();
 
-  fclose(file);
 
   return 1;
 }

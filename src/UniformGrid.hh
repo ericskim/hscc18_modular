@@ -18,10 +18,17 @@
 #include <algorithm>
 #include <climits>
 
-#include "TransitionFunction.hh"
-
 /** @namespace scots **/ 
 namespace scots {
+
+/**
+ * @brief abs_type defines type of abstract states (default = uint32_t) 
+ *
+ * It is required to be an integer type. It determines implicitely an upper
+ * bound on the number of abstract states (default = 2^32-1)
+ **/
+using abs_type=std::uint32_t;
+
 
 /**
  * @class UniformGrid 
@@ -50,7 +57,7 @@ namespace scots {
  * - http://arxiv.org/abs/1503.03715 for theoretical background 
  **/
 class UniformGrid {
-private:
+protected:
   /** @brief dimension of the Eucleadian space **/
   int m_dim;                
   /** @brief m_dim-dimensional vector containing the grid node distances **/
@@ -73,6 +80,7 @@ public:
     m_NN = nullptr;
   }
   /* destructor */
+  virtual
   ~UniformGrid() {
     delete[] m_eta;
     delete[] m_first;
@@ -110,20 +118,18 @@ public:
   /* move assignment operator */
   UniformGrid& operator=(UniformGrid&& other) {
     reset();
-
     m_dim=other.m_dim;
     m_eta=other.m_eta;
     m_first=other.m_first;
     m_no_grid_points=other.m_no_grid_points;
     m_NN=other.m_NN;
-
     other.null();
     return *this;
   } 
   /* @endcond */
 
   /**
-   * @brief provide uniform grid parameters and domain defining hyper interval 
+   * @brief provide uniform grid parameters and domain defining hyper-interval 
    * 
    * @param dim   - dimension of the real space
    * @param lb    - lower-left corner of the hyper-interval confining the uniform grid
@@ -267,7 +273,6 @@ public:
         std::cout << m_no_grid_points[i] << " ";
     }
     std::cout << "\nNumber of grid points: "<< total_no_grid_points() << std::endl;
-    std::cout << std::endl;
   }
 
   /** @name get functions **/
@@ -316,7 +321,7 @@ public:
   }
   //@}
 
-private:
+protected:
   void calc_nn() {
     /* compute m_NN */
     abs_type max = std::numeric_limits<abs_type>::max();
@@ -326,12 +331,13 @@ private:
       /* check overflow */
       if(total > (max/m_no_grid_points[i])) {
         reset();
-        throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in TransitionSystem.hh).");
+        throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in UniformGrid.hh).");
       }
       total *= m_no_grid_points[i];
     }
   }
 
+private:
   /** @brief helper function to calculate the overall number of grid points **/
   abs_type total_no_grid_points() const {
     abs_type total=1;

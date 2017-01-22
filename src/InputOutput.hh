@@ -252,7 +252,7 @@ bool read_from_file(StaticController& sc, const std::string& filename) {
   if(!read_from_file(wd,filename)) {
     return false;
   }
-  sc=StaticController(ss,is,std::move(wd));
+  sc = StaticController(ss,is,std::move(wd));
   return true;
 }
 

@@ -81,7 +81,7 @@ backend=biber]{biblatex}
         emphstyle=[1]{\color{types}}%
 }%
 \lstset{emph=[2]{UniformGrid, 
-                 AbstractionGB, 
+                 Abstraction, 
                  WinningDomain, 
                  TransitionFunction, 
                  StaticController},
@@ -127,42 +127,44 @@ backend=biber]{biblatex}
 \end{enumerate}
 
 
-\subsection{Performance Comparison}
-
-Performance values for the construction of symbolic models. {\color{red}
-synthesis is also needed...}
-
-For the BDD performance values we distinguish with BDD\_E and BDD\_D
-automatic variable reordering with the option {\tt CUDD\_REORDER\_SIFT} is enabled or not. The compressed file size
-results in the BDD case from using the {\tt DDDMP\_MODE\_BINARY} vs. {\tt
-DDDMP\_MODE\_TEXT} mode in the {\tt Dddmp\_cuddBddStore} command. For the
-sparse matrix case, the compressed file size results form zipping the file
-stored with {\tt SCOTS}.
-
-\begin{table}[h]
-\begin{tabular}{l|N|N|N|N|N|N|N|N|N}
-              \#T & \multicolumn{3}{c|}{$3.8\cdot10^6$} 
-                  & \multicolumn{3}{c|}{$15.2\cdot10^6$} 
-                  & \multicolumn{3}{c }{$60.7\cdot10^6$} \\
-                  & BBD\_E & BDD\_D  & SPAR 
-                  & BBD\_E & BDD\_D  & SPAR
-                  & BBD\_E & BDD\_D  & SPAR\\\hline
-run  time $[sec]$ & $25$   & $27$   & $0.5$ 
-                  & $303$   & $183$  & $1.9$
-                  & $2589$ & $1492$   & $7.5$ \\
-memory  $[B]$/\#T & $13.9$ & $82$ & $12.6$ 
-                  & $12.1$ & $49$ & $12.5$
-                  & $4.2 $ & $41.3$  & $12.4$\\
-file size $[MB]$  & 2.6   & 70 &  39 
-                  & 12    & 293 &  170 
-                  & xx    & 1228 &  710 \\
-compressed $[MB]$ & .33   & 6.3 & 8.9 
-                  & 1.6    & 27 &  39 
-                  & 39    & 111 &  144 \\[2ex]
-\end{tabular}
-\caption{DC DC boost converter.}
-\end{table}
-
+%\subsection{Performance Comparison}
+%
+% {\color{red} some initial numbers}
+%
+%
+%Performance values for the construction of symbolic models.
+%
+%For the BDD performance values we distinguish with BDD\_E and BDD\_D
+%automatic variable reordering with the option {\tt CUDD\_REORDER\_SIFT} is enabled or not. The compressed file size
+%results in the BDD case from using the {\tt DDDMP\_MODE\_BINARY} vs. {\tt
+%DDDMP\_MODE\_TEXT} mode in the {\tt Dddmp\_cuddBddStore} command. For the
+%sparse matrix case, the compressed file size results form zipping the file
+%stored with {\tt SCOTS}.
+%
+%\begin{table}[h]
+%\begin{tabular}{l|N|N|N|N|N|N|N|N|N}
+%              \#T & \multicolumn{3}{c|}{$3.8\cdot10^6$} 
+%                  & \multicolumn{3}{c|}{$15.2\cdot10^6$} 
+%                  & \multicolumn{3}{c }{$60.7\cdot10^6$} \\
+%                  & BBD\_E & BDD\_D  & SPAR 
+%                  & BBD\_E & BDD\_D  & SPAR
+%                  & BBD\_E & BDD\_D  & SPAR\\\hline
+%run  time $[sec]$ & $25$   & $27$   & $0.5$ 
+%                  & $303$   & $183$  & $1.9$
+%                  & $2950$ & $1492$   & $7.5$ \\
+%memory  $[B]$/\#T & $13.9$ & $82.1$ & $12.6$ 
+%                  & $12.1$ & $49.2$ & $12.5$
+%                  & $4.2 $ & $41.3$  & $12.4$\\
+%file size $[MB]$  & 2.6   & 70 &  39 
+%                  & 12    & 293 &  170 
+%                  & 43    & 1228 &  710 \\
+%compressed $[MB]$ & .33   & 6.3 & 8.9 
+%                  & 1.6    & 27 &  39 
+%                  & 5.6    & 111 &  144 \\[2ex]
+%\end{tabular}
+%\caption{DC DC boost converter.}
+%\end{table}
+%
 
 
 
@@ -780,7 +782,7 @@ correct controller refinement under measurement errors~\cite[Sec.~VI.B]{ReissigW
 perturbation parameter $z\in\R_{>0}^n$ in {\tt SCOTS} is explained in detail in 
 Section~\ref{s:usage:abs}.
 
-In the implementation of the computation of $F_2$ in {\tt AbstractionGB.hh}, we use a numerical ODE solver to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
+In the implementation of the computation of $F_2$ in {\tt Abstraction.hh}, we use a numerical ODE solver to compute an approximation of $\varphi(\tau,c,u)$ as well as $\beta(\eta/2,u)$.
 
 \section{Controller Synthesis}
 \label{s:theory:alg}
@@ -1079,7 +1081,7 @@ is the reachability specification associated with $Z_2$, also solves the
 control problem $(S_2,\Sigma_2)$. In order to enforce the
 equation~\eqref{e:theory:tf:avoid} in the computation of the transition function
 $F_2$ the user can optionally supply the avoid set to the function {\tt
-AbstractionGB::compute}, see Section~\ref{s:usage:abs}.
+Abstraction::compute\_gb}, see Section~\ref{s:usage:abs}.
 
 For the second method, the computation of the transition function is left
 unchanged, but Alg.~\ref{a:reach} is modified to account for the avoid set. To
@@ -1145,8 +1147,8 @@ model~\eqref{e:abs:sys} of $S_1$ in {\tt SCOTS}, the following ingredients are
 needed.
 \begin{enumerate}
   \item The solution $\varphi(\tau,x,u)$ of the IVP $\dot \xi = f(\xi,u)$,
-  $\xi(0)=x$ at time $\tau$, which is provided in terms of a lambda function
-  with signature 
+  $\xi(0)=x$ at time $\tau$, which is provided in terms of a lambda expression
+  of the form 
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
 [](state_type& x, const input_type& u)  -> void {}
 \end{lstlisting}
@@ -1155,8 +1157,8 @@ needed.
   {\tt\small input\_type} are aliases for {\tt\small std::array<double,dim>} in the appropriate
   dimension.
 
-  \item A growth bound $\beta(r,u)$, which is provided by a lambda function with
-  signature 
+  \item A growth bound $\beta(r,u)$, which is provided by a lambda expression of
+  the form
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
 [](state_type& r, const state_type& c, const input_type& u)  -> void {}
 \end{lstlisting}
@@ -1179,7 +1181,8 @@ scots::UniformGrid(const int dim,
   confining the set $\bar X_2$, and the grid parameter, respectively.
 
 	Internally, each cell $x_2=c+\segcc{-\eta/2,\eta/2}\in\bar X_2$ is represented
-  as an unsigned integer of type {\tt abs\_type}. In the default setting, {\tt abs\_type} is an alias set in {\tt TransitionFunction.hh} to 
+  as an unsigned integer of type {\tt abs\_type}. In the default setting, {\tt
+  abs\_type} is an alias set in {\tt UniformGrid.hh} to 
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
 using abs_type=std::uint32_t;
 \end{lstlisting}
@@ -1203,7 +1206,7 @@ scots::UniformGrid::abs_type xtoi(const grid_point_t& x) const
   account for measurement errors as defined in~\eqref{e:theory:perturbation} using the
   member function
 \begin{lstlisting}[basicstyle=\small\ttfamily]
-scots::AbstractionGB::set_measurement_error_bound(const state_type& z)
+scots::Abstraction::set_measurement_error_bound(const state_type& z)
 \end{lstlisting}
 \end{enumerate}
 
@@ -1305,15 +1308,15 @@ has been determined according to the optimization procedure
 in~\cite{WeberRunggerReissig17}.
 
 For the computation of the symbolic transition function $F_2$ we instantiate  the
-class {\tt\small AbstractionGB} and set the measurement error bound to $z$
+class {\tt\small Abstraction} and set the measurement error bound to $z$
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-  scots::AbstractionGB<state_type,input_type> abs(ss,is);
+  scots::Abstraction<state_type,input_type> abs(ss,is);
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};
   abs.set_measurement_error_bound(z);
 \end{lstlisting}
 The computation of $F_2$ itself is invoked by
 \begin{lstlisting}[basicstyle=\small\ttfamily, language=C++]
-  abs.compute(tf,aircraft_post,radius_post);
+  abs.compute_gb(tf,aircraft_post,radius_post);
 \end{lstlisting}
 
 Note that, due to the numerical errors in the computation of the solution of the
@@ -1357,7 +1360,7 @@ are implemented in the following functions.
 template<class F> 
 WinningDomain solve_reachability_game(const TransitionFunction& tf, F& ap)
 \end{lstlisting}
-  where the set $Z_2$ is defined as lambda function {\tt ap} with the signature
+  where the set $Z_2$ is defined as lambda expression {\tt ap} of the form
 \begin{lstlisting}[basicstyle=\small\ttfamily]
 [](const scots::abs_type& abs_state) -> bool {}
 \end{lstlisting}
@@ -1369,7 +1372,8 @@ WinningDomain solve_reachability_game(const TransitionFunction& tf, F& ap)
 template<class F>
 WinningDomain solve_reachability_game(const TransitionFunction& tf, F& ap)
 \end{lstlisting}
-  where the target set $Z_2$ is defined as lambda function {\tt ap} with the signature
+  where the target set $Z_2$ is defined as lambda expression {\tt ap} of the
+  form
 \begin{lstlisting}[basicstyle=\small\ttfamily]
 [](const scots::abs_type& abs_state) -> bool {}
 \end{lstlisting}
@@ -1406,7 +1410,7 @@ abstract specification associated with $S_1$, $S_2$ and $Q\circ P$%
 with $Q\circ P$ to account for the measurement errors, see~\cite[Sec.~VI.B]{ReissigWeberRungger15}.}
 is a reachability specification for $S_2$ associated with $Z_2$, where $Z_2$ is required to be a subset of
 	$\{ x_2\in X_2\mid P(x_2)\subseteq Z_1\}$.
-We represent $Z_2$ as lambda function {\tt target} as follows
+We represent $Z_2$ as lambda  {\tt target} as follows
 \begin{lstlisting}[basicstyle=\small\ttfamily]
   /* define target set */
   state_type t_lb = {{63,-3*M_PI/180,0}};
@@ -1433,7 +1437,7 @@ We represent $Z_2$ as lambda function {\tt target} as follows
     return false;
   };
 \end{lstlisting}
-Once we have the lambda function {\tt target} representing the target set, we compute the winning domain of $(S_2,\Sigma_2)$ by
+Once we have the lambda {\tt target} representing the target set, we compute the winning domain of $(S_2,\Sigma_2)$ by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
   WinningDomain win=solve_reachability_game(tf,target);
 \end{lstlisting}
@@ -1535,6 +1539,30 @@ A demonstration of the usage of the {\tt StaticController} from the MATLAB
 workspace can be found in the various m-files in the example directories.
 
 
+%\section{BDDs in {\tt SCOTS}}
+%
+%{\tt SCOTS} provides a number of classes and functions to obtain a \emph{binary decision
+%diagram} (BDD) representation of symbolic models, controllers and atomic
+%propositions. Although, in terms of computation times and memory usage
+%(see~Section~\ref{s:performance}) it is not advisable to use BDDs as underlying data
+%structure in the computation of symbolic models, there are several situations in which BDD representations are useful.
+%For example,
+%\begin{enumerate}
+%  \item to use {\tt SCOTS} in combination with other tools, such as {\tt slugs};
+%  \item to compactly save atomic propositions and controllers to a file;
+%  \item to write customized synthesis algorithms;
+%\end{enumerate}
+%Representations
+%\begin{enumerate}
+%  \item transition function $F_2$ as BDD
+%  \item synthesis
+%  \item writing BDDs to file
+%\end{enumerate}
+%
+%
+%
+%
+%It might be desirable to obtain a
 
 %\section{MATLAB Interface}
 %

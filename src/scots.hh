@@ -12,7 +12,7 @@
 
 #include "TransitionFunction.hh"
 #include "UniformGrid.hh"
-#include "AbstractionGB.hh"
+#include "Abstraction.hh"
 #include "GameSolver.hh"
 #include "WinningDomain.hh"
 #include "StaticController.hh"
@@ -22,8 +22,8 @@
 /* if scots is used in connection with the cudd library */
 #ifdef  SCOTS_BDD
 #include "dddmp.h"
-#include "IndexSet.hh"
-#include "SymbolicModelGB.hh"
+#include "SymbolicSet.hh"
+#include "SymbolicModel.hh"
 #endif
 
 #endif /* SCOTS_HH_ */

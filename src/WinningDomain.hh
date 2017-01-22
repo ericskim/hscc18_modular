@@ -15,11 +15,8 @@
 #include <iostream>
 #include <limits>
 
-/* to get abs_type */
-#include "TransitionFunction.hh"
-
-#define SCOTS_WD_TYPE   "WINNINGDOMAIN"
-#define SCOTS_WD_DATA   "DATA"
+/* to get abs_type alias */
+#include "UniformGrid.hh"
 
 /** @namespace scots **/ 
 namespace scots {

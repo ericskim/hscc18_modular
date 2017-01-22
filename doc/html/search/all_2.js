@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['filehandler',['FileHandler',['../classscots_1_1_file_handler.html',1,'scots']]],
-  ['filehandler_2ehh',['FileHandler.hh',['../_file_handler_8hh.html',1,'']]],
-  ['filereader',['FileReader',['../classscots_1_1_file_reader.html',1,'scots']]],
-  ['filewriter',['FileWriter',['../classscots_1_1_file_writer.html',1,'scots']]]
+  ['compute_5fgb',['compute_gb',['../classscots_1_1_abstraction.html#a8bf15ecc6a83af51fd0e97f8e1a23ecd',1,'scots::Abstraction::compute_gb(TransitionFunction &amp;transition_function, F1 &amp;system_post, F2 &amp;radius_post)'],['../classscots_1_1_abstraction.html#a3f8a2d8dce77fbf12b874908d494ca0b',1,'scots::Abstraction::compute_gb(TransitionFunction &amp;transition_function, F1 &amp;system_post, F2 &amp;radius_post, F3 &amp;&amp;avoid)'],['../classscots_1_1_symbolic_model.html#a56de4348623be0ff801672259db43691',1,'scots::SymbolicModel::compute_gb(BDD &amp;tf, F1 &amp;system_post, F2 &amp;radius_post)'],['../classscots_1_1_symbolic_model.html#a34797ecc3bd1fc3e2517c0b831f60975',1,'scots::SymbolicModel::compute_gb(BDD &amp;tf, F1 &amp;system_post, F2 &amp;radius_post, F3 &amp;&amp;avoid)']]]
 ];

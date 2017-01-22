@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 
+#include "UniformGrid.hh"
 #include "TransitionFunction.hh"
 #include "WinningDomain.hh"
 
@@ -54,11 +55,11 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
  * @brief solve reachability game according to Algorithm 2 in  <a href="./../../manual/manual.pdf">manual</a>
  * 
  * @param[in] trans_function - TransitionFunction of the symbolic model
- * @param[in]  target - lambda function with signature  
+ * @param[in]  target - lambda expression of the form
  *                      \verbatim [] (abs_type &i) -> bool \endverbatim 
  *                      returns true if state i is in target set and false otherwise
  *                       
- * @param[in] avoid  - OPTIONALLY provide lambda function with signature 
+ * @param[in] avoid  - OPTIONALLY provide lambda expression of the form
  *                      \verbatim [] (abs_type &i) -> bool \endverbatim
  *                      returns true if state i is in avoid set and false otherwise
  * 
@@ -142,7 +143,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
  * @brief solve invariance game according to Algorithm 1 in  <a href="./../../manual/manual.pdf">manual</a>
  * 
  * @param[in] trans_function - TransitionFunction of the symbolic model
- * @param[in] safe - lambda function with signature  
+ * @param[in] safe - lambda expression of the form
  *                    \verbatim [] (abs_type &i) -> bool \endverbatim 
  *                   returns true if state i is in safe set and false otherwise
  * @return -  WinningDomain that contains the set of winning states and valid inputs 
