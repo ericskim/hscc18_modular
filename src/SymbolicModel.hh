@@ -73,48 +73,29 @@ public:
     m_z = new double[pre.get_dim()] ();
   }
 
-  /** 
-   * @brief computes the transition function
-   *
-   * @param  tf - a BDD encoding the transition function as boolean function over
-   *              the BDD var IDs in m_pre, m_input, m_post
-   *
-   * @param system_post - lambda expression of the form
-   *                      \verbatim [] (state_type &x, const input_type &u) ->  void  \endverbatim
-   *                      system_post(x,u) provides a numerical approximation of ODE 
-   *                      solution at time tau with initial state x and input u \n
-   *                      the result is stored in x
-   *
-   * @param radius_post - lambda expression of the form
-   *                      \verbatim [] (state_type &r, const state_type& x, const input_type &u) -> void  \endverbatim
-   *                      radius_post(x,u) provides a numerical approximation of
-   *                      the growth bound for the cell (with center x, radius  r) and input u\n
-   *                      the result is stored in r
-   *
-   * @result -  number of transitions
-   **/
   template<class F1, class F2>
-  size_t compute_gb(BDD& tf, F1& system_post, F2& radius_post) {
-    return compute_gb(tf, system_post, radius_post, [](const abs_type&) noexcept {return false;});
+  BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, size_t& no_trans) {
+    return compute_gb(manager, system_post, radius_post, [](const abs_type&) noexcept {return false;}, no_trans);
   }
   /** 
    * @brief computes the transition function
    *
-   * @param  tf - a BDD encoding the transition function as boolean function over
-   *              the BDD var IDs in m_pre, m_input, m_post
+   * @param manager     - Cudd manager
    *
    * @param system_post - lambda expression  as above
    *
    * @param radius_post - lambda expression as above
    *
-   * @param avoid    - lambda of the form
+   * @param avoid       - optionally provide a lambda of the form
    *                      \verbatim [] (abs_type &i) -> bool \endverbatim
    *                      returns true if the abstract state i is in the avoid
    *                      set; otherwise returns false
-   * @result -  number of transitions
+   * @param no_trans    - number of transitions 
+   * @result   a BDD encoding the transition function as boolean function over
+   *              the BDD var IDs in m_pre, m_input, m_post
    **/
   template<class F1, class F2, class F3>
-  size_t compute_gb(BDD& tf, F1& system_post, F2& radius_post, F3&& avoid) {
+  BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, F3&& avoid, size_t& no_trans) {
     /* number of cells */
     abs_type N=m_pre.size(); 
     /* number of inputs */
@@ -142,7 +123,7 @@ public:
       upper_right[i]=m_pre.get_upper_right()[i];
     }
     /* the BDD to encode the transition function */
-    tf = m_pre.get_zero();
+    BDD tf = manager.bddZero();
     /* is post of (i,j) out of domain ? */
     bool out_of_domain;
     /* loop over all cells */
@@ -188,7 +169,7 @@ public:
           continue;
         }
         /* compute BDD of post */
-        BDD bdd_k = m_post.interval_to_bdd(lb,ub);
+        BDD bdd_k = m_post.interval_to_bdd(manager,lb,ub);
         /* add to transition function */
         tf = tf | (bdd_i & bdd_j & bdd_k);
       }
@@ -212,7 +193,8 @@ public:
     size_t nvars = m_pre.get_no_bdd_vars() +
                    m_input.get_no_bdd_vars() +
                    m_post.get_no_bdd_vars();
-    return tf.CountMinterm(nvars);
+    no_trans=tf.CountMinterm(nvars);
+    return tf;
   }
 //
 //  /** @brief TODO

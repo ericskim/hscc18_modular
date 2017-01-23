@@ -27,7 +27,7 @@ namespace scots {
  * It is required to be an integer type. It determines implicitely an upper
  * bound on the number of abstract states (default = 2^32-1). 
  **/
-using abs_type=std::uint64_t;
+using abs_type=std::uint32_t;
 
 /**
  * @class UniformGrid 
@@ -270,7 +270,7 @@ public:
   }
 
   /** @brief creates console output with grid information **/
-  void print_info(void) const {
+  void print_info() const {
     std::cout << "Distance of grid points (eta): ";
     for(int i=0; i<m_dim; i++) {
       std::cout << m_eta[i] << " ";
@@ -292,28 +292,28 @@ public:
 
   /** @name get functions **/
   //@{
-  int get_dim(void) const {
+  int get_dim() const {
     return m_dim;
   }
   /* total number of grid points */
   abs_type size() const {
     return total_no_grid_points();
   }
-  std::vector<double> get_eta(void) const {
+  std::vector<double> get_eta() const {
     std::vector<double> eta;
     for(int i=0; i<m_dim; i++) {
       eta.push_back(m_eta[i]);
     }
     return eta;
   }
-  std::vector<double> get_lower_left(void) const {
+  std::vector<double> get_lower_left() const {
     std::vector<double> lower_left;
     for(int i=0; i<m_dim; i++) {
       lower_left.push_back(m_first[i]);
     }
     return lower_left;
   }
-  std::vector<double> get_upper_right(void) const {
+  std::vector<double> get_upper_right() const {
     std::vector<double> upper_right;
     for(int i=0; i<m_dim; i++) {
       upper_right.push_back(m_first[i]+m_eta[i]*(m_no_grid_points[i]-1));

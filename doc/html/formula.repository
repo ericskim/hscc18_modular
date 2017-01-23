@@ -8,3 +8,25 @@
 \form#7:$j$
 \form#8:\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]
 \form#9:$ \xi(\tau) $
+\form#10:$S$
+\form#11:\[ S\subseteq ( [lb_0,ub_0] \times \cdots [lb_{dim-1},ub_{dim-1}] ) \cap \eta \mathbb Z^n \]
+\form#12:$ S\subseteq ( [lb_0,ub_0] \times \cdots [lb_{dim-1},ub_{dim-1}] ) \cap \eta \mathbb Z^n $
+\form#13:$ S\subseteq ( [lb_0,ub_0] \times \cdots [lb_{n-1},ub_{n-1}] ) \cap \eta \mathbb Z^n $
+\form#14:$x=(x_{j_0},\ldots, x_{j_m})$
+\form#15:$m<n$
+\form#16:$p=n-m$
+\form#17:\[ S(x):= \{ y\in \} \]
+\form#18:$ S(x) $
+\form#19:$ S(x):= \{ y\in \} $
+\form#20:$j_i=i$
+\form#21:$ S(x):= \{ y\mid (x_{j_0},\ldots, x_{j_m},y_{0},\ldots,y_{p})\in S \} $
+\form#22:$j_i$
+\form#23:$S(x) \subseteq [lb_{m},ub_{m}]\times\cdots\times [lb_{n-1},ub_{n-1}] ) \cap \eta \mathbb Z^n$
+\form#24:$x=(x_{j_0},\ldots, x_{j_{m-1}})$
+\form#25:$j_0,\ldots,j_{m-1}$
+\form#26:$n=4$
+\form#27:$m=2$
+\form#28:$j_0=1,j_1=3$
+\form#29:$ S(x):= \{ (y_0,y_1)\mid (y_0,x_1,y_1,x_3)\in S \} $
+\form#30:$ S(x):= \{ y\mid (x_{j_0},\ldots, x_{j_m},y_{0},\ldots,y_{p})\in S \}. $
+\form#31:$ S(x):= \{ (y_0,y_1)\mid (y_0,x_1,y_1,x_3)\in S \}. $

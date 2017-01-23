@@ -77,30 +77,16 @@ int main() {
   /* upper bounds of the hyper rectangle */
   state_type s_ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
-  state_type s_eta={{2,2,2}};
+  state_type s_eta={{.2,.2,.2}};
   /* construct SymbolicSet with the UniformGrid information for the state space
    * and BDD variable IDs for the pre */
   scots::SymbolicSet ss_pre(mgr, state_dim,s_lb,s_ub,s_eta);
   /* construct SymbolicSet with the UniformGrid information for the state space
    * and BDD variable IDs for the post */
+  scots::SymbolicSet ss_post(mgr, state_dim,s_lb,s_ub,s_eta);
   std::cout << "Unfiorm grid details:" << std::endl;
   ss_pre.print_info(1);
 
- // scots::SymbolicSet set2(ss_pre,std::vector<int>{0,2});
- // set2.print_info(1);
-
-  BDD bdd=ss_pre.get_zero(); 
-  bdd = mgr.bddVar(0) |  !mgr.bddVar(0) ;
-  bdd.PrintMinterm();
-
-  std::vector<std::vector<double>> gp = ss_pre.bdd_to_grid_points(bdd);
-
-  //input_type u = {{0.2,0.2}};
-  //ss_pre.restriction(bdd,u);
-
-  return 0;
-
-  scots::SymbolicSet ss_post(mgr, state_dim,s_lb,s_ub,s_eta);
 
   /* construct grid for the input space */
   /* lower bounds of the hyper rectangle */
@@ -133,8 +119,8 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  auto avoid = [&H,&ss_pre,&s_eta](const size_t idx) {
-    state_type x;
+  state_type x;
+  auto avoid = [&x,&H,&ss_pre,&s_eta](const abs_type idx) {
     ss_pre.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
     double c2= s_eta[1]/2.0+1e-10;
@@ -145,23 +131,23 @@ int main() {
     }
     return false;
   };
+  /* compute BDD for the avoid set (returns the number of elements) */ 
+  BDD bdd_avoid = ss_pre.ap_to_bdd(mgr,avoid);
+  /* write to files avoid.scs/avoid.bdd */
+  scots::write_to_file(ss_pre,bdd_avoid,"avoid");
 
   std::cout << "Computing the transition function: " << std::endl;
-  /* transition function of symbolic model */
+  /* initialize SymbolicModel class with the abstract state and input alphabet */
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
-  BDD tf;
-
   tt.tic();
-  size_t no_trans=sym_model.compute_gb(tf,vehicle_post, radius_post,avoid);
+  size_t no_trans;
+  BDD tf = sym_model.compute_gb(mgr,vehicle_post, radius_post,avoid,no_trans);
   tt.toc();
-
   std::cout << "Number of transitions: " << no_trans << std::endl;
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
-  scots::SymbolicSet set(scots::SymbolicSet(ss_pre,ss_post),ss_input);
-  std::cout << set.get_size(tf) << "\n";
 
   return 0;
 //  /* define target set */
