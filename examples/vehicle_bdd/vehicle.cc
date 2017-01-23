@@ -140,6 +140,16 @@ int main() {
   /* initialize SymbolicModel class with the abstract state and input alphabet */
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
+  auto gp = ss_pre.projection(mgr,bdd_avoid,std::vector<int>{0,1,2});
+
+  auto res = ss_pre.restriction(mgr,bdd_avoid,std::vector<double>{4},std::vector<int>{1});
+  //abs_type no = gp.size()/3;
+  //for(abs_type i=0; i<no; i++)  {
+  //  for(int j=0; j<3; j++) 
+
+  //}
+
+
   tt.tic();
   size_t no_trans;
   BDD tf = sym_model.compute_gb(mgr,vehicle_post, radius_post,avoid,no_trans);
@@ -147,6 +157,7 @@ int main() {
   std::cout << "Number of transitions: " << no_trans << std::endl;
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
+
 
 
   return 0;

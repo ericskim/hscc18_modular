@@ -160,13 +160,17 @@ public:
     for(int k=m_dim-1; k > 0; k--) {
       num=id/m_NN[k];
       id=id%m_NN[k];
-      if(k==(m_dim-1))
+      if(k==(m_dim-1)) {
         bdd = m_bdd_interval[k].int_to_bdd(num);
+      }
       else 
         bdd = bdd & m_bdd_interval[k].int_to_bdd(num);
     }
     num=id;
-    bdd = bdd & m_bdd_interval[0].int_to_bdd(num);
+    if(m_dim==1)
+      bdd = m_bdd_interval[0].int_to_bdd(num);
+    else 
+      bdd = bdd & m_bdd_interval[0].int_to_bdd(num);
     return bdd;
   }
 
@@ -198,7 +202,7 @@ public:
 
 
   /** @brief get a vector of grid points that are encoded in the BDD **/
-  std::vector<std::vector<double>> bdd_to_grid_points(const Cudd& manager, BDD bdd) {
+  std::vector<double> bdd_to_grid_points(const Cudd& manager, BDD bdd) {
     if((!get_no_bdd_vars()) || bdd==manager.bddZero())
       return {};
     /* disable reordering (if enabled) */
@@ -225,10 +229,11 @@ public:
     for(const auto& interval : m_bdd_interval) 
       bdd = bdd & interval.get_all_elements();
     /* init the vector of grid points to be returned */
-    std::vector<double> first(m_dim);
-    for(int i=0; i<m_dim; i++)
-      first[i]=m_first[i];
-    std::vector<std::vector<double>> gp(get_size(bdd),first);
+    std::vector<double> gp(get_size(bdd)*m_dim);
+    for(abs_type i=0; i<get_size(bdd); i++) {
+      for(int j=0; j<m_dim; j++)
+        gp[i*m_dim+j]=m_first[j];
+    }
 		/* set up iteration to iterate over BDD cubes */
 		DdManager* dd = manager.getManager();
 	  int *cube;
@@ -242,17 +247,17 @@ public:
         unsigned int no_vars = var_id[i].size();
         for (unsigned int j=0; j<no_vars; j++) {
           if(cube[var_id[i][j]]==1) {
-            gp[counter][i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
+            gp[counter*m_dim+i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
           }
           /* take care of don't care */
           if(cube[var_id[i][j]]==2) {
             for(abs_type k=0; k<offset; k++) {
               for(int l=0; l<=i; l++) {
-                gp[counter+k+offset][l]=gp[counter+k][l];
+                gp[(counter+k+offset)*m_dim+l]=gp[(counter+k)*m_dim+l];
               }
             }
             for(abs_type k=0; k<offset; k++) {
-              gp[counter+k+offset][i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
+              gp[(counter+k+offset)*m_dim+i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
             }
             offset=(offset<<1);
           }
@@ -268,7 +273,7 @@ public:
 
   /** @brief projection of the set of grid points onto the dimension in dim+1,
    * e.g., to project onto the 1st  and 2nd dimension, dim = {0,1}  **/
-  std::vector<std::vector<double>> projection(const Cudd& manager, const BDD& bdd, std::vector<int> dim) const {
+  std::vector<double> projection(const Cudd& manager, const BDD& bdd, std::vector<int> dim) const {
     if(!dim.size())
       return {};
     return SymbolicSet(*this,dim).bdd_to_grid_points(manager,bdd);
@@ -307,10 +312,10 @@ public:
    * @result          vector of grid points  \f$ S(x) \f$
    **/
   template<class grid_point_t>
-  std::vector<std::vector<double>> restriction(const Cudd& manager,
-                                               const BDD& bdd, 
-                                               const grid_point_t& x,  
-                                               std::vector<int> domain = {}) const {
+  std::vector<double> restriction(const Cudd& manager,
+                                  const BDD& bdd, 
+                                  const grid_point_t& x,  
+                                  std::vector<int> domain = {}) const {
     /* compute indices in domain/codomain */
     std::vector<int> codomain {};
     /* fill in default values */
@@ -332,6 +337,7 @@ public:
     abs_type id = set_dom.xtoi(x);
     BDD restricted = bdd & set_dom.id_to_bdd(id);
     restricted = restricted.ExistAbstract(manager.computeCube(set_dom.get_bdd_vars()));
+    restricted.PrintMinterm();
     /* map restricted BDD to grid points */
     return set_codom.bdd_to_grid_points(manager,restricted);
   }
