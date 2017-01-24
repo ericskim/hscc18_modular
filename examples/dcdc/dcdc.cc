@@ -107,7 +107,7 @@ int main() {
   /* transition function of symbolic model */
   scots::TransitionFunction tf;
   scots::Abstraction<state_type,input_type> abs(ss,is);
-  abs.verbose_off();
+  //abs.verbose_off();
 
   tt.tic();
   abs.compute_gb(tf,system_post, radius_post);

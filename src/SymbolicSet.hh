@@ -31,50 +31,27 @@ namespace scots {
  *  points as BDDs. See UniformGrid for details.
  *
  **/
-
 class SymbolicSet : public UniformGrid {
 private:
   /* a vector of BddIntegerIntervals - one for each dimension */
   std::vector<BddIntegerInterval<abs_type>> m_bdd_interval;
 public:
-  ///* @cond  EXCLUDE from doxygen */
-  ///* default destructor */
-  //~SymbolicSet() { };
-  ///* default move constructor */
-  ////SymbolicSet(SymbolicSet&& other) : m_manager(other.m_manager) {
-  ////  *this=std::move(other);
-  ////}
-  ///* default copy constructor*/
-  //SymbolicSet(const SymbolicSet& other)   {
-  //  *this=other;
-  //}
-  ///* default move assignment operator */
-  ////SymbolicSet& operator=(SymbolicSet&& other) {
-  ////  UniformGrid::operator=(std::move(other));
-  ////  m_bdd_interval = std::move(other.m_bdd_interval);
-  ////  return *this;
-  ////}
-  ///* default copy assignment operator */
-  //SymbolicSet& operator=(const SymbolicSet& other) {
-  //  UniformGrid::operator=(other);
-  //  m_bdd_interval = other.m_bdd_interval;
-  //  return *this;
-  //}
-  /* @endcond */
-  
+  /** @brief construct SymbolicSet with a Cudd manager **/
+  SymbolicSet() : UniformGrid(), m_bdd_interval{} { }
+
+  /** @brief create a SymbolicSet from other by projecting it onto the dimension in dim **/
   SymbolicSet(const SymbolicSet& other, std::vector<int> dim) :
               UniformGrid(other,dim), m_bdd_interval{} {
     for(const auto& i : dim) 
       m_bdd_interval.push_back(other.m_bdd_interval[i]);
   }
+  
+  /** @brief create a SymbolicSet and initialize m_bdd_interval with intervals **/
   SymbolicSet(const UniformGrid& grid,
               const std::vector<BddIntegerInterval<abs_type>>& intervals) :
               UniformGrid(grid), m_bdd_interval(intervals) { 
   }
-  /* @endcond */
 
-  /** @brief construct SymbolicSet with a Cudd manager **/
-  SymbolicSet() : UniformGrid(), m_bdd_interval{} { }
   /**
    * @brief provide BDD variable manager and  UniformGrid parameters 
    * 
@@ -94,6 +71,7 @@ public:
     for(int i=0; i<m_dim; i++) 
       m_bdd_interval.emplace_back(manager,abs_type{0},m_no_grid_points[i]-1);
   }
+
   /**
    * @brief provide BDD variable manager and UniformGrid 
    * 
@@ -157,20 +135,16 @@ public:
   BDD id_to_bdd(abs_type id) const {
     BDD bdd;
     abs_type num;
-    for(int k=m_dim-1; k > 0; k--) {
+    int k=m_dim-1;
+    /* k= m_dim -1 */
+    num=id/m_NN[k];
+    id=id%m_NN[k];
+    bdd = m_bdd_interval[k].int_to_bdd(num);
+    for(k=m_dim-2; k >= 0; k--) {
       num=id/m_NN[k];
       id=id%m_NN[k];
-      if(k==(m_dim-1)) {
-        bdd = m_bdd_interval[k].int_to_bdd(num);
-      }
-      else 
-        bdd = bdd & m_bdd_interval[k].int_to_bdd(num);
+      bdd = bdd & m_bdd_interval[k].int_to_bdd(num);
     }
-    num=id;
-    if(m_dim==1)
-      bdd = m_bdd_interval[0].int_to_bdd(num);
-    else 
-      bdd = bdd & m_bdd_interval[0].int_to_bdd(num);
     return bdd;
   }
 
@@ -201,7 +175,12 @@ public:
   }
 
 
-  /** @brief get a vector of grid points that are encoded in the BDD **/
+  /** @brief get a vector of grid points that are encoded in the BDD
+   *
+   *  The return vector is of size (number of grid points) x n where n is the  dimension.\n 
+   *  The grid points are stacked on top of each other, i.e., the first n
+   *  entries of the return vector represent the first grid point.
+   **/
   std::vector<double> bdd_to_grid_points(const Cudd& manager, BDD bdd) {
     if((!get_no_bdd_vars()) || bdd==manager.bddZero())
       return {};
@@ -211,15 +190,11 @@ public:
       manager.AutodynDisable();
     /* get variable ids */
 	  auto var_id = get_bdd_var_ids();
-	  std::vector<unsigned int> t_ids {};
-    for(const auto& v_id : var_id) 
-      for(const auto& id : v_id) 
-        t_ids.push_back(id);
 		/* find the variables in the support of the BDD but outside the SymbolicSet */
 		auto support_id = bdd.SupportIndices();
     std::vector<BDD> out{}; 
     for(const auto& id : support_id) {
-        if(std::find(t_ids.begin(), t_ids.end(), id)==t_ids.end())
+        if(std::find(var_id.begin(), var_id.end(), id)==var_id.end())
           out.emplace_back(manager.bddVar(id));
     }
     /* remove those variables from the bdd */
@@ -244,13 +219,14 @@ public:
  		Cudd_ForeachCube(dd,bdd.getNode(),gen,cube,value) {
       abs_type offset=1;
       for(int i=0; i<m_dim; i++) {
-        unsigned int no_vars = var_id[i].size();
+        unsigned int no_vars = m_bdd_interval[i].get_no_bdd_vars();
         for (unsigned int j=0; j<no_vars; j++) {
-          if(cube[var_id[i][j]]==1) {
+          unsigned int id = m_bdd_interval[i].get_bdd_var_ids()[j];
+          if(cube[id]==1) {
             gp[counter*m_dim+i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
           }
           /* take care of don't care */
-          if(cube[var_id[i][j]]==2) {
+          if(cube[id]==2) {
             for(abs_type k=0; k<offset; k++) {
               for(int l=0; l<=i; l++) {
                 gp[(counter+k+offset)*m_dim+l]=gp[(counter+k)*m_dim+l];
@@ -272,7 +248,7 @@ public:
   }
 
   /** @brief projection of the set of grid points onto the dimension in dim+1,
-   * e.g., to project onto the 1st  and 2nd dimension, dim = {0,1}  **/
+   * e.g., to project onto the 1st and 2nd coordinate, set dim = {0,1}  **/
   std::vector<double> projection(const Cudd& manager, const BDD& bdd, std::vector<int> dim) const {
     if(!dim.size())
       return {};
@@ -309,7 +285,7 @@ public:
    *                 if domain is not provided, then grid_point_t needs to have grid_point_t::size() method
    * @param domain   Optinally, provide the indices over which the elements of
    *                   x are interpreted
-   * @result          vector of grid points  \f$ S(x) \f$
+   * @result          vector of grid points  \f$ S(x) \f$ 
    **/
   template<class grid_point_t>
   std::vector<double> restriction(const Cudd& manager,
@@ -363,13 +339,14 @@ public:
   }
 
   /** @brief get number of BDD variables used to represent the SymbolicSet **/
-  std::vector<std::vector<unsigned int>> get_bdd_var_ids() const {
-    std::vector<std::vector<unsigned int>> var_id {};
-    for(const auto& interval : m_bdd_interval) 
-      var_id.push_back(interval.get_bdd_var_ids());
+  std::vector<unsigned int> get_bdd_var_ids() const {
+    std::vector<unsigned int> var_id {};
+    for(const auto& interval : m_bdd_interval) {
+      for(const auto& id : interval.get_bdd_var_ids()) 
+        var_id.push_back(id);
+    }
     return var_id;
   }
-
 
   /** @brief get number grid points represented by the BDD  **/
   abs_type get_size(BDD bdd) const {
@@ -379,6 +356,10 @@ public:
     return static_cast<abs_type>(bdd.CountMinterm(get_no_bdd_vars()));
   } 
 
+  /** @brief get BddIntegerInterval  **/
+  std::vector<BddIntegerInterval<abs_type>> get_bdd_intervals() const {
+    return m_bdd_interval;
+  }
 }; /* close class def */
 } /* close namespace */
 #endif /* SYMBOLICSET_HH_ */

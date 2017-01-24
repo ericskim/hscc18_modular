@@ -193,10 +193,10 @@ bool write_to_file(const SymbolicSet& set, const std::string& filename) {
     writer.add_VECTOR(SCOTS_UG_ETA,set.get_eta());
     writer.add_VECTOR(SCOTS_UG_LOWER_LEFT,set.get_lower_left());
     writer.add_VECTOR(SCOTS_UG_UPPER_RIGHT,set.get_upper_right());
-		auto bdd_var_id = set.get_bdd_var_ids();
+		auto intervals = set.get_bdd_intervals();
 		for(int i=0;i<set.get_dim(); i++) {
 		  std::string s = SCOTS_SS_BDD_VAR_ID;
-			writer.add_VECTOR(s.append(std::to_string(i+1)),bdd_var_id[i]);
+			writer.add_VECTOR(s.append(std::to_string(i+1)),intervals[i].get_bdd_var_ids());
     }
 
     writer.close();

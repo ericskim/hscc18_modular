@@ -133,57 +133,22 @@ int main() {
   };
   /* compute BDD for the avoid set (returns the number of elements) */ 
   BDD bdd_avoid = ss_pre.ap_to_bdd(mgr,avoid);
-  /* write to files avoid.scs/avoid.bdd */
+  /* write ap to files avoid.scs/avoid.bdd */
   scots::write_to_file(ss_pre,bdd_avoid,"avoid");
 
   std::cout << "Computing the transition function: " << std::endl;
   /* initialize SymbolicModel class with the abstract state and input alphabet */
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
-  auto gp = ss_pre.projection(mgr,bdd_avoid,std::vector<int>{0,1,2});
-
-  auto res = ss_pre.restriction(mgr,bdd_avoid,std::vector<double>{4},std::vector<int>{1});
-  //abs_type no = gp.size()/3;
-  //for(abs_type i=0; i<no; i++)  {
-  //  for(int j=0; j<3; j++) 
-
-  //}
-
-
   tt.tic();
   size_t no_trans;
-  BDD tf = sym_model.compute_gb(mgr,vehicle_post, radius_post,avoid,no_trans);
+  BDD tf = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
   tt.toc();
   std::cout << "Number of transitions: " << no_trans << std::endl;
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
 
-
-  return 0;
-//  /* define target set */
-//  auto target = [&ss,&s_eta](const abs_type idx) {
-//    state_type x;
-//    ss.itox(idx,x);
-//    /* function returns 1 if cell associated with x is in target set  */
-//    if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 
-//        0 <= (x[1]-s_eta[1]/2.0) && (x[1]+s_eta[1]/2.0) <= 0.5)
-//      return true;
-//    return false;
-//  };
-//   /* write target to file */
-//  write_to_file(ss,target,"target.scs");
-//
-// 
-//  std::cout << "\nSynthesis: " << std::endl;
-//  tt.tic();
-//  scots::WinningDomain win=scots::solve_reachability_game(tf,target);
-//  tt.toc();
-//  std::cout << "Winning domain size: " << win.get_size() << std::endl;
-//
-//  std::cout << "\nWrite controller to controller.scs \n";
-//  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller.scs"))
-//    std::cout << "Done. \n";
 
   return 1;
 }

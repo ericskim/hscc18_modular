@@ -88,9 +88,7 @@ int main() {
   /* BDD manager */
   Cudd manager;
 
-
   manager.AutodynEnable();
-  //manager.AutodynDisable();
   
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
@@ -108,7 +106,6 @@ int main() {
   /* hyper-rectangle [1,2] with grid node distance 1 */
   scots::SymbolicSet ss_input(manager,input_dim,input_type{{.99}},input_type{{2.1}},input_type{{1}});
   ss_input.print_info();
-
   
   /* compute transition function of symbolic model */
   std::cout << "Computing the transition function:\n";
@@ -116,36 +113,14 @@ int main() {
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
   tt.tic();
-  BDD tf;
-  size_t no_trans = sym_model.compute_gb(tf,system_post, radius_post);
+  size_t no_trans;
+  BDD tf = sym_model.compute_gb(manager,system_post,radius_post,no_trans);
   tt.toc();
 
   std::cout << "No of Transitions " << no_trans  << "\n";
-
   if(!getrusage(RUSAGE_SELF, &usage)) {
     std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)no_trans<< "\n";
   }
-
-  std::cout << "Writing to file: " << "\n";
-  tt.tic();
-  FILE *file = fopen ("dcdc.bdd","w");
-  Dddmp_cuddBddStore(
-    manager.getManager(),
-    NULL,
-    tf.getNode(),
-    //(char**)varnameschar, // char ** varnames, IN: array of variable names (or NULL)
-    NULL, // char ** varnames, IN: array of variable names (or NULL)
-    NULL,
-    //DDDMP_MODE_TEXT,
-    DDDMP_MODE_BINARY,
-    // DDDMP_VARNAMES,
-    DDDMP_VARIDS,
-    NULL,
-    file
-  );
-  fclose(file);
-  tt.toc();
-
 
   return 1;
 }

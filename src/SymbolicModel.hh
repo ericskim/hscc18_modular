@@ -41,6 +41,24 @@ private:
 	/* SymbolicSet conaining the BDD vars of the post  */
   const SymbolicSet& m_post;
 
+  void print_progress(const abs_type& i, const abs_type& N, abs_type& counter) {
+    if(!m_verbose)
+      return;
+    if(((double)i/(double)N*100)>counter){
+      if(counter==0)
+        std::cout << "loop: ";
+      if((counter%10)==0)
+        std::cout << counter;
+      else if((counter%2)==0) 
+        std::cout << ".";
+      counter++;
+    }
+    std::flush(std::cout); 
+    if(i==(N-1))
+      std::cout << "100\n";
+  }
+
+
 public:
   /* @cond  EXCLUDE from doxygen*/
   /* destructor */
@@ -57,14 +75,8 @@ public:
   /* @endcond */
 
   /** 
-   * @brief Construct SymbolicModel with the SymbolicSet s representing the
+   * @brief Construct SymbolicModel with the SymbolicSet representing the
    * state alphabet (pre and post) and input alphabet
-   * @param  - lambda function with signature  
-   *                      \verbatim [] (state_type &x, const input_type &u) ->  void  \endverbatim
-   *                      system_post(x,u) provides a numerical approximation of ODE 
-   *                      solution at time tau with initial state x and input u \n
-   *                      the result is stored in x
-   *
    **/
   SymbolicModel(const SymbolicSet& pre,
                 const SymbolicSet& input,
@@ -73,27 +85,26 @@ public:
     m_z = new double[pre.get_dim()] ();
   }
 
-  template<class F1, class F2>
-  BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, size_t& no_trans) {
-    return compute_gb(manager, system_post, radius_post, [](const abs_type&) noexcept {return false;}, no_trans);
-  }
   /** 
    * @brief computes the transition function
    *
    * @param manager     - Cudd manager
    *
-   * @param system_post - lambda expression  as above
+   * @param system_post - lambda expression as defined in  Abstraction::compute_gb
    *
-   * @param radius_post - lambda expression as above
+   * @param radius_post - lambda expression as defined in  Abstraction::compute_gb
    *
-   * @param avoid       - optionally provide a lambda of the form
-   *                      \verbatim [] (abs_type &i) -> bool \endverbatim
-   *                      returns true if the abstract state i is in the avoid
-   *                      set; otherwise returns false
+   * @param avoid       - lambda expression as defined in  Abstraction::compute_gb
+   *
    * @param no_trans    - number of transitions 
-   * @result   a BDD encoding the transition function as boolean function over
-   *              the BDD var IDs in m_pre, m_input, m_post
+   *
+   * @result              a BDD encoding the transition function as boolean function over
+   *                      the BDD var IDs in m_pre, m_input, m_post
    **/
+  template<class F1, class F2>
+  BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, size_t& no_trans) {
+    return compute_gb(manager, system_post, radius_post, [](const abs_type&) noexcept {return false;}, no_trans);
+  }
   template<class F1, class F2, class F3>
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, F3&& avoid, size_t& no_trans) {
     /* number of cells */
@@ -174,20 +185,8 @@ public:
         tf = tf | (bdd_i & bdd_j & bdd_k);
       }
       /* print progress */
-      if(m_verbose && ((double)i/(double)N*100)>counter){
-        if(counter==0)
-          std::cout << "loop: ";
-        if((counter%10)==0)
-          std::cout << counter;
-        else if((counter%2)==0) {
-          std::cout << ".";
-        }
-        counter++;
-      }
-      std::flush(std::cout); 
+      print_progress(i,N,counter);
     }
-    if(m_verbose)
-      std::cout << "100" << std::endl;
 
     /* count number of transitions */
     size_t nvars = m_pre.get_no_bdd_vars() +
@@ -196,33 +195,6 @@ public:
     no_trans=tf.CountMinterm(nvars);
     return tf;
   }
-//
-//  /** @brief TODO
-//   *  attainable set associated with cell with center x and input u
-//   *
-//   *  @param transition_function - the transition function of the abstraction
-//   *  @param x - center of cell 
-//   *  @param u - input
-//   **/
-//  void print_post(const state_type& x, const input_type& u) const { }
-//
-//  /** @brief TODO
-//   *  attainable set associated with cell (with center x) and input u
-//   *
-//   *  @param system_post - lambda function as in compute
-//   *  @param radius_post - lambda function as in compute
-//   *  @param x - center of cell 
-//   *  @param u - input
-//   **/
-//  template<class F1, class F2>
-//  void print_post( ){ }
-//
-//  /** @brief set the measurement error bound **/
-//  void set_measurement_error_bound(const state_type& error_bound) {
-//    for(int i=0; i<m_state_alphabet.get_dim(); i++) {
-//      m_z[i]=error_bound[i];
-//    }
-//  }
   /** @brief get measurement error bound **/
   std::vector<double> get_measruement_error_bound() {
     std::vector<double> z;

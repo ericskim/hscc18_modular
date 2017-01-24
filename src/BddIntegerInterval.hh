@@ -102,6 +102,7 @@ public:
   BDD int_to_bdd(int_type i) const {
     return m_int_to_bdd[i-m_lb];
   }
+
   /** @brief maps a (sub)interval in [lb; ub]  to its BDD representation **/
   BDD interval_to_bdd(const Cudd& manager, int_type lb, int_type ub) const {
     return manager.Interval(m_bdd_vars, static_cast<unsigned int>(lb)-m_lb, static_cast<unsigned int>(ub)-m_lb);

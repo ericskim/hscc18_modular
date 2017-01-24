@@ -43,6 +43,23 @@ private:
   const UniformGrid& m_input_alphabet;
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
+  /* to display the progress of the computation of the abstraction */
+  void print_progress(const abs_type& i, const abs_type& N, abs_type& counter) {
+    if(!m_verbose)
+      return;
+    if(((double)i/(double)N*100)>counter){
+      if(counter==0)
+        std::cout << "loop: ";
+      if((counter%10)==0)
+        std::cout << counter;
+      else if((counter%2)==0) 
+        std::cout << ".";
+      counter++;
+    }
+    std::flush(std::cout); 
+    if(i==(N-1))
+      std::cout << "100\n";
+  }
 public:
   /* @cond  EXCLUDE from doxygen*/
   /* destructor */
@@ -240,20 +257,8 @@ public:
         no_post[i*M+j]=npost;
       }
       /* print progress */
-      if(m_verbose && ((double)i/(double)N*100)>counter){
-        if(counter==0)
-          std::cout << "1st loop: ";
-        if((counter%10)==0)
-          std::cout << counter;
-        else if((counter%2)==0) {
-          std::cout << ".";
-        }
-        counter++;
-      }
-      std::flush(std::cout); 
+      print_progress(i,N,counter);
     }
-    if(m_verbose)
-      std::cout << "100" << std::endl;
     /* compute pre_ptr */
     abs_ptr_type sum=0;
     for(abs_type i=0; i<N; i++) {
@@ -309,20 +314,8 @@ public:
         }
       }
       /* print progress */
-      if(m_verbose && ((double)i/(double)N*100)>counter){
-        if(counter==0)
-          std::cout << "2nd loop: ";
-        if((counter%10)==0)
-          std::cout << counter;
-        else if((counter%2)==0) {
-          std::cout << ".";
-        }
-        counter++;
-      }
-      std::flush(std::cout); 
+      print_progress(i,N,counter);
     }
-    if(m_verbose) 
-      std::cout << "100" << std::endl;
     /* set values of abstract system */
     transition_function.m_no_states=N;
     transition_function.m_no_inputs=M;
