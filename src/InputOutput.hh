@@ -288,49 +288,34 @@ bool read_from_file(TransitionFunction& tf, const std::string& filename) {
   if(!reader.get_MEMBER(SCOTS_TF_NO_TRANS,T)) {
     return false;
   } 
-  abs_type* pre = new abs_type[T];
-  abs_type* no_pre = new abs_type[N*M];
-  abs_type* no_post = new abs_type[N*M];      
-  abs_ptr_type* pre_ptr = new abs_ptr_type[N*M];
-  auto cleanup = [&](void) {
-    delete[] pre;
-    delete[] no_pre;
-    delete[] no_post;
-    delete[] pre_ptr;
-  };
+  tf.init_infrastructure(N,M);
+  tf.init_transitions(T);
   size_t offset;
-  offset=reader.get_ARRAY(SCOTS_TF_NO_PRE,no_pre,N*M);
+  offset=reader.get_ARRAY(SCOTS_TF_NO_PRE,tf.m_no_pre,N*M);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
-  offset=reader.get_ARRAY(SCOTS_TF_NO_POST,no_post,N*M,offset);
+  offset=reader.get_ARRAY(SCOTS_TF_NO_POST,tf.m_no_post,N*M,offset);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
-  offset=reader.get_ARRAY(SCOTS_TF_PRE_PTR,pre_ptr,N*M,offset);
+  offset=reader.get_ARRAY(SCOTS_TF_PRE_PTR,tf.m_pre_ptr,N*M,offset);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
-  offset=reader.get_ARRAY(SCOTS_TF_PRE,pre,T,offset);
+  offset=reader.get_ARRAY(SCOTS_TF_PRE,tf.m_pre,T,offset);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
   reader.close();
-  tf.m_no_states=N;
-  tf.m_no_inputs=M;
-  tf.m_no_transitions=T;
-  tf.m_no_pre=no_pre;
-  tf.m_no_post=no_post;
-  tf.m_pre_ptr=pre_ptr;
-  tf.m_pre=pre;
   return true;
 }
 

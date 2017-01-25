@@ -16,7 +16,7 @@
 #include "GameSolver.hh"
 #include "WinningDomain.hh"
 #include "StaticController.hh"
-//#include "InputOutput.hh"
+#include "InputOutput.hh"
 
 
 #endif /* SCOTS_HH_ */

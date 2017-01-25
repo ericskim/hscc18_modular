@@ -122,7 +122,7 @@ int main() {
     return false;
   };
   /* write obstacles to file */
-  //write_to_file(ss,avoid,"obstacles.scs");
+  write_to_file(ss,avoid,"obstacles");
 
   std::cout << "Computing the transition function: " << std::endl;
   /* transition function of symbolic model */
@@ -149,7 +149,7 @@ int main() {
     return false;
   };
    /* write target to file */
-  //write_to_file(ss,target,"target.scs");
+  write_to_file(ss,target,"target");
 
  
   std::cout << "\nSynthesis: " << std::endl;
@@ -158,9 +158,9 @@ int main() {
   tt.toc();
   std::cout << "Winning domain size: " << win.get_size() << std::endl;
 
-//  std::cout << "\nWrite controller to controller.scs \n";
-//  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller.scs"))
-//    std::cout << "Done. \n";
+  std::cout << "\nWrite controller to controller.scs \n";
+  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller"))
+    std::cout << "Done. \n";
 
   return 1;
 }
