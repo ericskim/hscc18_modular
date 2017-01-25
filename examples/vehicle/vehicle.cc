@@ -122,7 +122,7 @@ int main() {
     return false;
   };
   /* write obstacles to file */
-  write_to_file(ss,avoid,"obstacles.scs");
+  write_to_file(ss,avoid,"obstacles");
 
   std::cout << "Computing the transition function: " << std::endl;
   /* transition function of symbolic model */
