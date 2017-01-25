@@ -12,19 +12,16 @@ classdef SymbolicSet < handle
   methods 
     function obj=SymbolicSet(filename)
     % the constructor opens the file 
-      if(isstr(filename))
+      if(ischar(filename))
         obj.filename=filename;
       else
         error('filname is not a string');
       end
 
-      [h dim]=mexSymbolicSet('init',filename);
+      [h, dim]=mexSymbolicSet('init',filename);
       obj.filename=filename;
       obj.h = h;
       obj.dim = dim;
-      if(isempty(h))
-        error(['SymbolicSet: could not read SymbolicSet from ', filename])
-      end
     end
     function disp(obj)
       disp(['Matlab object to access the points cointained in the SymbolicSet stored in ', obj.filename])
@@ -43,21 +40,21 @@ classdef SymbolicSet < handle
         error('SymbolicSet: vector equals or exceeds dimension');
       end
       if(isempty(varargin))
-        dim=0:1:x-1;
-        dim=dim(:);
+        r_dim=0:1:length(x)-1;
       else 
-        dim=varargin{1}(:);
-        if(length(dim)~=n)
+        r_dim=varargin{1}(:);
+        if(length(r_dim)~=n)
           error('SymbolicSet: vector and project dimensions must be of the same length');
         end
-        if(max(dim)>obj.dim)
+        if(max(r_dim)>obj.dim)
           error('SymbolicSet: project dimensions exceed dimension');
         end
-        dim = dim-1;
+        r_dim = r_dim-1;
       end
-      points=mexSymbolicSet('restriction',obj.h,x,dim);
+      r_dim=r_dim(:);
+      points=mexSymbolicSet('restriction',obj.h,x,r_dim);
       if(isempty(points))
-          error(['SymbolicSet: no grid points found for ',num2str(x)]);
+        error(['SymbolicSet: no grid points found for x=[',num2str(x'),']']);
       end
     end
 
@@ -67,19 +64,19 @@ classdef SymbolicSet < handle
     % get.point('project',[1 3]) loads the grid points in the symbolic set
     % projected onto the dimensions [1 3]
       if(isempty(varargin))
-        dim=0:1:obj.dim-1;
-        dim=dim(:);
+        p_dim=0:1:obj.dim-1;
+        p_dim=p_dim(:);
       else 
-        dim=varargin{1}(:);
-        if(length(dim)>=obj.dim)
+        p_dim=varargin{1}(:);
+        if(length(p_dim)>=obj.dim)
           error('SymbolicSet: vector of project dimensions exceeds dimension');
         end
-        if(max(dim)>obj.dim)
+        if(max(p_dim)>obj.dim)
           error('SymbolicSet: project dimensions exceed dimension');
         end
-        dim = dim-1;
+        p_dim = p_dim-1;
       end
-      points=mexSymbolicSet('gridpoints',obj.h,dim);
+      points=mexSymbolicSet('gridpoints',obj.h,p_dim);
     end
   end
 end

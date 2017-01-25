@@ -119,8 +119,8 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  state_type x;
-  auto avoid = [&x,&H,&ss_pre,&s_eta](const abs_type idx) {
+  auto avoid = [&H,&ss_pre,&s_eta](const abs_type idx) {
+    state_type x;
     ss_pre.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
     double c2= s_eta[1]/2.0+1e-10;
@@ -131,50 +131,60 @@ int main() {
     }
     return false;
   };
+
+
   /* compute BDD for the avoid set (returns the number of elements) */ 
-  BDD bdd_avoid = ss_pre.ap_to_bdd(mgr,avoid);
+  BDD A = ss_pre.ap_to_bdd(mgr,avoid);
   /* write ap to files avoid.scs/avoid.bdd */
-  scots::write_to_file(ss_pre,bdd_avoid,"avoid");
+  scots::write_to_file(ss_pre,A,"obstacles");
 
   std::cout << "Computing the transition function: " << std::endl;
   /* initialize SymbolicModel class with the abstract state and input alphabet */
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
+  /* does there exist the transition function file ?*/
+  BDD TF;
+  scots::SymbolicSet set(scots::SymbolicSet(ss_pre,ss_input),ss_post);
+  if(!scots::read_from_file(set,TF,mgr,"tf")) {
+    tt.tic();
+    size_t no_trans;
+    BDD TF = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
+    tt.toc();
+    std::cout << "Number of transitions: " << no_trans << std::endl;
+    if(!getrusage(RUSAGE_SELF, &usage))
+      std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
+
+    scots::write_to_file(set,TF,"tf");
+  } 
+
+  /* define target set */
+  auto target = [&ss_pre,&s_eta](const abs_type& idx) {
+    state_type x;
+    ss_pre.itox(idx,x);
+    /* function returns 1 if cell associated with x is in target set  */
+    if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 
+        0 <= (x[1]-s_eta[1]/2.0) && (x[1]+s_eta[1]/2.0) <= 0.5)
+      return true;
+    return false;
+  };
+  BDD T = ss_pre.ap_to_bdd(mgr,target);
+   /* write target to file */
+  write_to_file(ss_pre,T,"target");
+
+  std::cout << "\nSynthesis: " << std::endl;
+  scots::EnfPre enf_pre(mgr,TF,sym_model);
   tt.tic();
-  size_t no_trans;
-  BDD tf = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
+  BDD C = solve_reachability_game(mgr,enf_pre,T);
   tt.toc();
-  std::cout << "Number of transitions: " << no_trans << std::endl;
-  if(!getrusage(RUSAGE_SELF, &usage))
-    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
+
+  std::cout << "Winning domain size: " << ss_pre.get_size(mgr,C) << std::endl;
+  
+  /* symbolic set for the controller */
+  scots::SymbolicSet controller(ss_pre,ss_input);
+  std::cout << "\nWrite controller to controller.scs \n";
+  if(write_to_file(controller,C,"controller"))
+    std::cout << "Done. \n";
 
 
-    //BDD Z = ddmgr_->bddOne();
-    //BDD ZZ = ddmgr_->bddZero();
-    ///* the controller */
-    //BDD C = ddmgr_->bddZero();
-    ///* as long as not converged */
-    //size_t i;
-    //for(i=1; ZZ != Z; i++ ) {
-    //  Z=ZZ;
-    //  ZZ=FixedPoint::pre(Z) | TT;
-    //  /* new (state/input) pairs */
-    //  BDD N = ZZ & (!(C.ExistAbstract(cubeInput_)));
-    //  /* add new (state/input) pairs to the controller */
-    //  C=C | N;
-    //  /* print progress */
-    //  if(verbose) {
-    //    std::cout << ".";
-    //    std::flush(std::cout);
-    //    if(!(i%80))
-    //      std::cout << std::endl;
-    //  }
-    //}
-    //if(verbose) 
-    //  std::cout << " number: " << i << std::endl;
-    ///* restor transition relation */
-    //RR_=RR;
-    //return C;
-
-  return 1;
+    return 1;
 }

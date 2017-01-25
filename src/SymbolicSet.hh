@@ -162,7 +162,7 @@ public:
   /**
    * @brief obtain a BDD representation of the grid points whose grid point IDs
    * evaluate to true in the lambda expression
-   * \verbatim [](const abs_type& i) -> bool \endverbatim
+   * \verbatim [](const abs_type& i) -> bool \std::endverbatim
    **/
   template<class F>
   BDD ap_to_bdd(const Cudd& manager, const F& atomic_prop) const {
@@ -194,7 +194,7 @@ public:
 		auto support_id = bdd.SupportIndices();
     std::vector<BDD> out{}; 
     for(const auto& id : support_id) {
-        if(std::find(var_id.begin(), var_id.end(), id)==var_id.end())
+        if(std::find(std::begin(var_id), std::end(var_id), id)==std::end(var_id))
           out.emplace_back(manager.bddVar(id));
     }
     /* remove those variables from the bdd */
@@ -204,8 +204,9 @@ public:
     for(const auto& interval : m_bdd_interval) 
       bdd = bdd & interval.get_all_elements();
     /* init the vector of grid points to be returned */
-    std::vector<double> gp(get_size(bdd)*m_dim);
-    for(abs_type i=0; i<get_size(bdd); i++) {
+    abs_type no_gp = get_size(manager,bdd);
+    std::vector<double> gp(no_gp*m_dim);
+    for(abs_type i=0; i<no_gp; i++) {
       for(int j=0; j<m_dim; j++)
         gp[i*m_dim+j]=m_first[j];
     }
@@ -223,7 +224,9 @@ public:
         for (unsigned int j=0; j<no_vars; j++) {
           unsigned int id = m_bdd_interval[i].get_bdd_var_ids()[j];
           if(cube[id]==1) {
-            gp[counter*m_dim+i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
+            for(abs_type k=0; k<offset; k++) {
+              gp[(counter+k)*m_dim+i]+=(abs_type{1}<<(no_vars-1-j))*m_eta[i];
+            }
           }
           /* take care of don't care */
           if(cube[id]==2) {
@@ -297,12 +300,12 @@ public:
     /* fill in default values */
     if(domain.size()==0) {
       domain.resize(x.size());
-      std::iota(domain.begin(),domain.end(),0);
+      std::iota(std::begin(domain),std::end(domain),0);
       codomain.resize(m_dim-x.size());
-      std::iota(codomain.begin(),codomain.end(),x.size());
+      std::iota(std::begin(codomain),std::end(codomain),x.size());
     } else {
       for(int i=0; i<m_dim; i++) {
-        if(std::find(domain.begin(), domain.end(), i) == domain.end())
+        if(std::find(std::begin(domain), std::end(domain), i) == std::end(domain))
           codomain.push_back(i);
       }
     }
@@ -313,7 +316,6 @@ public:
     abs_type id = set_dom.xtoi(x);
     BDD restricted = bdd & set_dom.id_to_bdd(id);
     restricted = restricted.ExistAbstract(manager.computeCube(set_dom.get_bdd_vars()));
-    restricted.PrintMinterm();
     /* map restricted BDD to grid points */
     return set_codom.bdd_to_grid_points(manager,restricted);
   }
@@ -349,7 +351,18 @@ public:
   }
 
   /** @brief get number grid points represented by the BDD  **/
-  abs_type get_size(BDD bdd) const {
+  abs_type get_size(const Cudd& manager, BDD bdd) const {
+		/* find the variables in the support of the BDD but outside the SymbolicSet */
+	  auto var_id = get_bdd_var_ids();
+		auto support_id = bdd.SupportIndices();
+    std::vector<BDD> out{}; 
+    for(const auto& id : support_id) {
+        if(std::find(std::begin(var_id), std::end(var_id), id)==std::end(var_id))
+          out.emplace_back(manager.bddVar(id));
+    }
+    /* remove those variables from the bdd */
+    if(out.size()) 
+      bdd = bdd.ExistAbstract(manager.computeCube(out));
     /* limit the grid points in the grid */
     for(const auto& interval : m_bdd_interval) 
       bdd = bdd & interval.get_all_elements();

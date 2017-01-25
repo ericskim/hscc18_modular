@@ -1,5 +1,6 @@
 
-A path planning problem for a vehicle using the bycicle model
+A path planning problem for a vehicle using the bycicle model based on the BDD
+data structure
 
 1. edit the Makefile 
    adjust the compiler to your programming environment
@@ -17,7 +18,11 @@ A path planning problem for a vehicle using the bycicle model
   which produces
 
   ./controller.scs
+  ./controller.bdd
   ./obstacles.scs
+  ./obstacles.bdd
+  ./target.scs
+  ./target.bdd
 
 4. simulate the closed loop by running
 

@@ -26,7 +26,7 @@
 /* scots classes with bdd support */
 #include "SymbolicSet.hh"
 #include "SymbolicModel.hh"
-#include "EnfPre.hh"
+#include "FixedPoint.hh"
 #endif
 
 #endif /* SCOTS_HH_ */

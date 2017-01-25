@@ -3,8 +3,7 @@
 #
 #CC        = g++
 CC       	  = clang++
-CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG -DSCOTS_BDD
-CXXDEBUG		= -g -Wall -Wextra -std=c++11 
+CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3 -DNDEBUG -DSCOTS_BDD
 #
 # scots 
 #
@@ -18,7 +17,7 @@ CUDD		    =  -I/opt/local/include -L/opt/local/lib -lcudd
 
 .PHONY: vehicle simulate
 
-TARGET = vehicle
+TARGET = vehicle simulate
 
 all: $(TARGET)
 

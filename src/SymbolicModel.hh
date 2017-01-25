@@ -211,6 +211,15 @@ public:
   void verbose_off() {
     m_verbose=false;
   }
+  const SymbolicSet& get_sym_set_pre() const {
+    return m_pre;
+  }
+  const SymbolicSet& get_sym_set_post() const {
+    return m_post;
+  }
+  const SymbolicSet& get_sym_set_input() const {
+    return m_input;
+  }
 };
 
 } /* close namespace */
