@@ -170,21 +170,21 @@ public:
 
 
   /** @brief allocate part of the sparse matrix infrastructure **/
-  void init_infrastructure(size_t no_state, size_t no_inputs) {
+  void init_infrastructure(const abs_type& no_state, const abs_type& no_inputs) {
     clear();
     m_no_states=no_state;
     m_no_inputs=no_inputs;
 
-    m_pre_ptr.reset(new abs_ptr_type[no_state*no_inputs] ());
+    m_pre_ptr.reset(new abs_ptr_type[no_state*no_inputs]);
     m_no_pre.reset(new abs_type[no_state*no_inputs] ());
     m_no_post.reset(new abs_type[no_state*no_inputs] ());
 
   }
 
   /** @brief allocate memory for pre array **/
-  void init_transitions(size_t no_trans) {
-    m_no_states=no_trans;
-    m_pre.reset(new abs_type[no_trans] ());
+  void init_transitions(const abs_ptr_type& no_trans) {
+    m_no_transitions=no_trans;
+    m_pre.reset(new abs_type[no_trans]);
   }  
   
   /** @brief clear memory of TransitionFunction (if desired) **/
