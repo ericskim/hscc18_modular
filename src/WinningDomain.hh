@@ -42,7 +42,7 @@ namespace scots {
  **/
 class WinningDomain {
 /* allow the write_to_file function to access the private members */
-friend bool write_to_file(const WinningDomain&, const std::string&);
+friend bool write_to_file(const WinningDomain&, const std::string&, bool);
 private:
   /** @brief size of state alphabet N **/
   abs_type m_no_states=0;

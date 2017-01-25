@@ -52,20 +52,26 @@ namespace scots {
 
 /** @brief write WinningDomain to a file via a FileWriter **/
 inline
-bool write_to_file(const WinningDomain& wd, const std::string& filename) {
+bool write_to_file(const WinningDomain& wd, const std::string& filename, bool append_to_file=false ) {
   FileWriter writer(filename);
-  if(writer.open()) {
-    writer.add_TYPE(SCOTS_WD_TYPE);
-    writer.add_TEXT("i (state) j_0 ... j_n (valid inputs)");
-    writer.add_WINNINGDOMAIN(SCOTS_WD_DATA,
-                             wd.m_winning_domain,
-                             wd.m_inputs,
-                             wd.m_no_states,
-                             wd.m_no_inputs);
-    writer.close();
-    return true;
+  if(append_to_file) {
+    if(!writer.open()) {
+      return false;
+     }
+  } else {
+    if(!writer.create()) {
+      return false;
+     }
   }
-  return false;
+  writer.add_TYPE(SCOTS_WD_TYPE);
+  writer.add_TEXT("i (state) j_0 ... j_n (valid inputs)");
+  writer.add_WINNINGDOMAIN(SCOTS_WD_DATA,
+                           wd.m_winning_domain,
+                           wd.m_inputs,
+                           wd.m_no_states,
+                           wd.m_no_inputs);
+  writer.close();
+  return true;
 }
 
 /** @brief write StaticController to a file via a FileWriter **/
@@ -95,7 +101,7 @@ bool write_to_file(const StaticController& sc, const std::string& filename) {
     writer.close();
 
     /* write WinningDomain */
-    return write_to_file(sc.m_winning_domain,filename);
+    return write_to_file(sc.m_winning_domain,filename,true);
   }
   return false;
 }
