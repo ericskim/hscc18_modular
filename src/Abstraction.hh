@@ -44,12 +44,10 @@ private:
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
   /* to display the progress of the computation of the abstraction */
-  void print_progress(const abs_type& i, const abs_type& N, abs_type& counter) {
+  void progress(const abs_type& i, const abs_type& N, abs_type& counter) {
     if(!m_verbose)
       return;
-    if(((double)i/(double)N*100)>counter){
-      if(counter==0)
-        std::cout << "loop: ";
+    if(((double)i/(double)N*100)>=counter){
       if((counter%10)==0)
         std::cout << counter;
       else if((counter%2)==0) 
@@ -70,7 +68,6 @@ public:
   Abstraction& operator=(Abstraction&&)=delete;
   Abstraction& operator=(const Abstraction&)=delete;
   /* @endcond */
-
 
   /** @brief constructor with the abstract state alphabet and abstract input
    * alphabet (measurement error bound is set to zero)
@@ -250,7 +247,9 @@ public:
         transition_function.m_no_post[i*M+j]=npost;
       }
       /* print progress */
-      print_progress(i,N,counter);
+      if(counter==0)
+        std::cout << "1st loop: ";
+      progress(i,N,counter);
     }
     /* compute pre_ptr */
     abs_ptr_type sum=0;
@@ -305,7 +304,9 @@ public:
         }
       }
       /* print progress */
-      print_progress(i,N,counter);
+      if(counter==0)
+        std::cout << "2nd loop: ";
+      progress(i,N,counter);
     }
   }
  
