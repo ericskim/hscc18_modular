@@ -17,7 +17,7 @@
 #include <numeric>
 
 #include "UniformGrid.hh"
-#include "BddIntegerInterval.hh"
+#include "IntegerInterval.hh"
 
 /* cudd library */
 #include "cuddObj.hh"
@@ -33,8 +33,8 @@ namespace scots {
  **/
 class SymbolicSet : public UniformGrid {
 private:
-  /* a vector of BddIntegerIntervals - one for each dimension */
-  std::vector<BddIntegerInterval<abs_type>> m_bdd_interval;
+  /* a vector of IntegerIntervals - one for each dimension */
+  std::vector<IntegerInterval<abs_type>> m_bdd_interval;
 public:
   /** @brief construct SymbolicSet with a Cudd manager **/
   SymbolicSet() : UniformGrid(), m_bdd_interval{} { }
@@ -48,7 +48,7 @@ public:
   
   /** @brief create a SymbolicSet and initialize m_bdd_interval with intervals **/
   SymbolicSet(const UniformGrid& grid,
-              const std::vector<BddIntegerInterval<abs_type>>& intervals) :
+              const std::vector<IntegerInterval<abs_type>>& intervals) :
               UniformGrid(grid), m_bdd_interval(intervals) { 
   }
 
@@ -356,8 +356,8 @@ public:
     return static_cast<abs_type>(bdd.CountMinterm(get_no_bdd_vars()));
   } 
 
-  /** @brief get BddIntegerInterval  **/
-  std::vector<BddIntegerInterval<abs_type>> get_bdd_intervals() const {
+  /** @brief get IntegerInterval  **/
+  std::vector<IntegerInterval<abs_type>> get_bdd_intervals() const {
     return m_bdd_interval;
   }
 }; /* close class def */

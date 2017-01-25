@@ -389,8 +389,8 @@ bool read_from_file(SymbolicSet& set, const Cudd& manager, const std::string& fi
   UniformGrid grid;
   read_from_file(grid,filename);
 
-  /* read the BDD variable IDs and create BddIntegerInterval*/
-  std::vector<BddIntegerInterval<abs_type>> bdd_interval{};
+  /* read the BDD variable IDs and create IntegerInterval*/
+  std::vector<IntegerInterval<abs_type>> bdd_interval{};
   FileReader reader(filename);
   if(reader.open()) {
     size_t offset = 0;

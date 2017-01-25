@@ -23,3 +23,8 @@
 \form#22:$j$
 \form#23:\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]
 \form#24:$ \xi(\tau) $
+\form#25:$ F:X\times U \rightrightarrows X$
+\form#26:$ Z\subseteq X$
+\form#27:$pre(Z)=\{ x \in X \mid \exists_{u\in U} F(x,u)\neq \emptyset \wedge F(x,u)\subseteq Z\}$
+\form#28:$\mathrm{pre}(Z)=\{ x \in X \mid \exists_{u\in U} F(x,u)\neq \emptyset \wedge F(x,u)\subseteq Z\}$
+\form#29:$\mathrm{pre}(Z)=\{ (x,u) \in X\times U \mid F(x,u)\neq \emptyset \wedge F(x,u)\subseteq Z\}$

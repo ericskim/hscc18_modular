@@ -1,15 +1,9 @@
 var searchData=
 [
-  ['m_5fdim',['m_dim',['../classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b',1,'scots::UniformGrid']]],
-  ['m_5feta',['m_eta',['../classscots_1_1_uniform_grid.html#a140ae965e1cc6c943a5530c8d980a9d7',1,'scots::UniformGrid']]],
-  ['m_5ffirst',['m_first',['../classscots_1_1_uniform_grid.html#a67427e17f476b4dcae2a3ce3d5f1e9a4',1,'scots::UniformGrid']]],
-  ['m_5fnn',['m_NN',['../classscots_1_1_uniform_grid.html#a4e742aa9773f155219ee91633e432415',1,'scots::UniformGrid']]],
-  ['m_5fno_5fgrid_5fpoints',['m_no_grid_points',['../classscots_1_1_uniform_grid.html#ae1e2e02e29cf20161f17941d8d12aad9',1,'scots::UniformGrid']]],
-  ['m_5fno_5finputs',['m_no_inputs',['../classscots_1_1_transition_function.html#a9fcfa935ff7237356e3f41c8b453da5c',1,'scots::TransitionFunction']]],
-  ['m_5fno_5fpost',['m_no_post',['../classscots_1_1_transition_function.html#a347aaf3713c8eb2273a129f3b376102f',1,'scots::TransitionFunction']]],
-  ['m_5fno_5fpre',['m_no_pre',['../classscots_1_1_transition_function.html#ac17a84bea4d9b9f7da6d8ac9f414eb6f',1,'scots::TransitionFunction']]],
-  ['m_5fno_5fstates',['m_no_states',['../classscots_1_1_transition_function.html#ae179e2b5c9e19462abb13c143dd5ea04',1,'scots::TransitionFunction']]],
-  ['m_5fno_5ftransitions',['m_no_transitions',['../classscots_1_1_transition_function.html#a26e76fd70ab29e99f9457233ad989077',1,'scots::TransitionFunction']]],
-  ['m_5fpre',['m_pre',['../classscots_1_1_transition_function.html#ae4311154ff1f3879976120979877d0ea',1,'scots::TransitionFunction']]],
-  ['m_5fpre_5fptr',['m_pre_ptr',['../classscots_1_1_transition_function.html#a7e2ab6fe2ee92430571c4f16a0c54aac',1,'scots::TransitionFunction']]]
+  ['id_5fto_5fbdd',['id_to_bdd',['../classscots_1_1_symbolic_set.html#aad322c1de43babea44fe4fa88daff407',1,'scots::SymbolicSet']]],
+  ['inputoutput_2ehh',['InputOutput.hh',['../_input_output_8hh.html',1,'']]],
+  ['int_5fto_5fbdd',['int_to_bdd',['../classscots_1_1_bdd_integer_interval.html#a8aac74ec747cd53cebc0b328fde50f9f',1,'scots::BddIntegerInterval']]],
+  ['interval_5fto_5fbdd',['interval_to_bdd',['../classscots_1_1_bdd_integer_interval.html#a110e84a8d563eff9371f7ccb84941bc1',1,'scots::BddIntegerInterval::interval_to_bdd()'],['../classscots_1_1_symbolic_set.html#aac5ad57f9fecc632012f664ec7ea29c6',1,'scots::SymbolicSet::interval_to_bdd()']]],
+  ['is_5fwinning',['is_winning',['../classscots_1_1_winning_domain.html#ad71c07fda3268a4c288f3ec5c1d8342d',1,'scots::WinningDomain']]],
+  ['itox',['itox',['../classscots_1_1_uniform_grid.html#a0c902d0afff552e3ddcebca80fe64ccb',1,'scots::UniformGrid::itox(abs_type id, grid_point_t &amp;x) const'],['../classscots_1_1_uniform_grid.html#a8e459b4ebfbd69ff5841573a8b886fb6',1,'scots::UniformGrid::itox(abs_type id, std::vector&lt; double &gt; &amp;x) const']]]
 ];

@@ -122,6 +122,19 @@ int main() {
     std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)no_trans<< "\n";
   }
 
+  //std::cout << "Synthesis: ";
+
+  //BDD Z = ddmgr_->bddZero();
+  //BDD ZZ = ddmgr_->bddOne();
+  ///* as long as not converged */
+  //size_t i;
+  //for(i=1; ZZ != Z; i++ ) {
+  //  Z=ZZ;
+  //  ZZ=scots::enf_pre(Z) & S;
+  //  std::cout << "." << std::endl;
+  //}
+  //std::cout << "Number of iterations: " << i << std::endl;
+
   return 1;
 }
 

@@ -149,6 +149,32 @@ int main() {
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
 
+    //BDD Z = ddmgr_->bddOne();
+    //BDD ZZ = ddmgr_->bddZero();
+    ///* the controller */
+    //BDD C = ddmgr_->bddZero();
+    ///* as long as not converged */
+    //size_t i;
+    //for(i=1; ZZ != Z; i++ ) {
+    //  Z=ZZ;
+    //  ZZ=FixedPoint::pre(Z) | TT;
+    //  /* new (state/input) pairs */
+    //  BDD N = ZZ & (!(C.ExistAbstract(cubeInput_)));
+    //  /* add new (state/input) pairs to the controller */
+    //  C=C | N;
+    //  /* print progress */
+    //  if(verbose) {
+    //    std::cout << ".";
+    //    std::flush(std::cout);
+    //    if(!(i%80))
+    //      std::cout << std::endl;
+    //  }
+    //}
+    //if(verbose) 
+    //  std::cout << " number: " << i << std::endl;
+    ///* restor transition relation */
+    //RR_=RR;
+    //return C;
 
   return 1;
 }

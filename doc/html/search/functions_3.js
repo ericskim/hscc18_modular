@@ -1,7 +1,8 @@
 var searchData=
 [
   ['get_5fall_5felements',['get_all_elements',['../classscots_1_1_bdd_integer_interval.html#a35c7d59d0198154a31a6651a1f7807aa',1,'scots::BddIntegerInterval']]],
-  ['get_5fbdd_5fvar_5fids',['get_bdd_var_ids',['../classscots_1_1_bdd_integer_interval.html#a9d430a85b87773e07b893e535d53137f',1,'scots::BddIntegerInterval::get_bdd_var_ids()'],['../classscots_1_1_symbolic_set.html#a28129f5fa746e1c523a1e23267b31900',1,'scots::SymbolicSet::get_bdd_var_ids()']]],
+  ['get_5fbdd_5fintervals',['get_bdd_intervals',['../classscots_1_1_symbolic_set.html#a441b255b68e12148511f8e2861287936',1,'scots::SymbolicSet']]],
+  ['get_5fbdd_5fvar_5fids',['get_bdd_var_ids',['../classscots_1_1_bdd_integer_interval.html#a9d430a85b87773e07b893e535d53137f',1,'scots::BddIntegerInterval::get_bdd_var_ids()'],['../classscots_1_1_symbolic_set.html#a1a7e28847a3ed4438c33756506ee080e',1,'scots::SymbolicSet::get_bdd_var_ids()']]],
   ['get_5fbdd_5fvars',['get_bdd_vars',['../classscots_1_1_bdd_integer_interval.html#a5c8ad7749b92e0843abe79613b6cd2df',1,'scots::BddIntegerInterval::get_bdd_vars()'],['../classscots_1_1_symbolic_set.html#aeb542bb6c938f99d1e8e0bd24df16830',1,'scots::SymbolicSet::get_bdd_vars()']]],
   ['get_5fcontrol',['get_control',['../classscots_1_1_static_controller.html#a7bbdc76b030eb9215aaa72c44e730416',1,'scots::StaticController']]],
   ['get_5fdomain',['get_domain',['../classscots_1_1_static_controller.html#a4ea477bd0a3a78a6b5f06cba19815fa4',1,'scots::StaticController']]],

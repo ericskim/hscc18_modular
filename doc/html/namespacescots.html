@@ -63,7 +63,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">scots Namespace Reference</div>  </div>
 </div><!--header-->
@@ -76,6 +77,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_bdd_integer_interval.html">BddIntegerInterval</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class to represent the integers in a closed integer interval [lb; ub] as BDDs.  <a href="classscots_1_1_bdd_integer_interval.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1enf__pre.html">enf_pre</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes of the enforcable predecessor  <a href="classscots_1_1enf__pre.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_file_handler.html">FileHandler</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="classscots_1_1_file_handler.html" title="The FileHandler class stores the filename. ">FileHandler</a> class stores the filename.  <a href="classscots_1_1_file_handler.html#details">More...</a><br /></td></tr>
@@ -123,6 +127,12 @@ determinse implicitely an upper bound on the number of transitions (default = * 
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a894b2b1c6a09afd63080775c7ebdaa60"><td class="memItemLeft" align="right" valign="top"><a id="a894b2b1c6a09afd63080775c7ebdaa60"></a>
+class <a class="el" href="classscots_1_1enf__pre.html">scots::enf_pre</a>&#160;</td><td class="memItemRight" valign="bottom"><b>reach</b> (const BDD &amp;T, int verbose=0)</td></tr>
+<tr class="separator:a894b2b1c6a09afd63080775c7ebdaa60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e937d266ceefab9076ff039327aaf33"><td class="memItemLeft" align="right" valign="top"><a id="a7e937d266ceefab9076ff039327aaf33"></a>
+BDD&#160;</td><td class="memItemRight" valign="bottom"><b>reachAvoid</b> (const BDD &amp;T, const BDD &amp;A, int verbose=0)</td></tr>
+<tr class="separator:a7e937d266ceefab9076ff039327aaf33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
 <tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#a83ed532f815589bd86e519a173ac63ac">solve_reachability_game</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;trans_function, F1 &amp;target, F2 &amp;&amp;avoid, <a class="el" href="namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d">val_functionction_type</a> &amp;value)</td></tr>
 <tr class="memdesc:a83ed532f815589bd86e519a173ac63ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve reachability game according to Algorithm 2 in <a href="./../../manual/manual.pdf">manual</a>  <a href="#a83ed532f815589bd86e519a173ac63ac">More...</a><br /></td></tr>
@@ -172,6 +182,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="memitem:aba02119f1be93e8bde91a30aaf308488"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#aba02119f1be93e8bde91a30aaf308488">runge_kutta_fixed4</a> (RHS rhs, state_type &amp;x, input_type &amp;u, const int dim, const double tau, const int nint=10) noexcept</td></tr>
 <tr class="memdesc:aba02119f1be93e8bde91a30aaf308488"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fixed step size ODE solver implementing a RungeKutta scheme of order 4.  <a href="#aba02119f1be93e8bde91a30aaf308488">More...</a><br /></td></tr>
 <tr class="separator:aba02119f1be93e8bde91a30aaf308488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ab2c0efc775521f99ab1cbad41fadc8d2"><td class="memItemLeft" align="right" valign="top"><a id="ab2c0efc775521f99ab1cbad41fadc8d2"></a>
+class <a class="el" href="classscots_1_1_static_controller.html">scots::StaticController</a>&#160;</td><td class="memItemRight" valign="bottom"><b>reach</b></td></tr>
+<tr class="separator:ab2c0efc775521f99ab1cbad41fadc8d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"></div><h2 class="groupheader">Typedef Documentation</h2>
