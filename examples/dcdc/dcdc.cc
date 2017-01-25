@@ -136,7 +136,7 @@ int main() {
   std::cout << "Winning domain size: " << win.get_size() << "\n";
 
   std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller.scs"))
+  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller"))
     std::cout << "Done. \n";
 
   return 1;

@@ -146,7 +146,7 @@ int main() {
     return false;
   };
   /* write grid point IDs with uniform grid information to file */
-  write_to_file(ss,target,"target.scs");
+  write_to_file(ss,target,"target");
  
   std::cout << "\nSynthesis: " << std::endl;
   tt.tic();
@@ -155,7 +155,7 @@ int main() {
   std::cout << "Winning domain size: " << win.get_size() << std::endl;
 
   std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller.scs"))
+  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller"))
     std::cout << "Done. \n";
 
   return 1;
