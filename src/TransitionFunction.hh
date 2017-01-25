@@ -16,6 +16,7 @@
 #include <cstring>
 #include <vector>
 #include <cstdint>
+#include <memory>
 
 /** @namespace scots **/ 
 namespace scots {
@@ -76,13 +77,13 @@ public:
   /** @brief number of transitions T **/
   abs_ptr_type m_no_transitions; 
   /** @brief array[N*M] containing the pre's address in the array m_pre[T] **/
-  abs_ptr_type* m_pre_ptr;    
+  std::unique_ptr<abs_ptr_type[]> m_pre_ptr;    
   /** @brief array[T] containing the list of all pre */
-  abs_type* m_pre;         
+  std::unique_ptr<abs_type[]> m_pre;         
   /** @brief array[N*M] saving the number of post for each state-input pair (i,j) **/
-  abs_type* m_no_post;      
+  std::unique_ptr<abs_type[]> m_no_post;      
   /** @brief array[N*M] saving the number of pre for each state-input pair (i,j) **/
-  abs_type* m_no_pre;    
+  std::unique_ptr<abs_type[]> m_no_pre;    
 public:
   /* @cond  EXCLUDE from doxygen */
   /* default constructor */
@@ -91,41 +92,29 @@ public:
     m_no_inputs=0;
     m_no_transitions=0;
 
-    m_pre=nullptr;
-    m_pre_ptr=nullptr;
-    m_no_pre=nullptr;
-    m_no_post=nullptr;
+    m_pre.reset(nullptr);
+    m_pre_ptr.reset(nullptr);
+    m_no_pre.reset(nullptr);
+    m_no_post.reset(nullptr);
   }  
-  /* default destructor */
-  ~TransitionFunction() {
-    delete[] m_pre;
-    delete[] m_pre_ptr;
-    delete[] m_no_post;
-    delete[] m_no_pre;
-  }
   /* move constructor */
   TransitionFunction(TransitionFunction&& other) {
     *this = std::move(other);  
   }
   /* move asignement operator */
   TransitionFunction& operator=(TransitionFunction&& other) {
-    m_no_states=other.m_no_states;
-    m_no_inputs=other.m_no_inputs;
-    m_no_transitions=other.m_no_transitions;
+    m_no_states=std::move(other.m_no_states);
+    m_no_inputs=std::move(other.m_no_inputs);
+    m_no_transitions=std::move(other.m_no_transitions);
 
-    m_pre=other.m_pre;
-    m_pre_ptr=other.m_pre_ptr;
-    m_no_pre=other.m_no_pre;
-    m_no_post=other.m_no_post;
+    m_pre=std::move(other.m_pre);
+    m_pre_ptr=std::move(other.m_pre_ptr);
+    m_no_pre=std::move(other.m_no_pre);
+    m_no_post=std::move(other.m_no_post);
 
     other.m_no_states=0;
     other.m_no_inputs=0;
     other.m_no_transitions=0;
-
-    other.m_pre=nullptr;
-    other.m_pre_ptr=nullptr;
-    other.m_no_pre=nullptr;
-    other.m_no_post=nullptr;
 
     return *this;
   }
@@ -177,6 +166,37 @@ public:
       throw std::runtime_error(os.str().c_str());
     }
     return post;
+  }
+
+
+  /** @brief allocate part of the sparse matrix infrastructure **/
+  void init_infrastructure(size_t no_state, size_t no_inputs) {
+    clear();
+    m_no_states=no_state;
+    m_no_inputs=no_inputs;
+
+    m_pre_ptr.reset(new abs_ptr_type[no_state*no_inputs] ());
+    m_no_pre.reset(new abs_type[no_state*no_inputs] ());
+    m_no_post.reset(new abs_type[no_state*no_inputs] ());
+
+  }
+
+  /** @brief allocate memory for pre array **/
+  void init_transitions(size_t no_trans) {
+    m_no_states=no_trans;
+    m_pre.reset(new abs_type[no_trans] ());
+  }  
+  
+  /** @brief clear memory of TransitionFunction (if desired) **/
+  void clear() {
+    m_no_states=0;
+    m_no_inputs=0;
+    m_no_transitions=0;
+
+    m_pre.reset(nullptr);
+    m_pre_ptr.reset(nullptr);
+    m_no_pre.reset(nullptr);
+    m_no_post.reset(nullptr);
   }
 };
 

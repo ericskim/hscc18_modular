@@ -38,17 +38,13 @@ template<class state_type, class input_type>
 class Abstraction {
 private:
 	/** @brief measurement error bound **/
-	double* m_z;
+	std::unique_ptr<double[]> m_z;
   const UniformGrid& m_state_alphabet;
   const UniformGrid& m_input_alphabet;
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
 public:
   /* @cond  EXCLUDE from doxygen*/
-  /* destructor */
-  ~Abstraction() {
-    delete[] m_z;
-  }
   /* deactivate standard constructor */
   Abstraction() = delete;
   /* cannot be copied or moved */
@@ -57,6 +53,7 @@ public:
   Abstraction& operator=(Abstraction&&)=delete;
   Abstraction& operator=(const Abstraction&)=delete;
   /* @endcond */
+
 
   /** @brief constructor with the abstract state alphabet and abstract input
    * alphabet (measurement error bound is set to zero)
@@ -67,7 +64,7 @@ public:
   Abstraction(const UniformGrid& state_alphabet,
               const UniformGrid& input_alphabet) :
               m_state_alphabet(state_alphabet), m_input_alphabet(input_alphabet) {
-    m_z = new double[state_alphabet.get_dim()] ();
+    m_z = std::unique_ptr<double[]>(new double[state_alphabet.get_dim()]());
   }
 
   /** 
@@ -148,16 +145,12 @@ public:
       lower_left[i]=m_state_alphabet.get_lower_left()[i];
       upper_right[i]=m_state_alphabet.get_upper_right()[i];
     }
-    /* number of pre indices of (i,j), initialized to 0  */
-    abs_type* no_pre = new abs_type[N*M]();  
-    /* number of post indices of (i,j), initialized to 0 */
-    abs_type* no_post = new abs_type[N*M]();  
-    /* index to pre, where the cell IDs of the pre are stored */
-    abs_ptr_type* pre_ptr = new abs_ptr_type[N*M];
+    /* init in transition_function the members no_pre, no_post, pre_ptr */ 
+    transition_function.init_infrastructure(N,M);
     /* lower-left & upper-right corners of hyper rectangle of cells that cover attainable set */
-    abs_type* corner_IDs = new abs_type[N*M*2];
+    std::unique_ptr<abs_type[]> corner_IDs = std::unique_ptr<abs_type[]>(new abs_type[N*M*2]());
     /* is post of (i,j) out of domain ? */
-    bool* out_of_domain = new bool[N*M];
+    std::unique_ptr<bool[]> out_of_domain = std::unique_ptr<bool[]>(new bool[N*M]());
     /*
      * first loop: compute corner_IDs:
      * corner_IDs[i*M+j][0] = lower-left cell index of over-approximation of attainable set 
@@ -228,7 +221,7 @@ public:
           }
           /* (i,j,q) is a transition */    
           /* increment number of pres for (q,j) */ 
-          no_pre[q*M+j]++;
+          transition_function.m_no_pre[q*M+j]++;
           /* store id's of lower-left and upper-right cell */
           if(k==0)
             corner_IDs[i*(2*M)+2*j]=q;
@@ -237,7 +230,7 @@ public:
         }
         /* increment number of transitions by number of post */
         T+=npost;
-        no_post[i*M+j]=npost;
+        transition_function.m_no_post[i*M+j]=npost;
       }
       /* print progress */
       if(m_verbose && ((double)i/(double)N*100)>counter){
@@ -258,16 +251,14 @@ public:
     abs_ptr_type sum=0;
     for(abs_type i=0; i<N; i++) {
       for(abs_type j=0; j<M; j++) {
-        sum+=no_pre[i*M+j];
-        pre_ptr[i*M+j]=sum;
+        sum+=transition_function.m_no_pre[i*M+j];
+        transition_function.m_pre_ptr[i*M+j]=sum;
       }
     }
     /* allocate memory for pre list */
-    abs_type* pre = new abs_type[T];
-  
-    /*
-     * second loop: fill pre array
-     */
+    transition_function.init_transitions(T);
+
+    /* second loop: fill pre array */
     counter=0;
     for(abs_type i=0; i<N; i++) {
       /* loop over all inputs */
@@ -305,7 +296,7 @@ public:
             }
           }
           /* (i,j,q) is a transition */
-          pre[--pre_ptr[q*M+j]]=i;
+          transition_function.m_pre[--transition_function.m_pre_ptr[q*M+j]]=i;
         }
       }
       /* print progress */
@@ -323,17 +314,6 @@ public:
     }
     if(m_verbose) 
       std::cout << "100" << std::endl;
-    /* set values of abstract system */
-    transition_function.m_no_states=N;
-    transition_function.m_no_inputs=M;
-    transition_function.m_no_transitions=T;
-    transition_function.m_no_pre=no_pre;
-    transition_function.m_no_post=no_post;
-    transition_function.m_pre=pre;
-    transition_function.m_pre_ptr=pre_ptr;
-    /* cleanup */
-    delete[] corner_IDs;
-    delete[] out_of_domain;
   }
  
   /** @brief get the center of cells that are used to over-approximated the
