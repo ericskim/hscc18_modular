@@ -1,0 +1,28 @@
+\form#0:$ F:X\times U \rightrightarrows X$
+\form#1:$ Z\subseteq X$
+\form#2:$\mathrm{pre}(Z)=\{ (x,u) \in X\times U \mid F(x,u)\neq \emptyset \wedge F(x,u)\subseteq Z\}$
+\form#3:$S$
+\form#4:$ S\subseteq ( [lb_0,ub_0] \times \cdots [lb_{n-1},ub_{n-1}] ) \cap \eta \mathbb Z^n $
+\form#5:$x=(x_{j_0},\ldots, x_{j_{m-1}})$
+\form#6:$m<n$
+\form#7:$p=n-m$
+\form#8:$j_i$
+\form#9:$j_i=i$
+\form#10:$ S(x):= \{ y\mid (x_{j_0},\ldots, x_{j_m},y_{0},\ldots,y_{p})\in S \}. $
+\form#11:$S(x) \subseteq [lb_{m},ub_{m}]\times\cdots\times [lb_{n-1},ub_{n-1}] ) \cap \eta \mathbb Z^n$
+\form#12:$j_0,\ldots,j_{m-1}$
+\form#13:$n=4$
+\form#14:$m=2$
+\form#15:$j_0=1,j_1=3$
+\form#16:$ S(x):= \{ (y_0,y_1)\mid (y_0,x_1,y_1,x_3)\in S \}. $
+\form#17:$ S(x) $
+\form#18:$ S:=\{0,\ldots,N \}$
+\form#19:$ A:=\{0,\ldots,M \}$
+\form#20:$ (i,j,k) $
+\form#21:$i,k\in A$
+\form#22:$j\in A$
+\form#23:$i$
+\form#24:$k$
+\form#25:$j$
+\form#26:\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]
+\form#27:$ \xi(\tau) $
