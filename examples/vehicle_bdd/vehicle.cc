@@ -67,6 +67,9 @@ auto radius_post = [](state_type &r, const state_type &, const input_type &u) {
 int main() {
   /* to measure time */
   TicToc tt;
+  /* cudd manager */
+  Cudd mgr;
+  mgr.AutodynEnable();
 
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* lower bounds of the hyper rectangle */
@@ -75,10 +78,16 @@ int main() {
   state_type s_ub={{10,10,M_PI+0.4}};
   /* grid node distance diameter */
   state_type s_eta={{.2,.2,.2}};
-  scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
+  /* construct SymbolicSet with the UniformGrid information for the state space
+   * and BDD variable IDs for the pre */
+  scots::SymbolicSet ss_pre(mgr, state_dim,s_lb,s_ub,s_eta);
+  /* construct SymbolicSet with the UniformGrid information for the state space
+   * and BDD variable IDs for the post */
+  scots::SymbolicSet ss_post(mgr, state_dim,s_lb,s_ub,s_eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  ss.print_info();
-  
+  ss_pre.print_info(1);
+
+
   /* construct grid for the input space */
   /* lower bounds of the hyper rectangle */
   input_type i_lb={{-1,-1}};
@@ -86,8 +95,9 @@ int main() {
   input_type i_ub={{ 1, 1}};
   /* grid node distance diameter */
   input_type i_eta={{.3,.3}};
-  scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
-  is.print_info();
+  scots::SymbolicSet ss_input(mgr, input_dim,i_lb,i_ub,i_eta);
+  ss_input.print_info(1);
+
 
   /* set up constraint functions with obtacles */
   double H[15][4] = {
@@ -109,9 +119,9 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  auto avoid = [&H,ss,s_eta](const abs_type& idx) {
-    state_type x;
-    ss.itox(idx,x);
+  state_type x;
+  auto avoid = [&x,&H,&ss_pre,&s_eta](const abs_type idx) {
+    ss_pre.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
     double c2= s_eta[1]/2.0+1e-10;
     for(size_t i=0; i<15; i++) {
@@ -121,46 +131,50 @@ int main() {
     }
     return false;
   };
-  /* write obstacles to file */
-  write_to_file(ss,avoid,"obstacles");
+  /* compute BDD for the avoid set (returns the number of elements) */ 
+  BDD bdd_avoid = ss_pre.ap_to_bdd(mgr,avoid);
+  /* write ap to files avoid.scs/avoid.bdd */
+  scots::write_to_file(ss_pre,bdd_avoid,"avoid");
 
   std::cout << "Computing the transition function: " << std::endl;
-  /* transition function of symbolic model */
-  scots::TransitionFunction tf;
-  scots::Abstraction<state_type,input_type> abs(ss,is);
+  /* initialize SymbolicModel class with the abstract state and input alphabet */
+  scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
 
   tt.tic();
-  abs.compute_gb(tf,vehicle_post, radius_post, avoid);
-  //abs.compute_gb(tf,vehicle_post, radius_post);
+  size_t no_trans;
+  BDD tf = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
   tt.toc();
-
+  std::cout << "Number of transitions: " << no_trans << std::endl;
   if(!getrusage(RUSAGE_SELF, &usage))
-    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
-  std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
-  /* define target set */
-  auto target = [&ss,&s_eta](const abs_type idx) {
-    state_type x;
-    ss.itox(idx,x);
-    /* function returns 1 if cell associated with x is in target set  */
-    if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 
-        0 <= (x[1]-s_eta[1]/2.0) && (x[1]+s_eta[1]/2.0) <= 0.5)
-      return true;
-    return false;
-  };
-   /* write target to file */
-  write_to_file(ss,target,"target");
 
- 
-  std::cout << "\nSynthesis: " << std::endl;
-  tt.tic();
-  scots::WinningDomain win=scots::solve_reachability_game(tf,target);
-  tt.toc();
-  std::cout << "Winning domain size: " << win.get_size() << std::endl;
-
-  std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller"))
-    std::cout << "Done. \n";
+    //BDD Z = ddmgr_->bddOne();
+    //BDD ZZ = ddmgr_->bddZero();
+    ///* the controller */
+    //BDD C = ddmgr_->bddZero();
+    ///* as long as not converged */
+    //size_t i;
+    //for(i=1; ZZ != Z; i++ ) {
+    //  Z=ZZ;
+    //  ZZ=FixedPoint::pre(Z) | TT;
+    //  /* new (state/input) pairs */
+    //  BDD N = ZZ & (!(C.ExistAbstract(cubeInput_)));
+    //  /* add new (state/input) pairs to the controller */
+    //  C=C | N;
+    //  /* print progress */
+    //  if(verbose) {
+    //    std::cout << ".";
+    //    std::flush(std::cout);
+    //    if(!(i%80))
+    //      std::cout << std::endl;
+    //  }
+    //}
+    //if(verbose) 
+    //  std::cout << " number: " << i << std::endl;
+    ///* restor transition relation */
+    //RR_=RR;
+    //return C;
 
   return 1;
 }

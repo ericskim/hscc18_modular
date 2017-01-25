@@ -53,7 +53,7 @@ auto aircraft_post = [] (state_type &x, const input_type &u) {
     xx[2] = x[0]*std::sin(x[1]);
   };
   /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,x,u,state_dim,tau,5);
 };
 
 /* we integrate the growth bound by 0.25 sec (the result is stored in r)  */
@@ -69,13 +69,13 @@ auto radius_post = [] (state_type &r, const state_type &, const input_type &u) {
     L[2][0]=0.07483;
     L[2][1]=83.22;
     /* to account for input disturbances */
-    state_type w={{.108,0.002,0}};
+    const state_type w={{.108,0.002,0}};
     rr[0] = L[0][0]*r[0]+L[0][1]*r[1]+w[0]; /* L[0][2]=0 */
     rr[1] = L[1][0]*r[0]+L[1][1]*r[1]+w[1]; /* L[1][2]=0 */
     rr[2] = L[2][0]*r[0]+L[2][1]*r[1]+w[2]; /* L[2][2]=0 */
   };
   /* use 10 intermediate steps */
-  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,10);
+  scots::runge_kutta_fixed4(rhs,r,u,state_dim,tau,5);
 };
 
 int main() {
