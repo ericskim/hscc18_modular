@@ -58,7 +58,8 @@ public:
 		m_winning_domain = std::move(winning_domain);
   }
 
-  /** @brief get a std::vector containing the valid control inputs at state x **/
+  /** @brief get a std::vector containing the valid control inputs at state x \n
+    * does throw a runtime error if state x is out of winning domain**/
   template<class state_type, class input_type>
   std::vector<input_type> get_control(const state_type &x) {
     /* abstract state index */
@@ -81,6 +82,47 @@ public:
       inputs.push_back(u);
     }
     return inputs;
+  }
+
+  /** @brief get a std::vector containing the valid control inputs at state x \n
+    * does return an empty vector if state is out of winning domain**/
+  template<class state_type, class input_type>
+  std::vector<input_type> peek_control(const state_type &x) {
+    /* abstract state index */
+    abs_type i = m_state_grid.xtoi(x);
+
+    if(!m_winning_domain.is_winning(i)) {
+        return std::vector<input_type>{};
+    }
+    std::vector<input_type> abs_inputs = m_winning_domain.get_inputs(i);
+    return ItoX(abs_inputs,m_input_grid);
+  }
+
+  /** @brief do a index to state conversion for vectors **/
+  template<class grid_type>
+  std::vector<grid_type> ItoX(std::vector<abs_type>& Ivector,UniformGrid& grid){
+
+        std::vector<grid_type> Xvector;
+        grid_type x;
+
+        for(abs_type i=0; i<Ivector.size(); i++) {
+          grid.itox(Ivector[i],x);
+          Xvector.push_back(x);
+        }
+        return Xvector;
+  }
+
+  /** @brief do a state to index conversion for vectors **/
+  template<class grid_type>
+  std::vector<abs_type> XtoI(std::vector<grid_type>& Xvector,UniformGrid& grid){
+
+        std::vector<abs_type> Ivector;
+        abs_type i;
+
+        for(abs_type k=0; k<Xvector.size(); k++) {
+          Ivector.push_back(grid.xtoi(Xvector[k]));
+        }
+        return Ivector;
   }
 
   /** @brief get a std::vector containing the states in the winning domain **/
