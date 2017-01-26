@@ -37,6 +37,8 @@ namespace scots {
  * constructor or the set functions. 
  *
  **/
+#define SCOTS_WINNINGDOMAIN_LOSINGSTATE	std::numeric_limits<abs_type>::max()
+
 class WinningDomain {
 /* allow the write_to_file function to access the private members */
 friend bool write_to_file(const WinningDomain&, const std::string&, bool);
@@ -46,7 +48,7 @@ private:
   /** @brief size of input alphabet M **/
   abs_type m_no_inputs=0;
   /** @brief used to encode loosing states **/
-  abs_type m_max = std::numeric_limits<abs_type>::max();
+  abs_type m_max = SCOTS_WINNINGDOMAIN_LOSINGSTATE;
   /**
    * @brief array of size N  \n
    * (m_winning_domain[i]=m_max if i is not winning) 
