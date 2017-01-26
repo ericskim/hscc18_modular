@@ -132,6 +132,15 @@ public:
     }
     return count;
   }
+  /** @brief get the size of the state alphabet **/
+  abs_type get_no_states() {
+    return m_no_states;
+  }
+
+  /** @brief get the size of the input alphabet **/
+  abs_type get_no_inputs() {
+    return m_no_inputs;
+  }
 
   /** @brief get winning states **/
   std::vector<abs_type> get_winning_domain() {
