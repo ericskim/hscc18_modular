@@ -5,9 +5,7 @@
  *   author: Matthias Rungger
  */
 
-/*
- * information about this example is given in the readme file
- */
+/* information about this example is given in the readme file */
 
 #include <iostream>
 #include <array>
@@ -88,6 +86,7 @@ int main() {
   /* BDD manager */
   Cudd manager;
 
+  /* enable variable reordering */
   manager.AutodynEnable();
   
   /* setup the workspace of the synthesis problem and the uniform grid */
@@ -114,7 +113,7 @@ int main() {
 
   tt.tic();
   size_t no_trans;
-  BDD tf = sym_model.compute_gb(manager,system_post,radius_post,no_trans);
+  BDD TF = sym_model.compute_gb(manager,system_post,radius_post,no_trans);
   tt.toc();
 
   std::cout << "No of Transitions " << no_trans  << "\n";
@@ -122,18 +121,73 @@ int main() {
     std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)no_trans<< "\n";
   }
 
-  //std::cout << "Synthesis: ";
+  /* we continue with the controller synthesis for FG (target) */
+  std::cout << "Synthesis: ";
+  /* inner approximation of safe set */
+  auto safe = [&ss_pre,&eta](const abs_type& idx) {
+    double h[4] = {-1.1,1.6,-5.4, 5.9};
+    state_type x;
+    ss_pre.itox(idx,x);
+    double c1= eta[0]/2.0+1e-10;
+    double c2= eta[1]/2.0+1e-10;
+    if ((h[0]+c1) <= x[0] && x[0] <= (h[1]-c1) && 
+        (h[2]+c2) <= x[1] && x[1] <= (h[3]-c2)) {
+      return true;
+    }
+    return false;
+  };
+  BDD S = ss_pre.ap_to_bdd(manager,safe);
 
-  //BDD Z = ddmgr_->bddZero();
-  //BDD ZZ = ddmgr_->bddOne();
-  ///* as long as not converged */
-  //size_t i;
-  //for(i=1; ZZ != Z; i++ ) {
-  //  Z=ZZ;
-  //  ZZ=scots::enf_pre(Z) & S;
-  //  std::cout << "." << std::endl;
-  //}
-  //std::cout << "Number of iterations: " << i << std::endl;
+  /* 
+   * we implement the nested fixed point algorithm
+   *
+   * mu X. nu Y. ( pre(Y) & S ) | pre(X) 
+   *
+   */
+
+  /* set up enf_pre computation */
+  scots::EnfPre enf_pre(manager,TF,sym_model);
+  tt.tic();
+  size_t i,j;
+  /* outer fp*/
+  BDD X=manager.bddOne();
+  BDD XX=manager.bddZero();
+  /* inner fp*/
+  BDD Y=manager.bddZero();
+  BDD YY=manager.bddOne();
+  /* the controller */
+  BDD C=manager.bddZero();
+  /* helper */
+  BDD U=ss_input.get_cube(manager);
+  /* as long as not converged */
+  for(i=1; XX != X; i++) {
+    X=XX;
+    BDD preX=enf_pre(X);
+    /* init inner fp */
+    YY = manager.bddOne();
+    for(j=1; YY != Y; j++) {
+      Y=YY;
+      YY= ( enf_pre(Y) & S ) | preX;
+    }
+    XX=YY;
+    std::cout << "Inner: " << j << std::endl;
+    /* remove all (state/input) pairs that have been added
+     * to the controller already in the previous iteration * */
+    BDD N = XX & (!(C.ExistAbstract(U)));
+    /* add the remaining pairs to the controller */
+    C=C | N;
+  }
+  std::cout << "Outer: " << i << std::endl;
+  tt.toc();
+
+  std::cout << "Winning domain size: " << ss_pre.get_size(manager,C) << std::endl;
+  
+  /* symbolic set for the controller */
+  scots::SymbolicSet controller(ss_pre,ss_input);
+  std::cout << "\nWrite controller to controller.scs \n";
+  if(write_to_file(controller,C,"controller"))
+    std::cout << "Done. \n";
+
 
   return 1;
 }

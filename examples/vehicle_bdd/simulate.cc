@@ -68,7 +68,7 @@ int main() {
     /* returns a std vector with the valid control inputs */
     auto u = con.restriction(manager,C,x);
     std::cout << x[0] <<  " "  << x[1] << " " << x[2] << "\n";
-    std::cout << u[0] <<  " "  << u[1] << "\n";
+    //std::cout << u[0] <<  " "  << u[1] << "\n";
     vehicle_post(x,u);
     if(target(x)) {
       std::cout << "Arrived: " << x[0] <<  " "  << x[1] << " " << x[2] << std::endl;

@@ -37,10 +37,10 @@ namespace scots {
 template<class state_type, class input_type>
 class Abstraction {
 private:
-	/** @brief measurement error bound **/
-	std::unique_ptr<double[]> m_z;
   const UniformGrid& m_state_alphabet;
   const UniformGrid& m_input_alphabet;
+	/** @brief measurement error bound **/
+	std::unique_ptr<double[]> m_z;
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
   /* to display the progress of the computation of the abstraction */
@@ -77,9 +77,9 @@ public:
    **/
   Abstraction(const UniformGrid& state_alphabet,
               const UniformGrid& input_alphabet) :
-              m_state_alphabet(state_alphabet), m_input_alphabet(input_alphabet) {
-    m_z = std::unique_ptr<double[]>(new double[state_alphabet.get_dim()]());
-  }
+              m_state_alphabet(state_alphabet),
+              m_input_alphabet(input_alphabet),
+              m_z(new double[state_alphabet.get_dim()]()) { }
 
   /** 
    * @brief computes the transition function
@@ -162,9 +162,9 @@ public:
     /* init in transition_function the members no_pre, no_post, pre_ptr */ 
     transition_function.init_infrastructure(N,M);
     /* lower-left & upper-right corners of hyper rectangle of cells that cover attainable set */
-    std::unique_ptr<abs_type[]> corner_IDs = std::unique_ptr<abs_type[]>(new abs_type[N*M*2]());
+    std::unique_ptr<abs_type[]> corner_IDs(new abs_type[N*M*2]());
     /* is post of (i,j) out of domain ? */
-    std::unique_ptr<bool[]> out_of_domain = std::unique_ptr<bool[]>(new bool[N*M]());
+    std::unique_ptr<bool[]> out_of_domain(new bool[N*M]());
     /*
      * first loop: compute corner_IDs:
      * corner_IDs[i*M+j][0] = lower-left cell index of over-approximation of attainable set 
@@ -247,8 +247,10 @@ public:
         transition_function.m_no_post[i*M+j]=npost;
       }
       /* print progress */
-      if(counter==0)
-        std::cout << "1st loop: ";
+      if(m_verbose) {
+        if(counter==0)
+          std::cout << "1st loop: ";
+      }
       progress(i,N,counter);
     }
     /* compute pre_ptr */
@@ -304,8 +306,10 @@ public:
         }
       }
       /* print progress */
-      if(counter==0)
-        std::cout << "2nd loop: ";
+      if(m_verbose) {
+        if(counter==0)
+          std::cout << "2nd loop: ";
+      }
       progress(i,N,counter);
     }
   }

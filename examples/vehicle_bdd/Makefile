@@ -3,7 +3,7 @@
 #
 #CC        = g++
 CC       	  = clang++
-CXXFLAGS 		= -Wall -Wextra -std=c++14 -O3 -DNDEBUG -DSCOTS_BDD
+CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG -DSCOTS_BDD
 #
 # scots 
 #

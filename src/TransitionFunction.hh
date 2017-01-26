@@ -74,26 +74,25 @@ public:
   abs_type m_no_inputs;   
   /** @brief number of transitions T **/
   abs_ptr_type m_no_transitions; 
-  /** @brief array[N*M] containing the pre's address in the array m_pre[T] **/
-  std::unique_ptr<abs_ptr_type[]> m_pre_ptr;    
   /** @brief array[T] containing the list of all pre */
   std::unique_ptr<abs_type[]> m_pre;         
-  /** @brief array[N*M] saving the number of post for each state-input pair (i,j) **/
-  std::unique_ptr<abs_type[]> m_no_post;      
+  /** @brief array[N*M] containing the pre's address in the array m_pre[T] **/
+  std::unique_ptr<abs_ptr_type[]> m_pre_ptr;    
   /** @brief array[N*M] saving the number of pre for each state-input pair (i,j) **/
   std::unique_ptr<abs_type[]> m_no_pre;    
+  /** @brief array[N*M] saving the number of post for each state-input pair (i,j) **/
+  std::unique_ptr<abs_type[]> m_no_post;      
 public:
   /* @cond  EXCLUDE from doxygen */
   /* default constructor */
-  TransitionFunction() {
+  TransitionFunction() : m_pre(nullptr),
+                         m_pre_ptr(nullptr),
+                         m_no_pre(nullptr),
+                         m_no_post(nullptr) {
     m_no_states=0;
     m_no_inputs=0;
     m_no_transitions=0;
 
-    m_pre.reset(nullptr);
-    m_pre_ptr.reset(nullptr);
-    m_no_pre.reset(nullptr);
-    m_no_post.reset(nullptr);
   }  
   /* move constructor */
   TransitionFunction(TransitionFunction&& other) {

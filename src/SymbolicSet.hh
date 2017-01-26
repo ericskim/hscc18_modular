@@ -315,7 +315,7 @@ public:
     /* extract bdd with restriction */
     abs_type id = set_dom.xtoi(x);
     BDD restricted = bdd & set_dom.id_to_bdd(id);
-    restricted = restricted.ExistAbstract(manager.computeCube(set_dom.get_bdd_vars()));
+    restricted = restricted.ExistAbstract(set_dom.get_cube(manager));
     /* map restricted BDD to grid points */
     return set_codom.bdd_to_grid_points(manager,restricted);
   }
@@ -372,6 +372,10 @@ public:
   /** @brief get IntegerInterval  **/
   std::vector<IntegerInterval<abs_type>> get_bdd_intervals() const {
     return m_bdd_interval;
+  }
+  /** @brief get cube BDD with the BDD variables of the SymbolicSet **/
+  BDD get_cube(const Cudd& manager) const {
+    return manager.computeCube(get_bdd_vars());
   }
 }; /* close class def */
 } /* close namespace */

@@ -1,5 +1,5 @@
 /*
- *  FixedPoint.hh
+ *  EnfPre.hh
  *
  *  created: Jan 2017
  *   author: Matthias Rungger
@@ -7,11 +7,11 @@
 
 /**
  * @file
- * @brief contains the EnfPre class and some fixed point algorithms for synthesis 
+ * @brief contains the EnfPre class
  **/
 
-#ifndef FIXEDPOINT_HH_
-#define FIXEDPOINT_HH_
+#ifndef ENFPRE_HH_
+#define ENFPRE_HH_
 
 #include <iostream>
 #include <memory>
@@ -65,9 +65,9 @@ public:
     for(size_t i=0; i<pre_ids.size(); i++)
       m_permute[pre_ids[i]]=post_ids[i];
     /* create a cube with the input bdd vars */
-    m_cube_input = manager.computeCube(model.get_sym_set_input().get_bdd_vars());
+    m_cube_input = model.get_sym_set_input().get_cube(manager);
     /* create a cube with the post bdd vars */
-    m_cube_post = manager.computeCube(model.get_sym_set_post().get_bdd_vars());
+    m_cube_post = model.get_sym_set_post().get_cube(manager);
     /* copy the transition relation */
     m_tr_nopost=m_tr.ExistAbstract(m_cube_post);
   }
@@ -83,73 +83,32 @@ public:
     BDD preZ= m_tr_nopost & (!F);
     return preZ;
   }
-  const BDD& cube_input() const {
-    return m_cube_input;
-  }
 };
 
 
-/** 
- *  @brief:  
- *
- **/
-inline 
-BDD solve_invariance_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& S, bool verbose=true)  {
-
-  BDD Z = manager.bddZero();
-  BDD ZZ = manager.bddOne();
-
-  /* as long as not converged */
-  size_t i;
-  for(i=1; ZZ != Z; i++ ) {
-    Z=ZZ;
-    ZZ=enf_pre(Z) & S;
-    /* print progress */
-    if(verbose) {
-      std::cout << ".";
-      std::flush(std::cout);
-      if(!(i%80))
-        std::cout << std::endl;
-    }
-  }
-  if(verbose) 
-    std::cout << "\nNumber of iterations: " << i << std::endl;
-  return Z;
-} 
-
-
-/** 
- *  @brief:  
- *
- **/
-inline 
-BDD solve_reachability_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& T, bool verbose=true)  {
-
-  BDD Z = manager.bddOne();
-  BDD ZZ = manager.bddZero();
-  /* the controller */
-  BDD C = manager.bddZero();
-  /* as long as not converged */
-  size_t i;
-  for(i=1; ZZ != Z; i++ ) {
-    Z=ZZ;
-    ZZ=enf_pre(Z) | T;
-    /* new (state/input) pairs */
-    BDD N = ZZ & (!(C.ExistAbstract(enf_pre.cube_input())));
-    /* add new (state/input) pairs to the controller */
-    C=C | N;
-    /* print progress */
-    if(verbose) {
-      std::cout << ".";
-      std::flush(std::cout);
-      if(!(i%80))
-        std::cout << std::endl;
-    }
-  }
-  if(verbose) 
-    std::cout << "\nNumber of iterations: " << i << std::endl;
-  return C;
-}
+//inline 
+//BDD solve_invariance_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& S, bool verbose=true)  {
+//
+//  BDD Z = manager.bddZero();
+//  BDD ZZ = manager.bddOne();
+//
+//  /* as long as not converged */
+//  size_t i;
+//  for(i=1; ZZ != Z; i++ ) {
+//    Z=ZZ;
+//    ZZ=enf_pre(Z) & S;
+//    /* print progress */
+//    if(verbose) {
+//      std::cout << ".";
+//      std::flush(std::cout);
+//      if(!(i%80))
+//        std::cout << std::endl;
+//    }
+//  }
+//  if(verbose) 
+//    std::cout << "\nNumber of iterations: " << i << std::endl;
+//  return Z;
+//} 
 
 } /* close namespace */
-#endif /* FIXEDPOINT_HH_ */
+#endif /* ENFPRE_HH_ */

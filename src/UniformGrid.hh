@@ -17,6 +17,7 @@
 #include <exception>
 #include <algorithm>
 #include <climits>
+#include <memory>
 
 /** @namespace scots **/ 
 namespace scots {
@@ -64,32 +65,25 @@ protected:
   /** @brief dimension of the Eucleadian space **/
   int m_dim;                
   /** @brief m_dim-dimensional vector containing the grid node distances **/
-  double* m_eta;                      
+  std::unique_ptr<double[]> m_eta;                      
 	/** @brief m_dim-dimensional vector containing the real values of the first grid point **/
-  double* m_first;        
+  std::unique_ptr<double[]> m_first;        
 	/** @brief scots::abs_type array[m_dim] containing the number of grid points in each dimension **/
-  abs_type* m_no_grid_points;        
+  std::unique_ptr<abs_type[]> m_no_grid_points;        
 	/** @brief array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_grid_points[i-1]; **/
-  abs_type* m_NN;                       
+  std::unique_ptr<abs_type[]> m_NN;                       
 
 public:
   /* @cond  EXCLUDE from doxygen */
   /* default constructor */
-  UniformGrid() {
-    m_dim = 0;
-    m_eta = nullptr;
-    m_first = nullptr;
-    m_no_grid_points = nullptr; 
-    m_NN = nullptr;
-  }
+  UniformGrid() : m_dim(0),
+                  m_eta(nullptr), 
+                  m_first(nullptr),
+                  m_no_grid_points(nullptr),
+                  m_NN(nullptr) { }
   /* destructor */
   virtual
-  ~UniformGrid() {
-    delete[] m_eta;
-    delete[] m_first;
-    delete[] m_no_grid_points;
-    delete[] m_NN;
-  }
+  ~UniformGrid() { }
   /* copy constructor */
   UniformGrid(const UniformGrid& other) : UniformGrid() {
     *this=other;
@@ -102,13 +96,12 @@ public:
   UniformGrid& operator=(const UniformGrid &other) {
     if(this==&other)
       return *this;
-    reset();
     m_dim=other.m_dim;
     if(m_dim != 0) {
-      m_eta = new double[m_dim];
-      m_first = new double[m_dim];
-      m_no_grid_points = new abs_type[m_dim];
-      m_NN = new abs_type[m_dim];
+      m_eta.reset(new double[m_dim]);
+      m_first.reset(new double[m_dim]);
+      m_no_grid_points.reset(new abs_type[m_dim]);
+      m_NN.reset(new abs_type[m_dim]);
       for(int i=0; i<m_dim; i++) {
         m_eta[i] = other.m_eta[i];
         m_first[i]  = other.m_first[i];
@@ -122,10 +115,10 @@ public:
   UniformGrid(const UniformGrid &other, const std::vector<int>& dim) : UniformGrid() {
     m_dim=dim.size();
     if(m_dim != 0) {
-      m_eta = new double[m_dim];
-      m_first = new double[m_dim];
-      m_no_grid_points = new abs_type[m_dim];
-      m_NN = new abs_type[m_dim];
+      m_eta.reset(new double[m_dim]);
+      m_first.reset(new double[m_dim]);
+      m_no_grid_points.reset(new abs_type[m_dim]);
+      m_NN.reset(new abs_type[m_dim]);
       for(int i=0; i<m_dim; i++) {
         m_eta[i] = other.m_eta[dim[i]];
         m_first[i]  = other.m_first[dim[i]];
@@ -136,13 +129,11 @@ public:
   }
   /* move assignment operator */
   UniformGrid& operator=(UniformGrid&& other) {
-    reset();
-    m_dim=other.m_dim;
-    m_eta=other.m_eta;
-    m_first=other.m_first;
-    m_no_grid_points=other.m_no_grid_points;
-    m_NN=other.m_NN;
-    other.null();
+    m_dim=std::move(other.m_dim);
+    m_eta=std::move(other.m_eta);
+    m_first=std::move(other.m_first);
+    m_no_grid_points=std::move(other.m_no_grid_points);
+    m_NN=std::move(other.m_NN);
     return *this;
   } 
   /* @endcond */
@@ -169,10 +160,10 @@ public:
         if(lb[index] > ub[index]) 
           throw std::runtime_error("\nscots::UniformGrid: lower-left bound must be less than or equal to upper-right bound.");
       }
-      m_eta = new double[m_dim];
-      m_first = new double[m_dim];
-      m_no_grid_points = new abs_type[m_dim];
-      m_NN = new abs_type[m_dim];
+      m_eta.reset(new double[m_dim]);
+      m_first.reset(new double[m_dim]);
+      m_no_grid_points.reset(new abs_type[m_dim]);
+      m_NN.reset(new abs_type[m_dim]);
 
       /* determine number grid points in each dimension */
       std::size_t no_l, no_u;
@@ -186,7 +177,6 @@ public:
           /* compute number of grid points from zero to lower bound */
           no_l=std::llround(std::abs(lb[index])/eta[index]+sign_l*0.5);
         } catch (...) {
-          reset();
           std::ostringstream os;
           os << "\nscots::UniformGrid: something wrong in the division of " << lb[index] << " by " << eta[index] ;
           throw std::runtime_error(os.str().c_str());
@@ -198,14 +188,12 @@ public:
           /* compute number of grid points from zero to upper bound */
           no_u=std::llround(std::abs(ub[index])/eta[index]-sign_u*0.5);
         } catch (...) {
-          reset();
           std::ostringstream os;
           os << "\nscots::UniformGrid: something wrong in the division of " << ub[index] << " by " << eta[index] ;
           throw std::runtime_error(os.str().c_str());
         }
         /* check if number of grid points in dimension index does not exceed max representable by abs_type  */
         if((sign_u*no_u-sign_l*no_l+1) > std::numeric_limits<abs_type>::max()) {
-          reset();
           std::ostringstream os;
           throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in TransitionSystem.hh).");
         }
@@ -215,7 +203,6 @@ public:
       }
       calc_nn();
     } else {
-      reset();
       throw std::runtime_error("\nscots::UniformGrid: grid dimension has to be greater than zero (using non-default constructor)");
     }
   }
@@ -349,7 +336,6 @@ protected:
       m_NN[i] = total;
       /* check overflow */
       if(total > (max/m_no_grid_points[i])) {
-        reset();
         throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in UniformGrid.hh).");
       }
       total *= m_no_grid_points[i];
@@ -364,28 +350,6 @@ private:
       total *= m_no_grid_points[i];
     }
     return total;
-  }
-	/** @brief helper for reseting the whole grid **/
-  void reset() {
-    m_dim = 0;
-
-    delete[] m_eta;
-    delete[] m_first;
-    delete[] m_no_grid_points;
-    delete[] m_NN;
-
-    m_eta = nullptr;
-    m_first = nullptr;
-    m_no_grid_points = nullptr;
-    m_NN = nullptr;
-  }
-	/** @brief setting everything to zero **/
-  void null() {
-    m_dim = 0;
-    m_eta = nullptr;
-    m_first = nullptr;
-    m_no_grid_points = nullptr;
-    m_NN = nullptr;
   }
 };
 

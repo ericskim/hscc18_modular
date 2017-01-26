@@ -119,7 +119,7 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  auto avoid = [&H,&ss_pre,&s_eta](const abs_type idx) {
+  auto avoid = [&H,&ss_pre,&s_eta](const abs_type& idx) {
     state_type x;
     ss_pre.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
@@ -148,7 +148,7 @@ int main() {
   if(!scots::read_from_file(set,TF,mgr,"tf")) {
     tt.tic();
     size_t no_trans;
-    BDD TF = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
+    TF = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
     tt.toc();
     std::cout << "Number of transitions: " << no_trans << std::endl;
     if(!getrusage(RUSAGE_SELF, &usage))
@@ -172,9 +172,39 @@ int main() {
   write_to_file(ss_pre,T,"target");
 
   std::cout << "\nSynthesis: " << std::endl;
+
+  /* 
+   * we implement the fixed point algorithm 
+   *
+   * mu X. ( pre(X) & T ) 
+   *
+   */
+
+  /* setup enforcable predecessor */
   scots::EnfPre enf_pre(mgr,TF,sym_model);
   tt.tic();
-  BDD C = solve_reachability_game(mgr,enf_pre,T);
+  BDD X = mgr.bddOne();
+  BDD XX =mgr.bddZero();
+  /* the controller */
+  BDD C = mgr.bddZero();
+  /* BDD cube for existential abstract inputs */
+  BDD U = ss_input.get_cube(mgr);
+  /* as long as not converged */
+  size_t i;
+  for(i=1; XX != X; i++ ) {
+    X=XX;
+    XX=enf_pre(X) | T;
+    /* new (state/input) pairs */
+    BDD N = XX & (!(C.ExistAbstract(U)));
+    /* add new (state/input) pairs to the controller */
+    C=C | N;
+    /* print progress */
+    std::cout << ".";
+    std::flush(std::cout);
+    if(!(i%80))
+      std::cout << std::endl;
+  }
+  std::cout << "\nNumber of iterations: " << i << std::endl;
   tt.toc();
 
   std::cout << "Winning domain size: " << ss_pre.get_size(mgr,C) << std::endl;
