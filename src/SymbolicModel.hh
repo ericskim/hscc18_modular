@@ -30,18 +30,18 @@ namespace scots {
 template<class state_type, class input_type>
 class SymbolicModel {
 private:
-	/* measurement error bound */
-	double* m_z;
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
 	/* SymbolicSet conaining the BDD vars of the pre  */
-  const SymbolicSet& m_pre;
+  const SymbolicSet m_pre;
 	/* SymbolicSet conaining the BDD vars of the inputs  */
-  const SymbolicSet& m_input;
+  const SymbolicSet m_input;
 	/* SymbolicSet conaining the BDD vars of the post  */
-  const SymbolicSet& m_post;
+  const SymbolicSet m_post;
+	/* measurement error bound */
+	std::unique_ptr<double[]> m_z;
 
-  void print_progress(const abs_type& i, const abs_type& N, abs_type& counter) {
+  void progress(const abs_type& i, const abs_type& N, abs_type& counter) {
     if(!m_verbose)
       return;
     if(((double)i/(double)N*100)>counter){
@@ -58,13 +58,10 @@ private:
       std::cout << "100\n";
   }
 
-
 public:
   /* @cond  EXCLUDE from doxygen*/
   /* destructor */
-  ~SymbolicModel() {
-    delete[] m_z;
-  }
+  ~SymbolicModel() = default;
   /* deactivate standard constructor */
   SymbolicModel() = delete;
   /* cannot be copied or moved */
@@ -81,30 +78,29 @@ public:
   SymbolicModel(const SymbolicSet& pre,
                 const SymbolicSet& input,
                 const SymbolicSet& post) :
-                m_pre(pre), m_input(input), m_post(post) { 
-    m_z = new double[pre.get_dim()] ();
-  }
+                m_pre(pre), m_input(input), m_post(post),
+                m_z(new double[m_pre.get_dim()]()) {}
 
-  /** 
-   * @brief computes the transition function
-   *
-   * @param manager     - Cudd manager
-   *
-   * @param system_post - lambda expression as defined in  Abstraction::compute_gb
-   *
-   * @param radius_post - lambda expression as defined in  Abstraction::compute_gb
-   *
-   * @param avoid       - lambda expression as defined in  Abstraction::compute_gb
-   *
-   * @param no_trans    - number of transitions 
-   *
-   * @result              a BDD encoding the transition function as boolean function over
-   *                      the BDD var IDs in m_pre, m_input, m_post
-   **/
   template<class F1, class F2>
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, size_t& no_trans) {
     return compute_gb(manager, system_post, radius_post, [](const abs_type&) noexcept {return false;}, no_trans);
   }
+  /** 
+   * @brief computes the transition function
+   *
+   * @param [in]  manager     - Cudd manager
+   *              
+   * @param [in]  system_post - lambda expression as defined in  Abstraction::compute_gb
+   *              
+   * @param [in]  radius_post - lambda expression as defined in  Abstraction::compute_gb
+   *              
+   * @param [in]  avoid       - lambda expression as defined in  Abstraction::compute_gb
+   *              
+   * @param [out] no_trans    - number of transitions 
+   *
+   * @result              a BDD encoding the transition function as boolean function over
+   *                      the BDD var IDs in m_pre, m_input, m_post
+   **/
   template<class F1, class F2, class F3>
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, F3&& avoid, size_t& no_trans) {
     /* number of cells */
@@ -185,7 +181,7 @@ public:
         tf = tf | (bdd_i & bdd_j & bdd_k);
       }
       /* print progress */
-      print_progress(i,N,counter);
+      progress(i,N,counter);
     }
 
     /* count number of transitions */
@@ -195,22 +191,33 @@ public:
     no_trans=tf.CountMinterm(nvars);
     return tf;
   }
+  
+  /** @brief set the measurement error bound **/
+  void set_measurement_error_bound(const state_type& error_bound) {
+    for(int i=0; i<m_pre.get_dim(); i++) {
+      m_z[i]=error_bound[i];
+    }
+  }
+
+  /** @brief activate console output **/
+  void verbose_on() {
+    m_verbose=true;
+  }
+
   /** @brief get measurement error bound **/
-  std::vector<double> get_measruement_error_bound() {
+  std::vector<double> get_measruement_error_bound() const {
     std::vector<double> z;
     for(int i=0; i<m_pre.get_dim(); i++) {
       z.push_back(m_z[i]);
     }
     return z;
   }
-  /** @brief activate console output **/
-  void verbose_on() {
-    m_verbose=true;
-  }
+
   /** @brief deactivate console output **/
   void verbose_off() {
     m_verbose=false;
   }
+
   const SymbolicSet& get_sym_set_pre() const {
     return m_pre;
   }
@@ -220,6 +227,7 @@ public:
   const SymbolicSet& get_sym_set_input() const {
     return m_input;
   }
+
 };
 
 } /* close namespace */

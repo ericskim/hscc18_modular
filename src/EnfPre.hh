@@ -5,10 +5,7 @@
  *   author: Matthias Rungger
  */
 
-/**
- * @file
- * @brief contains the EnfPre class
- **/
+/** @file **/
 
 #ifndef ENFPRE_HH_
 #define ENFPRE_HH_
@@ -85,6 +82,16 @@ public:
   }
 };
 
+/** @brief: small function to output progess of an iteration to the terminal **/
+void print_progress(int i) {
+  std::cout << ".";
+  std::flush(std::cout);
+  if(!(i%40)) {
+    std::cout << "\r";
+    std::cout << "                                        ";
+    std::cout << "\r";
+  }
+}
 
 //inline 
 //BDD solve_invariance_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& S, bool verbose=true)  {

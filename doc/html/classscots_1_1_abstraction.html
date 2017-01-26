@@ -191,8 +191,8 @@ template&lt;class state_type , class input_type &gt; </div>
 <p>constructor with the abstract state alphabet and abstract input alphabet (measurement error bound is set to zero) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">state_alphabet</td><td>- <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by a hyper-interval. ">UniformGrid</a> representing the abstract state alphabet </td></tr>
-    <tr><td class="paramname">input_alphabet</td><td>- <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by a hyper-interval. ">UniformGrid</a> representing the abstract input alphabet </td></tr>
+    <tr><td class="paramname">state_alphabet</td><td>- <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> representing the abstract state alphabet </td></tr>
+    <tr><td class="paramname">input_alphabet</td><td>- <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> representing the abstract input alphabet </td></tr>
   </table>
   </dd>
 </dl>
@@ -253,7 +253,7 @@ template&lt;class F1 , class F2 &gt; </div>
   </table>
   </dd>
 </dl>
-<p>The computation proceeds in two loops. In the first loop the cornerIDs are comuted, which represents the cell indices that cover the over-approximation of the attainable set: </p><pre class="fragment">corner_IDs[i*M+j][0] </pre><p> = lower-left cell index of cells that cover the over-approximation of attainable set </p><pre class="fragment">corner_IDs[i*M+j][1] </pre><p> = upper-right cell index of cells that cover the over-approximation of attainable set</p>
+<p>The computation proceeds in two loops. In the first loop the cornerIDs are comuted, which represent the cell IDs that cover the over-approximation of the attainable set: </p><pre class="fragment">corner_IDs[i*M+j+0] </pre><p> = lower-left cell ID of the integer hyper-interval of cell IDs that cover the over-approximation of the attainable set of cell with ID=i under input ID=j </p><pre class="fragment">corner_IDs[i*M+j+1] </pre><p> = upper-right of the integer hyper-interval of cell IDs that cover the over-approximation of the attainable set of cell with ID=i under input ID=j</p>
 <p>In the second loop the data members of the <a class="el" href="classscots_1_1_transition_function.html" title="The transition function of the abstraction. ">TransitionFunction</a> are computed. </p>
 
 </div>

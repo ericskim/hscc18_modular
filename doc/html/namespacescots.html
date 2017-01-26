@@ -118,11 +118,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_symbolic_model.html">SymbolicModel</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the transition function of a symbolic model as BDD using the growth bound.  <a href="classscots_1_1_symbolic_model.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_symbolic_set.html">SymbolicSet</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> class with the capability to represent sets of grid points as BDDs. See <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> for details.  <a href="classscots_1_1_symbolic_set.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The transition function of the abstraction.  <a href="classscots_1_1_transition_function.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds the information of a uniform grid confined by a hyper-interval.  <a href="classscots_1_1_uniform_grid.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds the information of a uniform grid confined by the hyper-interval [lb, ub].  <a href="classscots_1_1_uniform_grid.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The abstract states from which the controller is winning.  <a href="classscots_1_1_winning_domain.html#details">More...</a><br /></td></tr>
@@ -146,14 +149,10 @@ determinse implicitely an upper bound on the number of transitions (default = * 
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9b876b4728231e45aa24e7f4602c38e7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b876b4728231e45aa24e7f4602c38e7"></a>
-BDD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a9b876b4728231e45aa24e7f4602c38e7">solve_invariance_game</a> (const Cudd &amp;manager, const <a class="el" href="classscots_1_1_enf_pre.html">EnfPre</a> &amp;enf_pre, const BDD &amp;S, bool verbose=true)</td></tr>
-<tr class="memdesc:a9b876b4728231e45aa24e7f4602c38e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">: <br /></td></tr>
-<tr class="separator:a9b876b4728231e45aa24e7f4602c38e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4d42bd8e85bb2a5325d448315992a95"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4d42bd8e85bb2a5325d448315992a95"></a>
-BDD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#ae4d42bd8e85bb2a5325d448315992a95">solve_reachability_game</a> (const Cudd &amp;manager, const <a class="el" href="classscots_1_1_enf_pre.html">EnfPre</a> &amp;enf_pre, const BDD &amp;T, bool verbose=true)</td></tr>
-<tr class="memdesc:ae4d42bd8e85bb2a5325d448315992a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">: <br /></td></tr>
-<tr class="separator:ae4d42bd8e85bb2a5325d448315992a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7822fde213325b1ccdba9be76853356f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7822fde213325b1ccdba9be76853356f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a7822fde213325b1ccdba9be76853356f">print_progress</a> (int i)</td></tr>
+<tr class="memdesc:a7822fde213325b1ccdba9be76853356f"><td class="mdescLeft">&#160;</td><td class="mdescRight">: small function to output progess of an iteration to the terminal <br /></td></tr>
+<tr class="separator:a7822fde213325b1ccdba9be76853356f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
 <tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#a83ed532f815589bd86e519a173ac63ac">solve_reachability_game</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;trans_function, F1 &amp;target, F2 &amp;&amp;avoid, <a class="el" href="namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d">val_functionction_type</a> &amp;value)</td></tr>
 <tr class="memdesc:a83ed532f815589bd86e519a173ac63ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve reachability game according to Algorithm 2 in <a href="./../../manual/manual.pdf">manual</a>  <a href="#a83ed532f815589bd86e519a173ac63ac">More...</a><br /></td></tr>
@@ -176,7 +175,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:aea60ca8d5776dab30586862345808e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2956dcf6189f1e498d72137cf3ff879d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2956dcf6189f1e498d72137cf3ff879d"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a2956dcf6189f1e498d72137cf3ff879d">write_to_file</a> (const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;grid, const std::string &amp;filename)</td></tr>
-<tr class="memdesc:a2956dcf6189f1e498d72137cf3ff879d"><td class="mdescLeft">&#160;</td><td class="mdescRight">write <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by a hyper-interval. ">UniformGrid</a> to a file via a <a class="el" href="classscots_1_1_file_writer.html" title="The FileWriter class is used to write information into files. ">FileWriter</a> <br /></td></tr>
+<tr class="memdesc:a2956dcf6189f1e498d72137cf3ff879d"><td class="mdescLeft">&#160;</td><td class="mdescRight">write <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> to a file via a <a class="el" href="classscots_1_1_file_writer.html" title="The FileWriter class is used to write information into files. ">FileWriter</a> <br /></td></tr>
 <tr class="separator:a2956dcf6189f1e498d72137cf3ff879d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c9ab824e033b2cf1fede2c83ead4e46"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4c9ab824e033b2cf1fede2c83ead4e46"></a>
 template&lt;class F &gt; </td></tr>
@@ -189,7 +188,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:abb395cdbed3f35dffa8ffbad2c9f62d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a204c9171cc0c4136cce749dfebb67fe0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a204c9171cc0c4136cce749dfebb67fe0"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a204c9171cc0c4136cce749dfebb67fe0">read_from_file</a> (<a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;grid, const std::string &amp;filename, size_t offset=0)</td></tr>
-<tr class="memdesc:a204c9171cc0c4136cce749dfebb67fe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">read <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by a hyper-interval. ">UniformGrid</a> from a file via a <a class="el" href="classscots_1_1_file_reader.html" title="The FileReader class is used to read information from files. ">FileReader</a> <br /></td></tr>
+<tr class="memdesc:a204c9171cc0c4136cce749dfebb67fe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">read <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> from a file via a <a class="el" href="classscots_1_1_file_reader.html" title="The FileReader class is used to read information from files. ">FileReader</a> <br /></td></tr>
 <tr class="separator:a204c9171cc0c4136cce749dfebb67fe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a069156b64f497e48cc6cb29ce9c88f27"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a069156b64f497e48cc6cb29ce9c88f27"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a069156b64f497e48cc6cb29ce9c88f27">read_from_file</a> (<a class="el" href="classscots_1_1_static_controller.html">StaticController</a> &amp;sc, const std::string &amp;filename)</td></tr>
@@ -217,7 +216,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 </div><div class="memdoc">
 
 <p>abs_type defines type of abstract states (default = uint32_t) </p>
-<p>It is required to be an integer type. It determines implicitely an upper bound on the number of abstract states (default = 2^32-1). </p>
+<p>It is required to be an integer type. It determines implicitly an upper bound on the number of abstract states (default = 2^32-1). </p>
 
 </div>
 </div>
@@ -284,7 +283,7 @@ template&lt;class RHS , class state_type , class input_type &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">rhs</td><td>- lambda function implementing the rhs of the ode <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]" src="form_26.png"/>
+<img class="formulaDsp" alt="\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]" src="form_12.png"/>
 </p>
  with signature <pre class="fragment">[] (state_type&amp; xx,  const state_type &amp;x, const input_type &amp;u) -&gt;  void </pre> </td></tr>
     <tr><td class="paramname">x</td><td>- state_type initial state x </td></tr>
@@ -295,7 +294,7 @@ template&lt;class RHS , class state_type , class input_type &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the solution of IVP at time tau <img class="formulaInl" alt="$ \xi(\tau) $" src="form_27.png"/> stored in x </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the solution of IVP at time tau <img class="formulaInl" alt="$ \xi(\tau) $" src="form_13.png"/> stored in x </dd></dl>
 
 </div>
 </div>

@@ -85,7 +85,7 @@ public:
       m_bdd_interval.emplace_back(manager,abs_type{0},m_no_grid_points[i]-1);
   }
   /**
-   * @brief construct product of two SymbolicSet s
+   * @brief construct product of two SymbolicSets
    * 
    * The instantiated SymbolicSet represents the Cartesian product of the
    * SymbolicSet set1 and the SymbolicSet set2
@@ -95,10 +95,10 @@ public:
    **/
   SymbolicSet(const SymbolicSet& set1, const SymbolicSet& set2) {
     m_dim = set1.m_dim + set2.m_dim;
-    m_eta = new double[m_dim];
-    m_first = new double[m_dim];
-    m_no_grid_points = new abs_type[m_dim];
-    m_NN = new abs_type[m_dim];
+    m_eta.reset(new double[m_dim]);
+    m_first.reset(new double[m_dim]);
+    m_no_grid_points.reset(new abs_type[m_dim]);
+    m_NN.reset(new abs_type[m_dim]);
     for(int i=0; i<set1.m_dim; i++) {
       m_eta[i] = set1.m_eta[i];
       m_first[i]  = set1.m_first[i];
@@ -133,13 +133,12 @@ public:
 
   /** @brief function to obtain a BDD representation of the grid point id **/
   BDD id_to_bdd(abs_type id) const {
-    BDD bdd;
     abs_type num;
     int k=m_dim-1;
     /* k= m_dim -1 */
     num=id/m_NN[k];
     id=id%m_NN[k];
-    bdd = m_bdd_interval[k].int_to_bdd(num);
+    BDD bdd = m_bdd_interval[k].int_to_bdd(num);
     for(k=m_dim-2; k >= 0; k--) {
       num=id/m_NN[k];
       id=id%m_NN[k];
@@ -162,7 +161,7 @@ public:
   /**
    * @brief obtain a BDD representation of the grid points whose grid point IDs
    * evaluate to true in the lambda expression
-   * \verbatim [](const abs_type& i) -> bool \std::endverbatim
+   * \verbatim [](const abs_type& i) -> bool \endverbatim
    **/
   template<class F>
   BDD ap_to_bdd(const Cudd& manager, const F& atomic_prop) const {

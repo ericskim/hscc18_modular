@@ -114,71 +114,71 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacescots.html">scots</a> {</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">class </span>SymbolicSet : <span class="keyword">public</span> UniformGrid {</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html">   34</a></span>&#160;<span class="keyword">class </span><a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a> : <span class="keyword">public</span> <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a> {</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="comment">/* a vector of IntegerIntervals - one for each dimension */</span></div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  std::vector&lt;IntegerInterval&lt;abs_type&gt;&gt; m_bdd_interval;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  SymbolicSet() : UniformGrid(), m_bdd_interval{} { }</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">   40</a></span>&#160;  <a class="code" href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">SymbolicSet</a>() : <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>(), m_bdd_interval{} { }</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  SymbolicSet(<span class="keyword">const</span> SymbolicSet&amp; other, std::vector&lt;int&gt; dim) :</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;              UniformGrid(other,dim), m_bdd_interval{} {</div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#adcbfc045937f9b57cf8644f99e4d68af">   43</a></span>&#160;  <a class="code" href="classscots_1_1_symbolic_set.html#adcbfc045937f9b57cf8644f99e4d68af">SymbolicSet</a>(<span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; other, std::vector&lt;int&gt; dim) :</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;              <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>(other,dim), m_bdd_interval{} {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; i : dim) </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      m_bdd_interval.push_back(other.m_bdd_interval[i]);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  }</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  SymbolicSet(<span class="keyword">const</span> UniformGrid&amp; grid,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;              <span class="keyword">const</span> std::vector&lt;IntegerInterval&lt;abs_type&gt;&gt;&amp; intervals) :</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;              UniformGrid(grid), m_bdd_interval(intervals) { </div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a1cc2b79a0ee93fa475063516e62725d7">   50</a></span>&#160;  <a class="code" href="classscots_1_1_symbolic_set.html#a1cc2b79a0ee93fa475063516e62725d7">SymbolicSet</a>(<span class="keyword">const</span> <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>&amp; grid,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;              <span class="keyword">const</span> std::vector&lt;<a class="code" href="classscots_1_1_integer_interval.html">IntegerInterval&lt;abs_type&gt;</a>&gt;&amp; intervals) :</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;              <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>(grid), m_bdd_interval(intervals) { </div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  }</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> gr<span class="keywordtype">id</span>_po<span class="keywordtype">int</span>_t&gt;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  SymbolicSet(<span class="keyword">const</span> Cudd&amp; manager,</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#acf62a7dd4028936701bd7998ebded73c">   65</a></span>&#160;  <a class="code" href="classscots_1_1_symbolic_set.html#acf62a7dd4028936701bd7998ebded73c">SymbolicSet</a>(<span class="keyword">const</span> Cudd&amp; manager,</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;              <span class="keyword">const</span> <span class="keywordtype">int</span> dim,</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;              <span class="keyword">const</span> grid_point_t&amp; lb,</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;              <span class="keyword">const</span> grid_point_t&amp; ub,</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;              <span class="keyword">const</span> grid_point_t&amp; eta) :</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;              UniformGrid(dim,lb,ub,eta), m_bdd_interval{} {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_dim; i++) </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      m_bdd_interval.emplace_back(manager,<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{0},m_no_grid_points[i]-1);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;              <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>(dim,lb,ub,eta), m_bdd_interval{} {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      m_bdd_interval.emplace_back(manager,<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{0},<a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>[i]-1);</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  }</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  SymbolicSet(<span class="keyword">const</span> Cudd&amp; manager,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;              <span class="keyword">const</span> UniformGrid&amp; grid) :</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;              UniformGrid(grid), m_bdd_interval{} {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_dim; i++) </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      m_bdd_interval.emplace_back(manager,<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{0},m_no_grid_points[i]-1);</div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a4acaf5c2041521b629f490330d409df8">   81</a></span>&#160;  <a class="code" href="classscots_1_1_symbolic_set.html#a4acaf5c2041521b629f490330d409df8">SymbolicSet</a>(<span class="keyword">const</span> Cudd&amp; manager,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;              <span class="keyword">const</span> <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>&amp; grid) :</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;              <a class="code" href="classscots_1_1_uniform_grid.html">UniformGrid</a>(grid), m_bdd_interval{} {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      m_bdd_interval.emplace_back(manager,<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{0},<a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>[i]-1);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  SymbolicSet(<span class="keyword">const</span> SymbolicSet&amp; set1, <span class="keyword">const</span> SymbolicSet&amp; set2) {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    m_dim = set1.m_dim + set2.m_dim;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    m_eta = <span class="keyword">new</span> <span class="keywordtype">double</span>[m_dim];</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    m_first = <span class="keyword">new</span> <span class="keywordtype">double</span>[m_dim];</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    m_no_grid_points = <span class="keyword">new</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>[m_dim];</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    m_NN = <span class="keyword">new</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>[m_dim];</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;set1.m_dim; i++) {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      m_eta[i] = set1.m_eta[i];</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      m_first[i]  = set1.m_first[i];</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      m_no_grid_points[i]  = set1.m_no_grid_points[i];</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a7437abad8ce7d03eb076204d49a8349f">   96</a></span>&#160;  <a class="code" href="classscots_1_1_symbolic_set.html#a7437abad8ce7d03eb076204d49a8349f">SymbolicSet</a>(<span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; set1, <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; set2) {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a> = set1.<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a> + set2.<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>.reset(<span class="keyword">new</span> <span class="keywordtype">double</span>[<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>]);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <a class="code" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">m_first</a>.reset(<span class="keyword">new</span> <span class="keywordtype">double</span>[m_dim]);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>.reset(<span class="keyword">new</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>[m_dim]);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <a class="code" href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">m_NN</a>.reset(<span class="keyword">new</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>[m_dim]);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;set1.<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>[i] = set1.<a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>[i];</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <a class="code" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">m_first</a>[i]  = set1.<a class="code" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">m_first</a>[i];</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>[i]  = set1.<a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>[i];</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      m_bdd_interval.push_back(set1.m_bdd_interval[i]);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=set1.m_dim, i=0; i&lt;set2.m_dim; i++) {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      m_eta[j+i] = set2.m_eta[i];</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      m_first[j+i]  = set2.m_first[i];</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      m_no_grid_points[j+i]  = set2.m_no_grid_points[i];</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=set1.<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>, i=0; i&lt;set2.<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>[j+i] = set2.<a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>[i];</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      <a class="code" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">m_first</a>[j+i]  = set2.<a class="code" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">m_first</a>[i];</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>[j+i]  = set2.<a class="code" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">m_no_grid_points</a>[i];</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      m_bdd_interval.push_back(set2.m_bdd_interval[i]);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    }</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    calc_nn();</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  }</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordtype">void</span> print_info(<span class="keywordtype">int</span> verbose=0)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00118"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#af97332e27845b4a6d289b159205a230b">  118</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_set.html#af97332e27845b4a6d289b159205a230b">print_info</a>(<span class="keywordtype">int</span> verbose=0)<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">UniformGrid::print_info</a>();</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Number of BDD variables per dimension &quot;</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_dim; i++) {</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      std::cout &lt;&lt; m_bdd_interval[i].get_no_bdd_vars() &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">if</span>(verbose) {</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_dim; i++) {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;Dim &quot;</span> &lt;&lt; i+1 &lt;&lt; <span class="stringliteral">&quot;: &quot;</span>;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        m_bdd_interval[i].print_bdd_IDs();</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      }</div>
@@ -186,203 +186,232 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  }</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  BDD id_to_bdd(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> <span class="keywordtype">id</span>)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    BDD bdd;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> num;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordtype">int</span> k=m_dim-1;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">/* k= m_dim -1 */</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    num=<span class="keywordtype">id</span>/m_NN[k];</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordtype">id</span>=<span class="keywordtype">id</span>%m_NN[k];</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    bdd = m_bdd_interval[k].int_to_bdd(num);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">for</span>(k=m_dim-2; k &gt;= 0; k--) {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      num=<span class="keywordtype">id</span>/m_NN[k];</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordtype">id</span>=<span class="keywordtype">id</span>%m_NN[k];</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      bdd = bdd &amp; m_bdd_interval[k].int_to_bdd(num);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    }</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">return</span> bdd;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  }</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  BDD interval_to_bdd(<span class="keyword">const</span> Cudd&amp; manager,</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                      <span class="keyword">const</span> std::vector&lt;abs_type&gt;&amp; lb,   </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                      <span class="keyword">const</span> std::vector&lt;abs_type&gt;&amp; ub)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    BDD bdd = m_bdd_interval[0].interval_to_bdd(manager,lb[0],ub[0]);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=1; i&lt;m_dim; i++) </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      bdd = bdd &amp; m_bdd_interval[i].interval_to_bdd(manager,lb[i],ub[i]);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">return</span> bdd;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> F&gt;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  BDD ap_to_bdd(<span class="keyword">const</span> Cudd&amp; manager, <span class="keyword">const</span> F&amp; atomic_prop)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    BDD result = manager.bddZero();; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> i=0; i&lt;size(); i++) {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <span class="keywordflow">if</span>(atomic_prop(i)) </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        result = result | id_to_bdd(i);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    }</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  }</div>
+<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">  135</a></span>&#160;  BDD <a class="code" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">id_to_bdd</a>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> <span class="keywordtype">id</span>)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> num;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordtype">int</span> k=<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>-1;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="comment">/* k= m_dim -1 */</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    num=<span class="keywordtype">id</span>/<a class="code" href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">m_NN</a>[k];</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordtype">id</span>=<span class="keywordtype">id</span>%<a class="code" href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">m_NN</a>[k];</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    BDD bdd = m_bdd_interval[k].int_to_bdd(num);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">for</span>(k=<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>-2; k &gt;= 0; k--) {</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      num=<span class="keywordtype">id</span>/<a class="code" href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">m_NN</a>[k];</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keywordtype">id</span>=<span class="keywordtype">id</span>%<a class="code" href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">m_NN</a>[k];</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      bdd = bdd &amp; m_bdd_interval[k].int_to_bdd(num);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">return</span> bdd;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">  152</a></span>&#160;  BDD <a class="code" href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">interval_to_bdd</a>(<span class="keyword">const</span> Cudd&amp; manager,</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                      <span class="keyword">const</span> std::vector&lt;abs_type&gt;&amp; lb,   </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                      <span class="keyword">const</span> std::vector&lt;abs_type&gt;&amp; ub)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    BDD bdd = m_bdd_interval[0].interval_to_bdd(manager,lb[0],ub[0]);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=1; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      bdd = bdd &amp; m_bdd_interval[i].<a class="code" href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">interval_to_bdd</a>(manager,lb[i],ub[i]);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordflow">return</span> bdd;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  }</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> F&gt;</div>
+<div class="line"><a name="l00167"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#afc80b76129c7d77c6c2c548e80498c6d">  167</a></span>&#160;  BDD <a class="code" href="classscots_1_1_symbolic_set.html#afc80b76129c7d77c6c2c548e80498c6d">ap_to_bdd</a>(<span class="keyword">const</span> Cudd&amp; manager, <span class="keyword">const</span> F&amp; atomic_prop)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    BDD result = manager.bddZero();; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> i=0; i&lt;size(); i++) {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">if</span>(atomic_prop(i)) </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        result = result | <a class="code" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">id_to_bdd</a>(i);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  }</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  std::vector&lt;double&gt; bdd_to_grid_points(<span class="keyword">const</span> Cudd&amp; manager, BDD bdd) {</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">if</span>((!get_no_bdd_vars()) || bdd==manager.bddZero())</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">/* disable reordering (if enabled) */</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    Cudd_ReorderingType *method=<span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">if</span>(manager.ReorderingStatus(method))</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      manager.AutodynDisable();</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">/* get variable ids */</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keyword">auto</span> var_id = get_bdd_var_ids();</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="comment">/* find the variables in the support of the BDD but outside the SymbolicSet */</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keyword">auto</span> support_id = bdd.SupportIndices();</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    std::vector&lt;BDD&gt; out{}; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <span class="keywordtype">id</span> : support_id) {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="keywordflow">if</span>(std::find(std::begin(var_id), std::end(var_id), <span class="keywordtype">id</span>)==std::end(var_id))</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;          out.emplace_back(manager.bddVar(<span class="keywordtype">id</span>));</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">/* remove those variables from the bdd */</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">if</span>(out.size()) </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      bdd = bdd.ExistAbstract(manager.computeCube(out));</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="comment">/* limit the grid points in the grid */</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      bdd = bdd &amp; interval.get_all_elements();</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="comment">/* init the vector of grid points to be returned */</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> no_gp = get_size(manager,bdd);</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    std::vector&lt;double&gt; gp(no_gp*m_dim);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> i=0; i&lt;no_gp; i++) {</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=0; j&lt;m_dim; j++)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        gp[i*m_dim+j]=m_first[j];</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="comment">/* set up iteration to iterate over BDD cubes */</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        DdManager* dd = manager.getManager();</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <span class="keywordtype">int</span> *cube;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    CUDD_VALUE_TYPE value;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    DdGen *gen;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> counter=0;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <span class="comment">/* iterate over BDD cubes */</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        Cudd_ForeachCube(dd,bdd.getNode(),gen,cube,value) {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> offset=1;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_dim; i++) {</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> no_vars = m_bdd_interval[i].get_no_bdd_vars();</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> j=0; j&lt;no_vars; j++) {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = m_bdd_interval[i].get_bdd_var_ids()[j];</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          <span class="keywordflow">if</span>(cube[<span class="keywordtype">id</span>]==1) {</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;offset; k++) {</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;              gp[(counter+k)*m_dim+i]+=(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{1}&lt;&lt;(no_vars-1-j))*m_eta[i];</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            }</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;          }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;          <span class="comment">/* take care of don&#39;t care */</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;          <span class="keywordflow">if</span>(cube[<span class="keywordtype">id</span>]==2) {</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;offset; k++) {</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> l=0; l&lt;=i; l++) {</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                gp[(counter+k+offset)*m_dim+l]=gp[(counter+k)*m_dim+l];</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;              }</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;offset; k++) {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;              gp[(counter+k+offset)*m_dim+i]+=(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{1}&lt;&lt;(no_vars-1-j))*m_eta[i];</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            }</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            offset=(offset&lt;&lt;1);</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;          }</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        }</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      counter+=offset;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="comment">/* reactivate reordering if it was enabled */</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keywordflow">if</span>(method!=<span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      manager.AutodynEnable(*method);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">return</span> gp;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  }</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  std::vector&lt;double&gt; projection(<span class="keyword">const</span> Cudd&amp; manager, <span class="keyword">const</span> BDD&amp; bdd, std::vector&lt;int&gt; dim)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">if</span>(!dim.size())</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordflow">return</span> SymbolicSet(*<span class="keyword">this</span>,dim).bdd_to_grid_points(manager,bdd);</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  }</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> gr<span class="keywordtype">id</span>_po<span class="keywordtype">int</span>_t&gt;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  std::vector&lt;double&gt; restriction(<span class="keyword">const</span> Cudd&amp; manager,</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                                  <span class="keyword">const</span> BDD&amp; bdd, </div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                                  <span class="keyword">const</span> grid_point_t&amp; x,  </div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                                  std::vector&lt;int&gt; domain = {}) <span class="keyword">const</span> {</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="comment">/* compute indices in domain/codomain */</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    std::vector&lt;int&gt; codomain {};</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="comment">/* fill in default values */</span></div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keywordflow">if</span>(domain.size()==0) {</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      domain.resize(x.size());</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      std::iota(std::begin(domain),std::end(domain),0);</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      codomain.resize(m_dim-x.size());</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      std::iota(std::begin(codomain),std::end(codomain),x.size());</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_dim; i++) {</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="keywordflow">if</span>(std::find(std::begin(domain), std::end(domain), i) == std::end(domain))</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;          codomain.push_back(i);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      }</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    }</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="comment">/* create SymbolicSet of the domain and codmain */</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    SymbolicSet set_dom(*<span class="keyword">this</span>,domain);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    SymbolicSet set_codom(*<span class="keyword">this</span>,codomain);</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="comment">/* extract bdd with restriction */</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> <span class="keywordtype">id</span> = set_dom.xtoi(x);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    BDD restricted = bdd &amp; set_dom.id_to_bdd(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    restricted = restricted.ExistAbstract(manager.computeCube(set_dom.get_bdd_vars()));</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="comment">/* map restricted BDD to grid points */</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordflow">return</span> set_codom.bdd_to_grid_points(manager,restricted);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  }</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> get_no_bdd_vars()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> num = 0;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      num+=interval.get_no_bdd_vars();</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">return</span> num;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  }</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  std::vector&lt;BDD&gt; get_bdd_vars()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    std::vector&lt;BDD&gt; vars {};</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) {</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      std::vector&lt;BDD&gt; var = interval.get_bdd_vars();</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p : var) {</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        vars.push_back(p);</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      }</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    }</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="keywordflow">return</span> vars;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  }</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  std::vector&lt;unsigned int&gt; get_bdd_var_ids()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    std::vector&lt;unsigned int&gt; var_id {};</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) {</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <span class="keywordtype">id</span> : interval.get_bdd_var_ids()) </div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        var_id.push_back(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    }</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="keywordflow">return</span> var_id;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  }</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> get_size(<span class="keyword">const</span> Cudd&amp; manager, BDD bdd)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;        <span class="comment">/* find the variables in the support of the BDD but outside the SymbolicSet */</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <span class="keyword">auto</span> var_id = get_bdd_var_ids();</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;        <span class="keyword">auto</span> support_id = bdd.SupportIndices();</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    std::vector&lt;BDD&gt; out{}; </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <span class="keywordtype">id</span> : support_id) {</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        <span class="keywordflow">if</span>(std::find(std::begin(var_id), std::end(var_id), <span class="keywordtype">id</span>)==std::end(var_id))</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;          out.emplace_back(manager.bddVar(<span class="keywordtype">id</span>));</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    }</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="comment">/* remove those variables from the bdd */</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="keywordflow">if</span>(out.size()) </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      bdd = bdd.ExistAbstract(manager.computeCube(out));</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="comment">/* limit the grid points in the grid */</span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) </div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      bdd = bdd &amp; interval.get_all_elements();</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a><span class="keyword">&gt;</span>(bdd.CountMinterm(get_no_bdd_vars()));</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  } </div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  std::vector&lt;IntegerInterval&lt;abs_type&gt;&gt; get_bdd_intervals()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordflow">return</span> m_bdd_interval;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  }</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;}; <span class="comment">/* close class def */</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;} <span class="comment">/* close namespace */</span></div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* SYMBOLICSET_HH_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00183"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a945ba3416d8c00459e4f32ee172073ad">  183</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classscots_1_1_symbolic_set.html#a945ba3416d8c00459e4f32ee172073ad">bdd_to_grid_points</a>(<span class="keyword">const</span> Cudd&amp; manager, BDD bdd) {</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">if</span>((!<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>()) || bdd==manager.bddZero())</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="comment">/* disable reordering (if enabled) */</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    Cudd_ReorderingType *method=<span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">if</span>(manager.ReorderingStatus(method))</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      manager.AutodynDisable();</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="comment">/* get variable ids */</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keyword">auto</span> var_id = <a class="code" href="classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28">get_bdd_var_ids</a>();</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="comment">/* find the variables in the support of the BDD but outside the SymbolicSet */</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="keyword">auto</span> support_id = bdd.SupportIndices();</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    std::vector&lt;BDD&gt; out{}; </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <span class="keywordtype">id</span> : support_id) {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        <span class="keywordflow">if</span>(std::find(std::begin(var_id), std::end(var_id), <span class="keywordtype">id</span>)==std::end(var_id))</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;          out.emplace_back(manager.bddVar(<span class="keywordtype">id</span>));</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">/* remove those variables from the bdd */</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span>(out.size()) </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      bdd = bdd.ExistAbstract(manager.computeCube(out));</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="comment">/* limit the grid points in the grid */</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      bdd = bdd &amp; interval.get_all_elements();</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="comment">/* init the vector of grid points to be returned */</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> no_gp = <a class="code" href="classscots_1_1_symbolic_set.html#a3f9238aecc0fb3f1304c789ac7051a12">get_size</a>(manager,bdd);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    std::vector&lt;double&gt; gp(no_gp*<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> i=0; i&lt;no_gp; i++) {</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=0; j&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; j++)</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        gp[i*m_dim+j]=<a class="code" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">m_first</a>[j];</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    }</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="comment">/* set up iteration to iterate over BDD cubes */</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        DdManager* dd = manager.getManager();</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      <span class="keywordtype">int</span> *cube;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    CUDD_VALUE_TYPE value;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    DdGen *gen;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> counter=0;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="comment">/* iterate over BDD cubes */</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        Cudd_ForeachCube(dd,bdd.getNode(),gen,cube,value) {</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> offset=1;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> no_vars = m_bdd_interval[i].get_no_bdd_vars();</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> j=0; j&lt;no_vars; j++) {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;          <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = m_bdd_interval[i].get_bdd_var_ids()[j];</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          <span class="keywordflow">if</span>(cube[<span class="keywordtype">id</span>]==1) {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;offset; k++) {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;              gp[(counter+k)*m_dim+i]+=(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{1}&lt;&lt;(no_vars-1-j))*<a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>[i];</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            }</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;          }</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;          <span class="comment">/* take care of don&#39;t care */</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;          <span class="keywordflow">if</span>(cube[<span class="keywordtype">id</span>]==2) {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;offset; k++) {</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> l=0; l&lt;=i; l++) {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                gp[(counter+k+offset)*m_dim+l]=gp[(counter+k)*m_dim+l];</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;              }</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            }</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;offset; k++) {</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;              gp[(counter+k+offset)*m_dim+i]+=(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{1}&lt;&lt;(no_vars-1-j))*<a class="code" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">m_eta</a>[i];</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            }</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            offset=(offset&lt;&lt;1);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;          }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        }</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      }</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      counter+=offset;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">/* reactivate reordering if it was enabled */</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">if</span>(method!=<span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      manager.AutodynEnable(*method);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">return</span> gp;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  }</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
+<div class="line"><a name="l00254"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a511237b6b2b8df975cdf8b8b368c228b">  254</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classscots_1_1_symbolic_set.html#a511237b6b2b8df975cdf8b8b368c228b">projection</a>(<span class="keyword">const</span> Cudd&amp; manager, <span class="keyword">const</span> BDD&amp; bdd, std::vector&lt;int&gt; dim)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordflow">if</span>(!dim.size())</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">SymbolicSet</a>(*<span class="keyword">this</span>,dim).bdd_to_grid_points(manager,bdd);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  }</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> gr<span class="keywordtype">id</span>_po<span class="keywordtype">int</span>_t&gt;</div>
+<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#aea1482064652cd01483e18d34fc098b6">  293</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classscots_1_1_symbolic_set.html#aea1482064652cd01483e18d34fc098b6">restriction</a>(<span class="keyword">const</span> Cudd&amp; manager,</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                                  <span class="keyword">const</span> BDD&amp; bdd, </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                                  <span class="keyword">const</span> grid_point_t&amp; x,  </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                                  std::vector&lt;int&gt; domain = {}) <span class="keyword">const</span> {</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    <span class="comment">/* compute indices in domain/codomain */</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    std::vector&lt;int&gt; codomain {};</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="comment">/* fill in default values */</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">if</span>(domain.size()==0) {</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      domain.resize(x.size());</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      std::iota(std::begin(domain),std::end(domain),0);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      codomain.resize(<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>-x.size());</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      std::iota(std::begin(codomain),std::end(codomain),x.size());</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <span class="keywordflow">if</span>(std::find(std::begin(domain), std::end(domain), i) == std::end(domain))</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;          codomain.push_back(i);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    }</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="comment">/* create SymbolicSet of the domain and codmain */</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <a class="code" href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">SymbolicSet</a> set_dom(*<span class="keyword">this</span>,domain);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <a class="code" href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">SymbolicSet</a> set_codom(*<span class="keyword">this</span>,codomain);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="comment">/* extract bdd with restriction */</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> <span class="keywordtype">id</span> = set_dom.xtoi(x);</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    BDD restricted = bdd &amp; set_dom.id_to_bdd(<span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    restricted = restricted.ExistAbstract(set_dom.get_cube(manager));</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="comment">/* map restricted BDD to grid points */</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">return</span> set_codom.bdd_to_grid_points(manager,restricted);</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  }</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
+<div class="line"><a name="l00323"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">  323</a></span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> <a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> num = 0;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) </div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      num+=interval.get_no_bdd_vars();</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">return</span> num;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  }</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
+<div class="line"><a name="l00331"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a56966f62b47c75a0de86c962ebf579c0">  331</a></span>&#160;  std::vector&lt;BDD&gt; <a class="code" href="classscots_1_1_symbolic_set.html#a56966f62b47c75a0de86c962ebf579c0">get_bdd_vars</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    std::vector&lt;BDD&gt; vars {};</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) {</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      std::vector&lt;BDD&gt; var = interval.get_bdd_vars();</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p : var) {</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        vars.push_back(p);</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      }</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    }</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="keywordflow">return</span> vars;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  }</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
+<div class="line"><a name="l00343"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28">  343</a></span>&#160;  std::vector&lt;unsigned int&gt; <a class="code" href="classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28">get_bdd_var_ids</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    std::vector&lt;unsigned int&gt; var_id {};</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) {</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <span class="keywordtype">id</span> : interval.get_bdd_var_ids()) </div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        var_id.push_back(<span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    <span class="keywordflow">return</span> var_id;</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  }</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
+<div class="line"><a name="l00353"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a3f9238aecc0fb3f1304c789ac7051a12">  353</a></span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> <a class="code" href="classscots_1_1_symbolic_set.html#a3f9238aecc0fb3f1304c789ac7051a12">get_size</a>(<span class="keyword">const</span> Cudd&amp; manager, BDD bdd)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;        <span class="comment">/* find the variables in the support of the BDD but outside the SymbolicSet */</span></div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      <span class="keyword">auto</span> var_id = <a class="code" href="classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28">get_bdd_var_ids</a>();</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <span class="keyword">auto</span> support_id = bdd.SupportIndices();</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    std::vector&lt;BDD&gt; out{}; </div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <span class="keywordtype">id</span> : support_id) {</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        <span class="keywordflow">if</span>(std::find(std::begin(var_id), std::end(var_id), <span class="keywordtype">id</span>)==std::end(var_id))</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;          out.emplace_back(manager.bddVar(<span class="keywordtype">id</span>));</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    }</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="comment">/* remove those variables from the bdd */</span></div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordflow">if</span>(out.size()) </div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;      bdd = bdd.ExistAbstract(manager.computeCube(out));</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="comment">/* limit the grid points in the grid */</span></div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; interval : m_bdd_interval) </div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      bdd = bdd &amp; interval.get_all_elements();</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a><span class="keyword">&gt;</span>(bdd.CountMinterm(<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>()));</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  } </div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
+<div class="line"><a name="l00372"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a57f55675fa86c8d77db6bce8cc727806">  372</a></span>&#160;  std::vector&lt;IntegerInterval&lt;abs_type&gt;&gt; <a class="code" href="classscots_1_1_symbolic_set.html#a57f55675fa86c8d77db6bce8cc727806">get_bdd_intervals</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="keywordflow">return</span> m_bdd_interval;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  }</div>
+<div class="line"><a name="l00376"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_set.html#a71bd180ab04fbeb4c6fab9d4a8a59abf">  376</a></span>&#160;  BDD <a class="code" href="classscots_1_1_symbolic_set.html#a71bd180ab04fbeb4c6fab9d4a8a59abf">get_cube</a>(<span class="keyword">const</span> Cudd&amp; manager)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordflow">return</span> manager.computeCube(<a class="code" href="classscots_1_1_symbolic_set.html#a56966f62b47c75a0de86c962ebf579c0">get_bdd_vars</a>());</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  }</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}; <span class="comment">/* close class def */</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;} <span class="comment">/* close namespace */</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* SYMBOLICSET_HH_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a1cc2b79a0ee93fa475063516e62725d7"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a1cc2b79a0ee93fa475063516e62725d7">scots::SymbolicSet::SymbolicSet</a></div><div class="ttdeci">SymbolicSet(const UniformGrid &amp;grid, const std::vector&lt; IntegerInterval&lt; abs_type &gt;&gt; &amp;intervals)</div><div class="ttdoc">create a SymbolicSet and initialize m_bdd_interval with intervals </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:50</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_af744074b941f3ca261bce49afe33fa9a"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">scots::UniformGrid::m_no_grid_points</a></div><div class="ttdeci">std::unique_ptr&lt; abs_type[]&gt; m_no_grid_points</div><div class="ttdoc">scots::abs_type array[m_dim] containing the number of grid points in each dimension ...</div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:75</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_adcbfc045937f9b57cf8644f99e4d68af"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#adcbfc045937f9b57cf8644f99e4d68af">scots::SymbolicSet::SymbolicSet</a></div><div class="ttdeci">SymbolicSet(const SymbolicSet &amp;other, std::vector&lt; int &gt; dim)</div><div class="ttdoc">create a SymbolicSet from other by projecting it onto the dimension in dim </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:43</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a71bd180ab04fbeb4c6fab9d4a8a59abf"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a71bd180ab04fbeb4c6fab9d4a8a59abf">scots::SymbolicSet::get_cube</a></div><div class="ttdeci">BDD get_cube(const Cudd &amp;manager) const </div><div class="ttdoc">get cube BDD with the BDD variables of the SymbolicSet </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:376</div></div>
 <div class="ttc" id="namespacescots_html"><div class="ttname"><a href="namespacescots.html">scots</a></div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html"><div class="ttname"><a href="classscots_1_1_uniform_grid.html">scots::UniformGrid</a></div><div class="ttdoc">Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:66</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_ac1fc1ae3d1492693e59520e1b3058d62"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">scots::SymbolicSet::SymbolicSet</a></div><div class="ttdeci">SymbolicSet()</div><div class="ttdoc">construct SymbolicSet with a Cudd manager </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:40</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a57f55675fa86c8d77db6bce8cc727806"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a57f55675fa86c8d77db6bce8cc727806">scots::SymbolicSet::get_bdd_intervals</a></div><div class="ttdeci">std::vector&lt; IntegerInterval&lt; abs_type &gt; &gt; get_bdd_intervals() const </div><div class="ttdoc">get IntegerInterval </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:372</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_ad4bd9ba0dcd545535eb942baec34ad6b"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">scots::UniformGrid::m_dim</a></div><div class="ttdeci">int m_dim</div><div class="ttdoc">dimension of the Eucleadian space </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:69</div></div>
 <div class="ttc" id="_uniform_grid_8hh_html"><div class="ttname"><a href="_uniform_grid_8hh.html">UniformGrid.hh</a></div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html"><div class="ttname"><a href="classscots_1_1_symbolic_set.html">scots::SymbolicSet</a></div><div class="ttdoc">The UniformGrid class with the capability to represent sets of grid points as BDDs. See UniformGrid for details. </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:34</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_ad862f290e4cb0b0ea3a1442a5746508f"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">scots::SymbolicSet::get_no_bdd_vars</a></div><div class="ttdeci">abs_type get_no_bdd_vars() const </div><div class="ttdoc">get number of BDD variables used to represent the SymbolicSet </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:323</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a56966f62b47c75a0de86c962ebf579c0"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a56966f62b47c75a0de86c962ebf579c0">scots::SymbolicSet::get_bdd_vars</a></div><div class="ttdeci">std::vector&lt; BDD &gt; get_bdd_vars() const </div><div class="ttdoc">get number of BDD variables used to represent the SymbolicSet </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:331</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_aea1482064652cd01483e18d34fc098b6"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#aea1482064652cd01483e18d34fc098b6">scots::SymbolicSet::restriction</a></div><div class="ttdeci">std::vector&lt; double &gt; restriction(const Cudd &amp;manager, const BDD &amp;bdd, const grid_point_t &amp;x, std::vector&lt; int &gt; domain={}) const </div><div class="ttdoc">restriction of the set of grid points (represented as the BDD bdd) to x </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:293</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_afc80b76129c7d77c6c2c548e80498c6d"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#afc80b76129c7d77c6c2c548e80498c6d">scots::SymbolicSet::ap_to_bdd</a></div><div class="ttdeci">BDD ap_to_bdd(const Cudd &amp;manager, const F &amp;atomic_prop) const </div><div class="ttdoc">obtain a BDD representation of the grid points whose grid point IDs evaluate to true in the lambda ex...</div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:167</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_af97332e27845b4a6d289b159205a230b"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#af97332e27845b4a6d289b159205a230b">scots::SymbolicSet::print_info</a></div><div class="ttdeci">void print_info(int verbose=0) const </div><div class="ttdoc">print information about the symbolic set </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:118</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_aa8173e1107c0a2a6230ebb163f07f743"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">scots::SymbolicSet::interval_to_bdd</a></div><div class="ttdeci">BDD interval_to_bdd(const Cudd &amp;manager, const std::vector&lt; abs_type &gt; &amp;lb, const std::vector&lt; abs_type &gt; &amp;ub) const </div><div class="ttdoc">get a BDD representation of the grid points whose IDs are an element of the integer hyper-interval [l...</div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:152</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_aeedf4833d000d3b7ed165b90e826ddf7"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">scots::UniformGrid::m_first</a></div><div class="ttdeci">std::unique_ptr&lt; double[]&gt; m_first</div><div class="ttdoc">m_dim-dimensional vector containing the real values of the first grid point </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:73</div></div>
 <div class="ttc" id="_integer_interval_8hh_html"><div class="ttname"><a href="_integer_interval_8hh.html">IntegerInterval.hh</a></div></div>
-<div class="ttc" id="namespacescots_html_ada6a0cbabc01e198ebc8e503689de43a"><div class="ttname"><a href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">scots::abs_type</a></div><div class="ttdeci">std::uint32_t abs_type</div><div class="ttdoc">abs_type defines type of abstract states (default = uint32_t) </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:31</div></div>
-<div class="ttc" id="classscots_1_1_uniform_grid_html_acdf7467b400f3a30b9a5adbfbefdaa7e"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">scots::UniformGrid::print_info</a></div><div class="ttdeci">void print_info() const </div><div class="ttdoc">creates console output with grid information </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:277</div></div>
+<div class="ttc" id="namespacescots_html_ada6a0cbabc01e198ebc8e503689de43a"><div class="ttname"><a href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">scots::abs_type</a></div><div class="ttdeci">std::uint32_t abs_type</div><div class="ttdoc">abs_type defines type of abstract states (default = uint32_t) </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:32</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a945ba3416d8c00459e4f32ee172073ad"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a945ba3416d8c00459e4f32ee172073ad">scots::SymbolicSet::bdd_to_grid_points</a></div><div class="ttdeci">std::vector&lt; double &gt; bdd_to_grid_points(const Cudd &amp;manager, BDD bdd)</div><div class="ttdoc">get a vector of grid points that are encoded in the BDD </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:183</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a72f44e48ef8a139b7c12f9f700b1aa28"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28">scots::SymbolicSet::get_bdd_var_ids</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; get_bdd_var_ids() const </div><div class="ttdoc">get number of BDD variables used to represent the SymbolicSet </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:343</div></div>
+<div class="ttc" id="classscots_1_1_integer_interval_html"><div class="ttname"><a href="classscots_1_1_integer_interval.html">scots::IntegerInterval</a></div><div class="ttdoc">A class to represent the integers in a closed integer interval [lb; ub] as BDDs. </div><div class="ttdef"><b>Definition:</b> IntegerInterval.hh:28</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a7648b878fc7ed9a8955bb843c283eff5"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">scots::SymbolicSet::id_to_bdd</a></div><div class="ttdeci">BDD id_to_bdd(abs_type id) const </div><div class="ttdoc">function to obtain a BDD representation of the grid point id </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:135</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_a77e61cc403e5e7c4d15b5a8102588354"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">scots::UniformGrid::m_eta</a></div><div class="ttdeci">std::unique_ptr&lt; double[]&gt; m_eta</div><div class="ttdoc">m_dim-dimensional vector containing the grid node distances </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:71</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a511237b6b2b8df975cdf8b8b368c228b"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a511237b6b2b8df975cdf8b8b368c228b">scots::SymbolicSet::projection</a></div><div class="ttdeci">std::vector&lt; double &gt; projection(const Cudd &amp;manager, const BDD &amp;bdd, std::vector&lt; int &gt; dim) const </div><div class="ttdoc">projection of the set of grid points onto the dimension in dim+1, e.g., to project onto the 1st and 2...</div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:254</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_acf62a7dd4028936701bd7998ebded73c"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#acf62a7dd4028936701bd7998ebded73c">scots::SymbolicSet::SymbolicSet</a></div><div class="ttdeci">SymbolicSet(const Cudd &amp;manager, const int dim, const grid_point_t &amp;lb, const grid_point_t &amp;ub, const grid_point_t &amp;eta)</div><div class="ttdoc">provide BDD variable manager and UniformGrid parameters </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:65</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_aba9f28f2647e4557794dc333caf1e593"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">scots::UniformGrid::m_NN</a></div><div class="ttdeci">std::unique_ptr&lt; abs_type[]&gt; m_NN</div><div class="ttdoc">array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_grid_points[i-1]; </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:77</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_acdf7467b400f3a30b9a5adbfbefdaa7e"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">scots::UniformGrid::print_info</a></div><div class="ttdeci">void print_info() const </div><div class="ttdoc">creates console output with grid information </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:267</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a7437abad8ce7d03eb076204d49a8349f"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a7437abad8ce7d03eb076204d49a8349f">scots::SymbolicSet::SymbolicSet</a></div><div class="ttdeci">SymbolicSet(const SymbolicSet &amp;set1, const SymbolicSet &amp;set2)</div><div class="ttdoc">construct product of two SymbolicSets </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:96</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a3f9238aecc0fb3f1304c789ac7051a12"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a3f9238aecc0fb3f1304c789ac7051a12">scots::SymbolicSet::get_size</a></div><div class="ttdeci">abs_type get_size(const Cudd &amp;manager, BDD bdd) const </div><div class="ttdoc">get number grid points represented by the BDD </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:353</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_set_html_a4acaf5c2041521b629f490330d409df8"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a4acaf5c2041521b629f490330d409df8">scots::SymbolicSet::SymbolicSet</a></div><div class="ttdeci">SymbolicSet(const Cudd &amp;manager, const UniformGrid &amp;grid)</div><div class="ttdoc">provide BDD variable manager and UniformGrid </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:81</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

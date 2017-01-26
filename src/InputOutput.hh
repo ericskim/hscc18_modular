@@ -378,8 +378,9 @@ inline
 bool read_from_file(SymbolicSet& set, const Cudd& manager, const std::string& filename) {
   /* read UniformGrid from file */
   UniformGrid grid;
-  read_from_file(grid,filename);
-
+  if(!read_from_file(grid,filename)){
+    return false;
+  }
   /* read the BDD variable IDs and create IntegerInterval*/
   std::vector<IntegerInterval<abs_type>> bdd_interval{};
   FileReader reader(filename);
@@ -409,7 +410,7 @@ bool read_from_file(SymbolicSet& set, const Cudd& manager, const std::string& fi
  * See dddmp.h for the different modes of reading.
  **/
 inline
-bool read_from_file(SymbolicSet& set, BDD& bdd, const Cudd& manager, const std::string& filename, char mode = 'B') {
+bool read_from_file(SymbolicSet& set, BDD& bdd, Cudd& manager, const std::string& filename, char mode = 'B') {
   if(!read_from_file(set,manager,filename))
     return false;
   FileReader reader(filename);

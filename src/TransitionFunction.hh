@@ -85,16 +85,13 @@ public:
 public:
   /* @cond  EXCLUDE from doxygen */
   /* default constructor */
-  TransitionFunction() : 
-        m_no_states(0),
-        m_no_inputs(0),
-        m_no_transitions(0),
-	m_pre(nullptr),
-	m_pre_ptr(nullptr),
-	m_no_pre(nullptr),
-	m_no_post(nullptr){
-
-  }  
+  TransitionFunction() : m_no_states(0),
+                         m_no_inputs(0),
+                         m_no_transitions(0),
+                         m_pre(nullptr),
+                         m_pre_ptr(nullptr),
+                         m_no_pre(nullptr),
+                         m_no_post(nullptr) { }  
   /* move constructor */
   TransitionFunction(TransitionFunction&& other) {
     *this = std::move(other);  

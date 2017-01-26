@@ -11,8 +11,9 @@
 #define INTEGERINTERVAL_HH_
 
 
-#include <vector>
 #include <iostream>
+#include <vector>
+#include <memory>
 
 /* cudd library */
 #include "cuddObj.hh"
@@ -25,7 +26,7 @@ namespace scots {
  **/
 template<class int_type >
 class IntegerInterval {
-public:
+private:
   /* lower bound of interval */
   int_type m_lb;
   /* upper bound of interval */
@@ -53,13 +54,21 @@ public:
   }
 
 public:
+  /* @cond  EXCLUDE from doxygen */
+  /* default constructor */
+  IntegerInterval() : m_lb(0),  
+                      m_ub(0), 
+                      m_bdd_vars{},
+                      m_bdd_var_id{},
+                      m_int_to_bdd{} { }
+  /* @endcond */
     
   /** @brief Instantiate the IntegerInterval with the integer interval [lb;ub]\n 
    *  optionally, provide the bdd variable ids to reprsent the integer interval **/
   IntegerInterval(const Cudd& manager,
-                     int_type lb, int_type ub,
-                     const std::vector<unsigned int>& bdd_var_id = {}) :
-                     m_lb(lb), m_ub(ub), m_bdd_var_id(bdd_var_id) {
+                  int_type lb, int_type ub,
+                  const std::vector<unsigned int>& bdd_var_id = {}) :
+                  m_lb(lb), m_ub(ub), m_bdd_var_id(bdd_var_id) {
     /* compute necessar no of BDD variables to represent the integer in the interval  */ 
     m_size = ub-lb+1;
     unsigned int no_bdd_var = m_bdd_var_id.size();
@@ -76,26 +85,27 @@ public:
     /* get new BDD variable IDs */
     m_bdd_vars.resize(no_bdd_var);
     m_bdd_var_id.resize(no_bdd_var);
-    int* phase = new int[no_bdd_var] (); 
-    BDD* vars = new BDD[no_bdd_var];
+    std::unique_ptr<BDD[]> vars{ new BDD[no_bdd_var] }; 
     for(unsigned int j=0; j<no_bdd_var; j++) {
+      /* copy ids from bdd_var_id or create new ones */
       if(!bdd_var_id.size()) {
+        /* get new IDs */
         vars[j] = manager.bddVar();
         m_bdd_var_id[j]=vars[j].NodeReadIndex();
       } else {
+        /* copy IDs from bdd_var_id */
         vars[j] = manager.bddVar(bdd_var_id[j]);
       }
       m_bdd_vars[j]=vars[j];
     }
     /* create BDDs to represent the integers in the interval */
+    std::unique_ptr<int[]> phase{ new int[no_bdd_var] () }; 
     m_int_to_bdd.resize(m_size);
     for(int_type i=0; i<m_size; i++) {
-      m_int_to_bdd[i] = manager.bddComputeCube(vars,phase,no_bdd_var);
-      add_one(phase,no_bdd_var);
+      m_int_to_bdd[i] = manager.bddComputeCube(vars.get(),phase.get(),no_bdd_var);
+      add_one(phase.get(),no_bdd_var);
       //m_int_to_bdd[i].PrintMinterm();
     }
-    delete[] vars;
-    delete[] phase;
   }
 
   /** @brief maps an integer in the interval to its BDD representation **/

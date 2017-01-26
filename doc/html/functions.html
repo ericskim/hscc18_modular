@@ -80,6 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
       <li><a href="#index_a"><span>a</span></a></li>
+      <li><a href="#index_b"><span>b</span></a></li>
       <li><a href="#index_c"><span>c</span></a></li>
       <li><a href="#index_e"><span>e</span></a></li>
       <li><a href="#index_g"><span>g</span></a></li>
@@ -87,6 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="#index_m"><span>m</span></a></li>
       <li><a href="#index_o"><span>o</span></a></li>
       <li><a href="#index_p"><span>p</span></a></li>
+      <li><a href="#index_r"><span>r</span></a></li>
       <li><a href="#index_s"><span>s</span></a></li>
       <li><a href="#index_t"><span>t</span></a></li>
       <li><a href="#index_u"><span>u</span></a></li>
@@ -117,6 +119,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>Abstraction()
 : <a class="el" href="classscots_1_1_abstraction.html#a4db798cb5d5570641e041199343f2c5e">scots::Abstraction&lt; state_type, input_type &gt;</a>
 </li>
+<li>ap_to_bdd()
+: <a class="el" href="classscots_1_1_symbolic_set.html#afc80b76129c7d77c6c2c548e80498c6d">scots::SymbolicSet</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_b"></a>- b -</h3><ul>
+<li>bdd_to_grid_points()
+: <a class="el" href="classscots_1_1_symbolic_set.html#a945ba3416d8c00459e4f32ee172073ad">scots::SymbolicSet</a>
+</li>
 </ul>
 
 
@@ -126,7 +138,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>compute_gb()
 : <a class="el" href="classscots_1_1_abstraction.html#a8bf15ecc6a83af51fd0e97f8e1a23ecd">scots::Abstraction&lt; state_type, input_type &gt;</a>
-, <a class="el" href="classscots_1_1_symbolic_model.html#a7f75a3968747165142d773394cd7d2a5">scots::SymbolicModel&lt; state_type, input_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">scots::SymbolicModel&lt; state_type, input_type &gt;</a>
 </li>
 </ul>
 
@@ -142,14 +154,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>get_all_elements()
 : <a class="el" href="classscots_1_1_integer_interval.html#ac4cb3449c3dbf982cba8a2052d421471">scots::IntegerInterval&lt; int_type &gt;</a>
 </li>
+<li>get_bdd_intervals()
+: <a class="el" href="classscots_1_1_symbolic_set.html#a57f55675fa86c8d77db6bce8cc727806">scots::SymbolicSet</a>
+</li>
 <li>get_bdd_var_ids()
 : <a class="el" href="classscots_1_1_integer_interval.html#af58b76fa0cce12dddd56d26d58ba7977">scots::IntegerInterval&lt; int_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28">scots::SymbolicSet</a>
 </li>
 <li>get_bdd_vars()
 : <a class="el" href="classscots_1_1_integer_interval.html#a8d2e6a7aa2024936133342df4a9b388e">scots::IntegerInterval&lt; int_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_set.html#a56966f62b47c75a0de86c962ebf579c0">scots::SymbolicSet</a>
 </li>
 <li>get_control()
 : <a class="el" href="classscots_1_1_static_controller.html#a7bbdc76b030eb9215aaa72c44e730416">scots::StaticController</a>
+</li>
+<li>get_cube()
+: <a class="el" href="classscots_1_1_symbolic_set.html#a71bd180ab04fbeb4c6fab9d4a8a59abf">scots::SymbolicSet</a>
 </li>
 <li>get_domain()
 : <a class="el" href="classscots_1_1_static_controller.html#a4ea477bd0a3a78a6b5f06cba19815fa4">scots::StaticController</a>
@@ -159,10 +179,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>get_measruement_error_bound()
 : <a class="el" href="classscots_1_1_abstraction.html#a904d9bc1aa85329abf705306d05e53f5">scots::Abstraction&lt; state_type, input_type &gt;</a>
-, <a class="el" href="classscots_1_1_symbolic_model.html#aaf4376741d1d98a4e96d52658eee0105">scots::SymbolicModel&lt; state_type, input_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">scots::SymbolicModel&lt; state_type, input_type &gt;</a>
 </li>
 <li>get_no_bdd_vars()
 : <a class="el" href="classscots_1_1_integer_interval.html#aec2ef4bac74c20c207c2c5bb89cfd3e4">scots::IntegerInterval&lt; int_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">scots::SymbolicSet</a>
+</li>
+<li>get_no_inputs()
+: <a class="el" href="classscots_1_1_winning_domain.html#a77425e7b983dae20a231d245fd718221">scots::WinningDomain</a>
+</li>
+<li>get_no_states()
+: <a class="el" href="classscots_1_1_winning_domain.html#ab665116f0d088af3231a0279797cbbca">scots::WinningDomain</a>
 </li>
 <li>get_no_transitions()
 : <a class="el" href="classscots_1_1_transition_function.html#ae3848823c1574ffd9fa9cc52b7bcb952">scots::TransitionFunction</a>
@@ -175,7 +202,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classscots_1_1_transition_function.html#aabc1f0bbefd0a935deb2cb21019f46fe">scots::TransitionFunction</a>
 </li>
 <li>get_size()
-: <a class="el" href="classscots_1_1_winning_domain.html#a06faa2c99d97029bb5ef2afd643c2220">scots::WinningDomain</a>
+: <a class="el" href="classscots_1_1_symbolic_set.html#a3f9238aecc0fb3f1304c789ac7051a12">scots::SymbolicSet</a>
+, <a class="el" href="classscots_1_1_winning_domain.html#a06faa2c99d97029bb5ef2afd643c2220">scots::WinningDomain</a>
 </li>
 <li>get_winning_domain()
 : <a class="el" href="classscots_1_1_winning_domain.html#a16a0b60d371b0b32e26a4500e6422593">scots::WinningDomain</a>
@@ -184,6 +212,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_i"></a>- i -</h3><ul>
+<li>id_to_bdd()
+: <a class="el" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">scots::SymbolicSet</a>
+</li>
 <li>init_infrastructure()
 : <a class="el" href="classscots_1_1_transition_function.html#ad59ebf8ac9e7fc83d34a4c41c2c313e3">scots::TransitionFunction</a>
 </li>
@@ -198,6 +229,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>interval_to_bdd()
 : <a class="el" href="classscots_1_1_integer_interval.html#a31eff34edf847efd128f885a8cb1bedf">scots::IntegerInterval&lt; int_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">scots::SymbolicSet</a>
 </li>
 <li>is_winning()
 : <a class="el" href="classscots_1_1_winning_domain.html#ad71c07fda3268a4c288f3ec5c1d8342d">scots::WinningDomain</a>
@@ -213,16 +245,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">scots::UniformGrid</a>
 </li>
 <li>m_eta
-: <a class="el" href="classscots_1_1_uniform_grid.html#a140ae965e1cc6c943a5530c8d980a9d7">scots::UniformGrid</a>
+: <a class="el" href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">scots::UniformGrid</a>
 </li>
 <li>m_first
-: <a class="el" href="classscots_1_1_uniform_grid.html#a67427e17f476b4dcae2a3ce3d5f1e9a4">scots::UniformGrid</a>
+: <a class="el" href="classscots_1_1_uniform_grid.html#aeedf4833d000d3b7ed165b90e826ddf7">scots::UniformGrid</a>
 </li>
 <li>m_NN
-: <a class="el" href="classscots_1_1_uniform_grid.html#a4e742aa9773f155219ee91633e432415">scots::UniformGrid</a>
+: <a class="el" href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">scots::UniformGrid</a>
 </li>
 <li>m_no_grid_points
-: <a class="el" href="classscots_1_1_uniform_grid.html#ae1e2e02e29cf20161f17941d8d12aad9">scots::UniformGrid</a>
+: <a class="el" href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">scots::UniformGrid</a>
 </li>
 <li>m_no_inputs
 : <a class="el" href="classscots_1_1_transition_function.html#a9fcfa935ff7237356e3f41c8b453da5c">scots::TransitionFunction</a>
@@ -260,7 +292,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classscots_1_1_integer_interval.html#a8185d5584afd256946aad14126ac515e">scots::IntegerInterval&lt; int_type &gt;</a>
 </li>
 <li>print_info()
-: <a class="el" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">scots::UniformGrid</a>
+: <a class="el" href="classscots_1_1_symbolic_set.html#af97332e27845b4a6d289b159205a230b">scots::SymbolicSet</a>
+, <a class="el" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">scots::UniformGrid</a>
 </li>
 <li>print_post()
 : <a class="el" href="classscots_1_1_abstraction.html#a9de7c62deafae61f912057342591d913">scots::Abstraction&lt; state_type, input_type &gt;</a>
@@ -268,18 +301,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>print_post_gb()
 : <a class="el" href="classscots_1_1_abstraction.html#a509fe1f3806c79a14468c8dcf83ace85">scots::Abstraction&lt; state_type, input_type &gt;</a>
 </li>
+<li>projection()
+: <a class="el" href="classscots_1_1_symbolic_set.html#a511237b6b2b8df975cdf8b8b368c228b">scots::SymbolicSet</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_r"></a>- r -</h3><ul>
+<li>restriction()
+: <a class="el" href="classscots_1_1_symbolic_set.html#aea1482064652cd01483e18d34fc098b6">scots::SymbolicSet</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
 <li>set_measurement_error_bound()
 : <a class="el" href="classscots_1_1_abstraction.html#a8409a64f3cb1811a1fa7bb6207df872b">scots::Abstraction&lt; state_type, input_type &gt;</a>
+, <a class="el" href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">scots::SymbolicModel&lt; state_type, input_type &gt;</a>
 </li>
 <li>StaticController()
 : <a class="el" href="classscots_1_1_static_controller.html#af9a022ff991cc3ec80ab83dae7f07ef3">scots::StaticController</a>
 </li>
 <li>SymbolicModel()
 : <a class="el" href="classscots_1_1_symbolic_model.html#a6fc9353c005c7612cfca3938e6b73d68">scots::SymbolicModel&lt; state_type, input_type &gt;</a>
+</li>
+<li>SymbolicSet()
+: <a class="el" href="classscots_1_1_symbolic_set.html#ac1fc1ae3d1492693e59520e1b3058d62">scots::SymbolicSet</a>
 </li>
 </ul>
 

@@ -1,14 +1,14 @@
 %
 % dcdc.m
 %
-% created on: 09.10.2015
-%     author: rungger
+% created: Jan 2017
+%  author: rungger
 %
 % see readme file for more information on the dcdc example
 %
 % you need to run ./dcdc binary first 
 %
-% so that the file: dcdc_controller.bdd is created
+% so that the file: controller.bdd/controller.scs is created
 %
 
 function dcdc
@@ -21,17 +21,18 @@ x0=[1.2 5.5];
 x0=[.7 5.4];
 
 % load the symbolic set containing the controller
-C=SymbolicSet('dcdc_controller.bdd');
+C=SymbolicSet('controller');
 
 y=x0;
 v=[];
 T=400; 
 for t=1:T/0.5
 
-  u=C.getInputs(y(end,:));
-  v=[v; u(end,:)];
-  [t x]=ode45(@unicycle_ode,[0 .5], y(end,:), odeset('abstol',1e-4,'reltol',1e-4),u(end,:));
-
+  u=C.restriction(y(end,:));
+  % pick valid inputs
+  u=u(end,:);
+  [t x]=ode45(@unicycle_ode,[0 .5], y(end,:), odeset('abstol',1e-4,'reltol',1e-4),u);
+  v=[v; u];
   y=[y; x(end,:)];
 end
 
@@ -40,17 +41,15 @@ end
 colors=get(groot,'DefaultAxesColorOrder');
 
 % plot the domain of the controller
-set=SymbolicSet('dcdc_controller.bdd','projection',[1 2]);
-x=set.points;
+x=C.points([1 2]);
 plot(x(:,1),x(:,2),'.','color',[0.8 0.8 0.8])
 hold on
 
 % plot initial state  and trajectory
 plot(y(:,1),y(:,2),'.-','color',colors(1,:))
-plot(y(1,1),y(1,1),'.','color',colors(5,:),'markersize',20)
+plot(y(1,1),y(1,2),'.','color',colors(5,:),'markersize',20)
 
-% plot safe set
-%v=[1.15 5.45; 1.55 5.45; 1.15 5.85; 1.55 5.85 ];
+% plot target set
 v=[1.1 5.4; 1.6 5.4; 1.1 5.9; 1.6 5.9 ];
 patch('vertices',v,'faces',[1 2 4 3],'facecolor','none','edgec',colors(2,:),'linew',1)
 hold on

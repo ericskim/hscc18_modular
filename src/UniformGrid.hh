@@ -25,7 +25,7 @@ namespace scots {
 /**
  * @brief abs_type defines type of abstract states (default = uint32_t) 
  *
- * It is required to be an integer type. It determines implicitely an upper
+ * It is required to be an integer type. It determines implicitly an upper
  * bound on the number of abstract states (default = 2^32-1). 
  **/
 #ifndef SCOTS_BDD
@@ -37,24 +37,27 @@ using abs_type=std::uint64_t;
 /**
  * @class UniformGrid 
  *
- * @brief Holds the information of a uniform grid confined by a hyper-interval
+ * @brief Holds the information of a uniform grid confined by the hyper-interval
+ * [lb, ub]
  *
- * Properties: 
- * - the grid points are distributied uniformly in each dimension 
- * - the domain of the unfiorm grid is defined by a hyper interval 
- * - each grid pont is associated with a hyper-rectangle with radius eta/2 centered at the grid point 
  *
  * Grid point alignment: 
+ * - the grid points are distributed uniformly in each dimension 
  * - the origin is a grid point (not necessarily contained in the set) 
  * - the distance of the grid points in each dimension i is defined by eta[i] 
  *
  * Each grid point is associated with an ID of type abs_type (default
- * abs_type=uint32_t). 
- * Given that the UnfiormGrid is used to represent a subset of the abstract
- * state alphabet, then each grid point represents the center of a cell of
- * readius eta/2. 
- * The member functions itox and xtoi can be used to map between the ID and the
- * grid point/center of the cell.
+ * abs_type=uint32_t). The abs_type need to be an integral type and implicitly determines an upper bound on the number of
+ * grid points that are representable by the UniformGrid.
+ *
+ *
+ * A UniformGrid is often used to encode the state alphabet (or real quantizer
+ * symbols) of an abstraction. In that context, we interpret the grid points as
+ * centers of cells and the grid point IDs as cell IDs. The radius of the cells
+ * is given by \f$\eta/2\f$. 
+ *
+ * The member functions itox and xtoi are used to map between the IDs and the
+ * grid points/center of the cells.
  *
  * See 
  * - the manual in <a href="./../../manual/manual.pdf">manual</a>
@@ -83,7 +86,7 @@ public:
                   m_NN(nullptr) { }
   /* destructor */
   virtual
-  ~UniformGrid() { }
+  ~UniformGrid() = default;
   /* copy constructor */
   UniformGrid(const UniformGrid& other) : UniformGrid() {
     *this=other;

@@ -71,81 +71,91 @@ int main() {
   Cudd mgr;
   mgr.AutodynEnable();
 
-  /* setup the workspace of the synthesis problem and the uniform grid */
-  /* lower bounds of the hyper rectangle */
-  state_type s_lb={{0,0,-M_PI-0.4}};
-  /* upper bounds of the hyper rectangle */
-  state_type s_ub={{10,10,M_PI+0.4}};
-  /* grid node distance diameter */
-  state_type s_eta={{.2,.2,.2}};
-  /* construct SymbolicSet with the UniformGrid information for the state space
-   * and BDD variable IDs for the pre */
-  scots::SymbolicSet ss_pre(mgr, state_dim,s_lb,s_ub,s_eta);
-  /* construct SymbolicSet with the UniformGrid information for the state space
-   * and BDD variable IDs for the post */
-  scots::SymbolicSet ss_post(mgr, state_dim,s_lb,s_ub,s_eta);
+  /* try to read data from files */
+  scots::SymbolicSet ss_pre;
+  scots::SymbolicSet ss_post;
+  if(!scots::read_from_file(ss_pre,mgr,"state_pre") ||
+     !scots::read_from_file(ss_post,mgr,"state_post")) {
+   /* lower bounds of the hyper rectangle */
+    state_type s_lb={{0,0,-M_PI-0.4}};
+    /* upper bounds of the hyper rectangle */
+    state_type s_ub={{10,10,M_PI+0.4}};
+    /* grid node distance diameter */
+    state_type s_eta={{.2,.2,.2}};
+    /* construct SymbolicSet with the UniformGrid information for the state space
+     * and BDD variable IDs for the pre */
+    ss_pre = scots::SymbolicSet(mgr, state_dim,s_lb,s_ub,s_eta);
+    /* construct SymbolicSet with the UniformGrid information for the state space
+     * and BDD variable IDs for the post */
+    ss_post = scots::SymbolicSet(mgr, state_dim,s_lb,s_ub,s_eta);
+ 
+    scots::write_to_file(ss_pre,"state_pre");
+    scots::write_to_file(ss_post,"state_post");
+  }
   std::cout << "Unfiorm grid details:" << std::endl;
   ss_pre.print_info(1);
 
-
-  /* construct grid for the input space */
-  /* lower bounds of the hyper rectangle */
-  input_type i_lb={{-1,-1}};
-  /* upper bounds of the hyper rectangle */
-  input_type i_ub={{ 1, 1}};
-  /* grid node distance diameter */
-  input_type i_eta={{.3,.3}};
-  scots::SymbolicSet ss_input(mgr, input_dim,i_lb,i_ub,i_eta);
+  /* try to read data from files */
+  scots::SymbolicSet ss_input;
+  if(!scots::read_from_file(ss_input,mgr,"input_alphabet")) {
+    /* construct grid for the input space */
+    /* lower bounds of the hyper rectangle */
+    input_type i_lb={{-1,-1}};
+    /* upper bounds of the hyper rectangle */
+    input_type i_ub={{ 1, 1}};
+    /* grid node distance diameter */
+    input_type i_eta={{.3,.3}};
+    ss_input = scots::SymbolicSet(mgr, input_dim,i_lb,i_ub,i_eta);
+    scots::write_to_file(ss_input,"input_alphabet");
+  }
   ss_input.print_info(1);
 
-
-  /* set up constraint functions with obtacles */
-  double H[15][4] = {
-    { 1  , 1.2, 0  ,   9 },
-    { 2.2, 2.4, 0  ,   5 },
-    { 2.2, 2.4, 6  ,  10 },
-    { 3.4, 3.6, 0  ,   9 },
-    { 4.6, 4.8, 1  ,  10 },
-    { 5.8, 6  , 0  ,   6 },
-    { 5.8, 6  , 7  ,  10 },
-    { 7  , 7.2, 1  ,  10 },
-    { 8.2, 8.4, 0  ,  8.5},
-    { 8.4, 9.3, 8.3,  8.5},
-    { 9.3, 10 , 7.1,  7.3},
-    { 8.4, 9.3, 5.9,  6.1},
-    { 9.3, 10 , 4.7,  4.9},
-    { 8.4, 9.3, 3.5,  3.7},
-    { 9.3, 10 , 2.3,  2.5}
-  };
-
-  /* avoid function returns 1 if x is in avoid set  */
-  auto avoid = [&H,&ss_pre,&s_eta](const abs_type& idx) {
-    state_type x;
-    ss_pre.itox(idx,x);
-    double c1= s_eta[0]/2.0+1e-10;
-    double c2= s_eta[1]/2.0+1e-10;
-    for(size_t i=0; i<15; i++) {
-      if ((H[i][0]-c1) <= x[0] && x[0] <= (H[i][1]+c1) && 
-          (H[i][2]-c2) <= x[1] && x[1] <= (H[i][3]+c2))
-        return true;
-    }
-    return false;
-  };
-
-
-  /* compute BDD for the avoid set (returns the number of elements) */ 
-  BDD A = ss_pre.ap_to_bdd(mgr,avoid);
-  /* write ap to files avoid.scs/avoid.bdd */
-  scots::write_to_file(ss_pre,A,"obstacles");
-
-  std::cout << "Computing the transition function: " << std::endl;
+  BDD TF;
   /* initialize SymbolicModel class with the abstract state and input alphabet */
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
-
   /* does there exist the transition function file ?*/
-  BDD TF;
-  scots::SymbolicSet set(scots::SymbolicSet(ss_pre,ss_input),ss_post);
+  scots::SymbolicSet set;
+  set.print_info(1);
   if(!scots::read_from_file(set,TF,mgr,"tf")) {
+    /* set up constraint functions with obtacles */
+    double H[15][4] = {
+      { 1  , 1.2, 0  ,   9 },
+      { 2.2, 2.4, 0  ,   5 },
+      { 2.2, 2.4, 6  ,  10 },
+      { 3.4, 3.6, 0  ,   9 },
+      { 4.6, 4.8, 1  ,  10 },
+      { 5.8, 6  , 0  ,   6 },
+      { 5.8, 6  , 7  ,  10 },
+      { 7  , 7.2, 1  ,  10 },
+      { 8.2, 8.4, 0  ,  8.5},
+      { 8.4, 9.3, 8.3,  8.5},
+      { 9.3, 10 , 7.1,  7.3},
+      { 8.4, 9.3, 5.9,  6.1},
+      { 9.3, 10 , 4.7,  4.9},
+      { 8.4, 9.3, 3.5,  3.7},
+      { 9.3, 10 , 2.3,  2.5}
+    };
+    /* avoid function returns 1 if x is in avoid set  */
+    auto avoid = [&H,&ss_pre](const abs_type& idx) {
+      state_type x;
+      ss_pre.itox(idx,x);
+      double c1= ss_pre.get_eta()[0]/2.0+1e-10;
+      double c2= ss_pre.get_eta()[1]/2.0+1e-10;
+      for(size_t i=0; i<15; i++) {
+        if ((H[i][0]-c1) <= x[0] && x[0] <= (H[i][1]+c1) && 
+            (H[i][2]-c2) <= x[1] && x[1] <= (H[i][3]+c2))
+          return true;
+      }
+      return false;
+    };
+    /* compute BDD for the avoid set (returns the number of elements) */ 
+    BDD A = ss_pre.ap_to_bdd(mgr,avoid);
+    /* write ap to files avoid.scs/avoid.bdd */
+    scots::write_to_file(ss_pre,A,"obstacles");
+
+    set = scots::SymbolicSet(scots::SymbolicSet(ss_pre,ss_input),ss_post);
+
+    std::cout << "Computing the transition function: " << std::endl;
     tt.tic();
     size_t no_trans;
     TF = sym_model.compute_gb(mgr,vehicle_post,radius_post,avoid,no_trans);
@@ -155,23 +165,27 @@ int main() {
       std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
     scots::write_to_file(set,TF,"tf");
-  } 
+  }
+  mgr.DebugCheck();
 
   /* define target set */
-  auto target = [&ss_pre,&s_eta](const abs_type& idx) {
+  auto target = [&ss_pre](const abs_type& idx) {
     state_type x;
     ss_pre.itox(idx,x);
+    double r0 = ss_pre.get_eta()[0]/2.0;
+    double r1 = ss_pre.get_eta()[1]/2.0;
     /* function returns 1 if cell associated with x is in target set  */
-    if (9 <= (x[0]-s_eta[0]/2.0) && (x[0]+s_eta[0]/2.0) <= 9.5 && 
-        0 <= (x[1]-s_eta[1]/2.0) && (x[1]+s_eta[1]/2.0) <= 0.5)
+    if (9 <= (x[0]-r0) && (x[0]+r0) <= 9.5 && 
+        0 <= (x[1]-r1) && (x[1]+r1) <= 0.5)
       return true;
     return false;
   };
   BDD T = ss_pre.ap_to_bdd(mgr,target);
-   /* write target to file */
+  /* write target to file */
   write_to_file(ss_pre,T,"target");
 
   std::cout << "\nSynthesis: " << std::endl;
+
 
   /* 
    * we implement the fixed point algorithm 
@@ -199,10 +213,7 @@ int main() {
     /* add new (state/input) pairs to the controller */
     C=C | N;
     /* print progress */
-    std::cout << ".";
-    std::flush(std::cout);
-    if(!(i%80))
-      std::cout << std::endl;
+    scots::print_progress(i);
   }
   std::cout << "\nNumber of iterations: " << i << std::endl;
   tt.toc();

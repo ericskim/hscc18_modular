@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['winningdomain_2ehh',['WinningDomain.hh',['../_winning_domain_8hh.html',1,'']]]
+  ['uniformgrid_2ehh',['UniformGrid.hh',['../_uniform_grid_8hh.html',1,'']]]
 ];

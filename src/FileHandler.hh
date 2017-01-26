@@ -169,24 +169,22 @@ public:
 #ifdef SCOTS_BDD 
 	/* functions are only availabe if BDD support is activated */  
   bool add_BDD(const BDD& bdd, char mode='B') {
+   /* before we save the BDD to file, we transfer it to another manager */
+    Cudd manager_temp;
+    BDD tosave = bdd.Transfer(manager_temp);
+
     /* open filename */
 		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
 	 	FILE *file = fopen (filename.c_str(),"w");
 		if(!file)
 			return false;
-		Dddmp_cuddBddStore(
-			bdd.manager(),
-			NULL,
-			bdd.getNode(),
-			NULL, 
-			NULL,
-			(int)mode,
-			DDDMP_VARIDS,
-			NULL,
-			file
-		);
+		int store = Dddmp_cuddBddStore(tosave.manager(),NULL,
+                                   tosave.getNode(),NULL,NULL,
+                                   (int)mode,DDDMP_VARIDS,NULL,file);
 		if(!fclose(file))
 			return false;
+    if (store!=DDDMP_SUCCESS) 
+      return false;
 		return true;
   }
 #endif
@@ -441,6 +439,7 @@ public:
 #ifdef SCOTS_BDD 
 	/* functions are only availabe if BDD support is activated */  
   bool get_BDD(const Cudd& manager, BDD& bdd, char mode='B') {
+
     /* open file1name */
 		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
 	 	FILE *file = fopen(filename.c_str(),"r");
@@ -448,19 +447,14 @@ public:
 			return false;
 
 
-		DdNode *bdd_node =
-		Dddmp_cuddBddLoad(manager.getManager(),\
-                      DDDMP_VAR_MATCHIDS,\
-                      NULL,\
-                      NULL,\
-											NULL,\
-                      (int)mode,\
-                      NULL,\
-                      file);
+		DdNode *node =
+		Dddmp_cuddBddLoad(manager.getManager(),
+                      DDDMP_VAR_MATCHIDS,NULL,NULL,
+                      NULL,(int)mode,NULL,file);
 		fclose(file);
-		if(!bdd_node) 
+		if(!node) 
 			return false;
-	  bdd=BDD(manager,bdd_node);
+	  bdd=BDD(manager,node);
 		return true;
   }
 #endif

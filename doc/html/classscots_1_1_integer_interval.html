@@ -91,7 +91,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classscots_1_1_integer_interval-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">scots::IntegerInterval&lt; int_type &gt; Class Template Reference</div>  </div>
@@ -105,9 +104,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1859b84ec87932f162dd01dbf0abaf1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1859b84ec87932f162dd01dbf0abaf1a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>add_one</b> (int *phase, unsigned int num)</td></tr>
-<tr class="separator:a1859b84ec87932f162dd01dbf0abaf1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08c285daf353a7623a35cafedfe04577"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08c285daf353a7623a35cafedfe04577"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_integer_interval.html#a08c285daf353a7623a35cafedfe04577">IntegerInterval</a> (const Cudd &amp;manager, int_type lb, int_type ub, const std::vector&lt; unsigned int &gt; &amp;bdd_var_id={})</td></tr>
 <tr class="memdesc:a08c285daf353a7623a35cafedfe04577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the <a class="el" href="classscots_1_1_integer_interval.html" title="A class to represent the integers in a closed integer interval [lb; ub] as BDDs. ">IntegerInterval</a> with the integer interval [lb;ub]<br />
@@ -141,27 +137,6 @@ int_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 BDD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_integer_interval.html#ac4cb3449c3dbf982cba8a2052d421471">get_all_elements</a> () const </td></tr>
 <tr class="memdesc:ac4cb3449c3dbf982cba8a2052d421471"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a BDD that encodes all elements of the integer interval <br /></td></tr>
 <tr class="separator:ac4cb3449c3dbf982cba8a2052d421471"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a1a74b8708980940adfe4ade647077bc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a74b8708980940adfe4ade647077bc9"></a>
-int_type&#160;</td><td class="memItemRight" valign="bottom"><b>m_lb</b></td></tr>
-<tr class="separator:a1a74b8708980940adfe4ade647077bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6acc76d0802eabf16df190e74d67e9ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6acc76d0802eabf16df190e74d67e9ec"></a>
-int_type&#160;</td><td class="memItemRight" valign="bottom"><b>m_ub</b></td></tr>
-<tr class="separator:a6acc76d0802eabf16df190e74d67e9ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a4dc9feb6982689d61c8a6a732befc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a4dc9feb6982689d61c8a6a732befc9"></a>
-int_type&#160;</td><td class="memItemRight" valign="bottom"><b>m_size</b></td></tr>
-<tr class="separator:a2a4dc9feb6982689d61c8a6a732befc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46a6807211914540edc66309037357ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46a6807211914540edc66309037357ce"></a>
-std::vector&lt; BDD &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_bdd_vars</b></td></tr>
-<tr class="separator:a46a6807211914540edc66309037357ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87eee41c072324f23b6faae61ef39acf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87eee41c072324f23b6faae61ef39acf"></a>
-std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_bdd_var_id</b></td></tr>
-<tr class="separator:a87eee41c072324f23b6faae61ef39acf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a164a4772525097c9dfd7a20193552409"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a164a4772525097c9dfd7a20193552409"></a>
-std::vector&lt; BDD &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_int_to_bdd</b></td></tr>
-<tr class="separator:a164a4772525097c9dfd7a20193552409"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class int_type&gt;<br />

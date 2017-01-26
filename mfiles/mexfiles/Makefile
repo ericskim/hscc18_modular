@@ -22,7 +22,7 @@ CUDDLPATH   = -L$(CUDDPATH)/lib
 
 
 
-all: sparse 
+all: sparse bdd
 
 sparse: GridPoints mexStaticController
 

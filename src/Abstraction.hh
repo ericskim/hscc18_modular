@@ -37,9 +37,11 @@ namespace scots {
 template<class state_type, class input_type>
 class Abstraction {
 private:
-  const UniformGrid& m_state_alphabet;
-  const UniformGrid& m_input_alphabet;
-	/** @brief measurement error bound **/
+	/* grid information of state alphabet */
+  const UniformGrid m_state_alphabet;
+	/* grid information of input alphabet */
+  const UniformGrid m_input_alphabet;
+	/* measurement error bound */
 	std::unique_ptr<double[]> m_z;
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
@@ -99,9 +101,13 @@ public:
    *                      the result is stored in r
    *
    * The computation proceeds in two loops. In the first loop the cornerIDs are
-   * comuted, which represents the cell indices that cover the over-approximation of the attainable set:
-   * \verbatim corner_IDs[i*M+j][0] \endverbatim = lower-left cell index of cells that cover the  over-approximation of attainable set 
-   * \verbatim corner_IDs[i*M+j][1] \endverbatim = upper-right cell index of cells that cover the  over-approximation of attainable set 
+   * comuted, which represent the cell IDs that cover the over-approximation of the attainable set:
+   * \verbatim corner_IDs[i*M+j+0] \endverbatim = lower-left cell ID of the
+   * integer hyper-interval of cell IDs that cover the over-approximation of the
+   * attainable set of cell with ID=i under input ID=j
+   * \verbatim corner_IDs[i*M+j+1] \endverbatim = upper-right  of the
+   * integer hyper-interval of cell IDs that cover the over-approximation of the
+   * attainable set of cell with ID=i under input ID=j
    * 
    * In the second loop the data members of the TransitionFunction are computed.
    * 
@@ -286,7 +292,7 @@ public:
           k_ub=k_ub-ub[k]*NN[k];
           /* number of grid points in each dimension in the post */
           no[k]=(ub[k]-lb[k]+1);
-          /* totoal no of post of (i,j) */
+          /* total no of post of (i,j) */
           npost*=no[k];
           cc[k]=0;
         }

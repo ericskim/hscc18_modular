@@ -91,11 +91,11 @@ int main() {
   
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
-  state_type eta={{2.0/4e3,2.0/4e3}};
+  state_type eta={{20.0/4e3,20.0/4e3}};
   /* lower bounds of the hyper-rectangle */
-  state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
+  state_type lb={{0.649,4.949}};
   /* upper bounds of the hyper-rectangle */
-  state_type ub={{1.55+eta[0]/2,5.85+eta[1]/2}};
+  state_type ub={{1.65,5.95}};
   scots::SymbolicSet ss_pre(manager,state_dim,lb,ub,eta);
   scots::SymbolicSet ss_post(manager,state_dim,lb,ub,eta);
   std::cout << "Unfiorm grid details:\n";
@@ -121,11 +121,12 @@ int main() {
     std::cout << "Memory pro Transition: " << usage.ru_maxrss/(double)no_trans<< "\n";
   }
 
+  manager.DebugCheck();
   /* we continue with the controller synthesis for FG (target) */
   std::cout << "Synthesis: ";
   /* inner approximation of safe set */
   auto safe = [&ss_pre,&eta](const abs_type& idx) {
-    double h[4] = {-1.1,1.6,-5.4, 5.9};
+    double h[4] = {1.1,1.6,5.4, 5.9};
     state_type x;
     ss_pre.itox(idx,x);
     double c1= eta[0]/2.0+1e-10;
@@ -141,7 +142,7 @@ int main() {
   /* 
    * we implement the nested fixed point algorithm
    *
-   * mu X. nu Y. ( pre(Y) & S ) | pre(X) 
+   * mu Z. nu Y. ( pre(Y) & S ) | pre(Z) 
    *
    */
 
@@ -150,8 +151,8 @@ int main() {
   tt.tic();
   size_t i,j;
   /* outer fp*/
-  BDD X=manager.bddOne();
-  BDD XX=manager.bddZero();
+  BDD Z=manager.bddOne();
+  BDD ZZ=manager.bddZero();
   /* inner fp*/
   BDD Y=manager.bddZero();
   BDD YY=manager.bddOne();
@@ -160,20 +161,21 @@ int main() {
   /* helper */
   BDD U=ss_input.get_cube(manager);
   /* as long as not converged */
-  for(i=1; XX != X; i++) {
-    X=XX;
-    BDD preX=enf_pre(X);
+  for(i=1; ZZ != Z; i++) {
+    Z=ZZ;
+    ZZ = enf_pre(Z) | S;
+    BDD preZ=enf_pre(Z);
     /* init inner fp */
     YY = manager.bddOne();
     for(j=1; YY != Y; j++) {
       Y=YY;
-      YY= ( enf_pre(Y) & S ) | preX;
+      YY = ( enf_pre(Y) & S ) | preZ;
     }
-    XX=YY;
+    ZZ=YY;
     std::cout << "Inner: " << j << std::endl;
-    /* remove all (state/input) pairs that have been added
-     * to the controller already in the previous iteration * */
-    BDD N = XX & (!(C.ExistAbstract(U)));
+    /* remove all state-input pairs that have been added
+     * to the controller already in the previous iterations */
+    BDD N = ZZ & (!(C.ExistAbstract(U)));
     /* add the remaining pairs to the controller */
     C=C | N;
   }

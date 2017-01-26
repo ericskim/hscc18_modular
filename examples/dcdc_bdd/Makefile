@@ -18,7 +18,7 @@ CUDD		    =  -I/opt/local/include -L/opt/local/lib -lcudd
 
 .PHONY: dcdc simulate
 
-TARGET = dcdc 
+TARGET = dcdc simulate
 
 all: $(TARGET)
 
