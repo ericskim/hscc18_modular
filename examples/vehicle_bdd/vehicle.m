@@ -19,7 +19,11 @@
 %
 
 function vehicle
+<<<<<<< HEAD
 clear set
+=======
+clear all
+>>>>>>> origin/experimental
 close all
 
 
@@ -50,6 +54,7 @@ while(loop>0)
       lb(2) <= y(end,2) & y(end,2) <= ub(2))
     break;
   end 
+<<<<<<< HEAD
   
   u=controller.restriction(y(end,:));
   % pick a valid input
@@ -58,6 +63,14 @@ while(loop>0)
 
   [t x]=ode45(@unicycle_ode,[0 tau], y(end,:), odeset('abstol',1e-12,'reltol',1e-12),u);
   
+=======
+  u=controller.restriction(y(end,:));
+  % pick a valid input
+  u=u(1,:);
+  [t x]=ode45(@unicycle_ode,[0 tau], y(end,:), odeset('abstol',1e-12,'reltol',1e-12),u);
+  
+  v=[v; u];
+>>>>>>> origin/experimental
   y=[y; x(end,:)];
 
 end

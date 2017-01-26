@@ -57,9 +57,9 @@ public:
          const BDD& transition_relation,
          const SymbolicModel<state_type,input_type>& model) : m_tr(transition_relation) {
     /* the permutation array */
-    int size = manager.ReadSize();
+    size_t size = manager.ReadSize();
     m_permute = std::unique_ptr<int[]>(new int[size]);
-    std::iota(m_permute.get(),m_permute.get()+manager.ReadSize(),0);
+    std::iota(m_permute.get(),m_permute.get()+size,0);
     auto pre_ids = model.get_sym_set_pre().get_bdd_var_ids();
     auto post_ids = model.get_sym_set_post().get_bdd_var_ids();
     for(size_t i=0; i<pre_ids.size(); i++)

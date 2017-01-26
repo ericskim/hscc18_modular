@@ -3,8 +3,8 @@
 #
 #CC        = g++
 CC       	  = clang++
-CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3
-CXXDEBUG		= -g -Wall -Wextra -std=c++11
+CXXFLAGS 		= -Wall -Wextra -std=c++11 -O3 -DNDEBUG
+CXXDEBUG		= -g -Wall -Wextra -std=c++11 
 #
 # scots 
 #
@@ -21,7 +21,7 @@ vehicle:
 	$(CC) $(CXXFLAGS) $(SCOTSINC) vehicle.cc -o vehicle
 
 simulate: 
-	$(CC) $(CXXFLAGS) $(SCOTSINC) $(BOOSTINC) simulate.cc -o simulate
+	$(CC) $(CXXFLAGS) $(SCOTSINC) simulate.cc -o simulate
 
 clean:
 	rm vehicle simulate

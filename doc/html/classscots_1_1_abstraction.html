@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>SCOTS: scots::AbstractionGB&lt; state_type, input_type &gt; Class Template Reference</title>
+<title>SCOTS: scots::Abstraction&lt; state_type, input_type &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,78 +85,76 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacescots.html">scots</a></li><li class="navelem"><a class="el" href="classscots_1_1_abstraction_g_b.html">AbstractionGB</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacescots.html">scots</a></li><li class="navelem"><a class="el" href="classscots_1_1_abstraction.html">Abstraction</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classscots_1_1_abstraction_g_b-members.html">List of all members</a>  </div>
+<a href="classscots_1_1_abstraction-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">scots::AbstractionGB&lt; state_type, input_type &gt; Class Template Reference</div>  </div>
+<div class="title">scots::Abstraction&lt; state_type, input_type &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Computation of the transition function of symbolic model based on a growth bound.  
- <a href="classscots_1_1_abstraction_g_b.html#details">More...</a></p>
+<p>Computation of the transition function of symbolic model/abstraction.  
+ <a href="classscots_1_1_abstraction.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_abstraction_g_b_8hh_source.html">AbstractionGB.hh</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_abstraction_8hh_source.html">Abstraction.hh</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0b387a0701b3e8280595973b83350500"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a0b387a0701b3e8280595973b83350500">AbstractionGB</a> (const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;state_alphabet, const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;input_alphabet)</td></tr>
-<tr class="memdesc:a0b387a0701b3e8280595973b83350500"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor with the abstract state alphabet and abstract input alphabet (measurement error bound is set to zero)  <a href="#a0b387a0701b3e8280595973b83350500">More...</a><br /></td></tr>
-<tr class="separator:a0b387a0701b3e8280595973b83350500"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d54721b7d67df0d33f2c6b02bb02910"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
-<tr class="memitem:a3d54721b7d67df0d33f2c6b02bb02910"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a3d54721b7d67df0d33f2c6b02bb02910">compute</a> (<a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, F1 &amp;system_post, F2 &amp;radius_post)</td></tr>
-<tr class="memdesc:a3d54721b7d67df0d33f2c6b02bb02910"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes the transition function  <a href="#a3d54721b7d67df0d33f2c6b02bb02910">More...</a><br /></td></tr>
-<tr class="separator:a3d54721b7d67df0d33f2c6b02bb02910"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68a9d82ef2174b429979942e6abcede0"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 , class F3 &gt; </td></tr>
-<tr class="memitem:a68a9d82ef2174b429979942e6abcede0"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a68a9d82ef2174b429979942e6abcede0">compute</a> (<a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, F1 &amp;system_post, F2 &amp;radius_post, F3 &amp;&amp;overflow)</td></tr>
-<tr class="memdesc:a68a9d82ef2174b429979942e6abcede0"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes the transition function  <a href="#a68a9d82ef2174b429979942e6abcede0">More...</a><br /></td></tr>
-<tr class="separator:a68a9d82ef2174b429979942e6abcede0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a589fdd6b8760f2f6077ba7d0893b2ecf"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
-<tr class="memitem:a589fdd6b8760f2f6077ba7d0893b2ecf"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; state_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a589fdd6b8760f2f6077ba7d0893b2ecf">get_post</a> (F1 &amp;system_post, F2 &amp;radius_post, const state_type &amp;x, const input_type &amp;u) const </td></tr>
-<tr class="memdesc:a589fdd6b8760f2f6077ba7d0893b2ecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the center of cells that are used to over-approximated the attainable set associated with cell (with center x) and input u  <a href="#a589fdd6b8760f2f6077ba7d0893b2ecf">More...</a><br /></td></tr>
-<tr class="separator:a589fdd6b8760f2f6077ba7d0893b2ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a446fefb61b297b051764def2e4aae20e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; state_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a446fefb61b297b051764def2e4aae20e">get_post</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, const state_type &amp;x, const input_type &amp;u) const </td></tr>
-<tr class="memdesc:a446fefb61b297b051764def2e4aae20e"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the center of cells that are used to over-approximated the attainable set associated with cell with center x and input u  <a href="#a446fefb61b297b051764def2e4aae20e">More...</a><br /></td></tr>
-<tr class="separator:a446fefb61b297b051764def2e4aae20e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1230c80c603526d1d2dce50fd985df9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a1230c80c603526d1d2dce50fd985df9d">print_post</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, const state_type &amp;x, const input_type &amp;u) const </td></tr>
-<tr class="memdesc:a1230c80c603526d1d2dce50fd985df9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">print the center of cells that are used to over-approximated the attainable set associated with cell with center x and input u  <a href="#a1230c80c603526d1d2dce50fd985df9d">More...</a><br /></td></tr>
-<tr class="separator:a1230c80c603526d1d2dce50fd985df9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3155f8ac66c641302a5c64209758359"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
-<tr class="memitem:ac3155f8ac66c641302a5c64209758359"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#ac3155f8ac66c641302a5c64209758359">print_post</a> (F1 &amp;system_post, F2 &amp;radius_post, const state_type &amp;x, const input_type &amp;u) const </td></tr>
-<tr class="memdesc:ac3155f8ac66c641302a5c64209758359"><td class="mdescLeft">&#160;</td><td class="mdescRight">print the center of cells that are used to over-approximated the attainable set associated with cell (with center x) and input u  <a href="#ac3155f8ac66c641302a5c64209758359">More...</a><br /></td></tr>
-<tr class="separator:ac3155f8ac66c641302a5c64209758359"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4876d4142471c1389cc2efcd633e26e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4876d4142471c1389cc2efcd633e26e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#ab4876d4142471c1389cc2efcd633e26e">set_measurement_error_bound</a> (const state_type &amp;error_bound)</td></tr>
-<tr class="memdesc:ab4876d4142471c1389cc2efcd633e26e"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the measurement error bound <br /></td></tr>
-<tr class="separator:ab4876d4142471c1389cc2efcd633e26e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3831f4032a55f517d1c553f5965d302c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3831f4032a55f517d1c553f5965d302c"></a>
-std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a3831f4032a55f517d1c553f5965d302c">get_measruement_error_bound</a> ()</td></tr>
-<tr class="memdesc:a3831f4032a55f517d1c553f5965d302c"><td class="mdescLeft">&#160;</td><td class="mdescRight">get measurement error bound <br /></td></tr>
-<tr class="separator:a3831f4032a55f517d1c553f5965d302c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a044c1d1df18506f2bd28d054febde596"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a044c1d1df18506f2bd28d054febde596"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a044c1d1df18506f2bd28d054febde596">verbose_on</a> ()</td></tr>
-<tr class="memdesc:a044c1d1df18506f2bd28d054febde596"><td class="mdescLeft">&#160;</td><td class="mdescRight">activate console output <br /></td></tr>
-<tr class="separator:a044c1d1df18506f2bd28d054febde596"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36c8d54693c4ec58b511926a38a3d69a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36c8d54693c4ec58b511926a38a3d69a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction_g_b.html#a36c8d54693c4ec58b511926a38a3d69a">verbose_off</a> ()</td></tr>
-<tr class="memdesc:a36c8d54693c4ec58b511926a38a3d69a"><td class="mdescLeft">&#160;</td><td class="mdescRight">deactivate console output <br /></td></tr>
-<tr class="separator:a36c8d54693c4ec58b511926a38a3d69a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4db798cb5d5570641e041199343f2c5e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a4db798cb5d5570641e041199343f2c5e">Abstraction</a> (const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;state_alphabet, const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;input_alphabet)</td></tr>
+<tr class="memdesc:a4db798cb5d5570641e041199343f2c5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor with the abstract state alphabet and abstract input alphabet (measurement error bound is set to zero)  <a href="#a4db798cb5d5570641e041199343f2c5e">More...</a><br /></td></tr>
+<tr class="separator:a4db798cb5d5570641e041199343f2c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bf15ecc6a83af51fd0e97f8e1a23ecd"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
+<tr class="memitem:a8bf15ecc6a83af51fd0e97f8e1a23ecd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a8bf15ecc6a83af51fd0e97f8e1a23ecd">compute_gb</a> (<a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, F1 &amp;system_post, F2 &amp;radius_post)</td></tr>
+<tr class="memdesc:a8bf15ecc6a83af51fd0e97f8e1a23ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes the transition function  <a href="#a8bf15ecc6a83af51fd0e97f8e1a23ecd">More...</a><br /></td></tr>
+<tr class="separator:a8bf15ecc6a83af51fd0e97f8e1a23ecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f8a2d8dce77fbf12b874908d494ca0b"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 , class F3 &gt; </td></tr>
+<tr class="memitem:a3f8a2d8dce77fbf12b874908d494ca0b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a3f8a2d8dce77fbf12b874908d494ca0b">compute_gb</a> (<a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, F1 &amp;system_post, F2 &amp;radius_post, F3 &amp;&amp;avoid)</td></tr>
+<tr class="memdesc:a3f8a2d8dce77fbf12b874908d494ca0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes the transition function  <a href="#a3f8a2d8dce77fbf12b874908d494ca0b">More...</a><br /></td></tr>
+<tr class="separator:a3f8a2d8dce77fbf12b874908d494ca0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a822a5b17895bd65481cbc6c7be7874a5"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
+<tr class="memitem:a822a5b17895bd65481cbc6c7be7874a5"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; state_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a822a5b17895bd65481cbc6c7be7874a5">get_post</a> (F1 &amp;system_post, F2 &amp;radius_post, const state_type &amp;x, const input_type &amp;u) const </td></tr>
+<tr class="memdesc:a822a5b17895bd65481cbc6c7be7874a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the center of cells that are used to over-approximated the attainable set associated with cell (with center x) and input u  <a href="#a822a5b17895bd65481cbc6c7be7874a5">More...</a><br /></td></tr>
+<tr class="separator:a822a5b17895bd65481cbc6c7be7874a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9de7c62deafae61f912057342591d913"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a9de7c62deafae61f912057342591d913">print_post</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;transition_function, const state_type &amp;x, const input_type &amp;u) const </td></tr>
+<tr class="memdesc:a9de7c62deafae61f912057342591d913"><td class="mdescLeft">&#160;</td><td class="mdescRight">print the center of cells that are stored in the transition function as post of the cell with center x and input u  <a href="#a9de7c62deafae61f912057342591d913">More...</a><br /></td></tr>
+<tr class="separator:a9de7c62deafae61f912057342591d913"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a509fe1f3806c79a14468c8dcf83ace85"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
+<tr class="memitem:a509fe1f3806c79a14468c8dcf83ace85"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a509fe1f3806c79a14468c8dcf83ace85">print_post_gb</a> (F1 &amp;system_post, F2 &amp;radius_post, const state_type &amp;x, const input_type &amp;u) const </td></tr>
+<tr class="memdesc:a509fe1f3806c79a14468c8dcf83ace85"><td class="mdescLeft">&#160;</td><td class="mdescRight">print the center of cells that are used to over-approximated the attainable set (computed according to the growth bound) associated with the cell with center x and input u  <a href="#a509fe1f3806c79a14468c8dcf83ace85">More...</a><br /></td></tr>
+<tr class="separator:a509fe1f3806c79a14468c8dcf83ace85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8409a64f3cb1811a1fa7bb6207df872b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8409a64f3cb1811a1fa7bb6207df872b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a8409a64f3cb1811a1fa7bb6207df872b">set_measurement_error_bound</a> (const state_type &amp;error_bound)</td></tr>
+<tr class="memdesc:a8409a64f3cb1811a1fa7bb6207df872b"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the measurement error bound <br /></td></tr>
+<tr class="separator:a8409a64f3cb1811a1fa7bb6207df872b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a904d9bc1aa85329abf705306d05e53f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a904d9bc1aa85329abf705306d05e53f5"></a>
+std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a904d9bc1aa85329abf705306d05e53f5">get_measruement_error_bound</a> ()</td></tr>
+<tr class="memdesc:a904d9bc1aa85329abf705306d05e53f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">get measurement error bound <br /></td></tr>
+<tr class="separator:a904d9bc1aa85329abf705306d05e53f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92e00bc7b690699bba48579c5abe045f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92e00bc7b690699bba48579c5abe045f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#a92e00bc7b690699bba48579c5abe045f">verbose_on</a> ()</td></tr>
+<tr class="memdesc:a92e00bc7b690699bba48579c5abe045f"><td class="mdescLeft">&#160;</td><td class="mdescRight">activate console output <br /></td></tr>
+<tr class="separator:a92e00bc7b690699bba48579c5abe045f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac3ca551cf6a4cc134f210440f52079"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adac3ca551cf6a4cc134f210440f52079"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_abstraction.html#adac3ca551cf6a4cc134f210440f52079">verbose_off</a> ()</td></tr>
+<tr class="memdesc:adac3ca551cf6a4cc134f210440f52079"><td class="mdescLeft">&#160;</td><td class="mdescRight">deactivate console output <br /></td></tr>
+<tr class="separator:adac3ca551cf6a4cc134f210440f52079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class state_type, class input_type&gt;<br />
-class scots::AbstractionGB&lt; state_type, input_type &gt;</h3>
+class scots::Abstraction&lt; state_type, input_type &gt;</h3>
 
-<p>Computation of the transition function of symbolic model based on a growth bound. </p>
+<p>Computation of the transition function of symbolic model/abstraction. </p>
+<p>It implements in compute_gb the computation of the transition function based on a growth bound. Additionally, it provides the functions print_post and print_post_gb to print the center of the cells that cover the attainable set which is computed from the growth bound.</p>
 <p>See</p><ul>
 <li>the manual in <a href="./../../manual/manual.pdf">manual.pdf</a></li>
 <li><a href="http://arxiv.org/abs/1503.03715">http://arxiv.org/abs/1503.03715</a> for theoretical background </li>
 </ul>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a0b387a0701b3e8280595973b83350500"></a>
+<a class="anchor" id="a4db798cb5d5570641e041199343f2c5e"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -166,7 +164,7 @@ template&lt;class state_type , class input_type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::<a class="el" href="classscots_1_1_abstraction_g_b.html">AbstractionGB</a> </td>
+          <td class="memname"><a class="el" href="classscots_1_1_abstraction.html">scots::Abstraction</a>&lt; state_type, input_type &gt;::<a class="el" href="classscots_1_1_abstraction.html">Abstraction</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;&#160;</td>
           <td class="paramname"><em>state_alphabet</em>, </td>
@@ -202,7 +200,7 @@ template&lt;class state_type , class input_type &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a3d54721b7d67df0d33f2c6b02bb02910"></a>
+<a class="anchor" id="a8bf15ecc6a83af51fd0e97f8e1a23ecd"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -214,7 +212,7 @@ template&lt;class F1 , class F2 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::compute </td>
+          <td class="memname">void <a class="el" href="classscots_1_1_abstraction.html">scots::Abstraction</a>&lt; state_type, input_type &gt;::compute_gb </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;&#160;</td>
           <td class="paramname"><em>transition_function</em>, </td>
@@ -248,9 +246,9 @@ template&lt;class F1 , class F2 &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">transition_function</td><td>- the result of the computation</td></tr>
-    <tr><td class="paramname">system_post</td><td>- lambda function with signature <pre class="fragment">[] (state_type &amp;x, const input_type &amp;u) -&gt;  void  </pre> system_post(x,u) provides a numerical approximation of ODE solution at time tau with initial state x and input u <br />
+    <tr><td class="paramname">system_post</td><td>- lambda expression of the form <pre class="fragment">[] (state_type &amp;x, const input_type &amp;u) -&gt;  void  </pre> system_post(x,u) provides a numerical approximation of ODE solution at time tau with initial state x and input u <br />
  the result is stored in x</td></tr>
-    <tr><td class="paramname">radius_post</td><td>- lambda function with signature <pre class="fragment">[] (state_type &amp;r, const state_type&amp; x, const input_type &amp;u) -&gt; void  </pre> radius_post(x,u) provides a numerical approximation of the growth bound for the cell (with center x, radius r) and input u<br />
+    <tr><td class="paramname">radius_post</td><td>- lambda expression of the form <pre class="fragment">[] (state_type &amp;r, const state_type&amp; x, const input_type &amp;u) -&gt; void  </pre> radius_post(x,u) provides a numerical approximation of the growth bound for the cell (with center x, radius r) and input u<br />
  the result is stored in r</td></tr>
   </table>
   </dd>
@@ -260,7 +258,7 @@ template&lt;class F1 , class F2 &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a68a9d82ef2174b429979942e6abcede0"></a>
+<a class="anchor" id="a3f8a2d8dce77fbf12b874908d494ca0b"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -272,7 +270,7 @@ template&lt;class F1 , class F2 , class F3 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::compute </td>
+          <td class="memname">void <a class="el" href="classscots_1_1_abstraction.html">scots::Abstraction</a>&lt; state_type, input_type &gt;::compute_gb </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;&#160;</td>
           <td class="paramname"><em>transition_function</em>, </td>
@@ -293,7 +291,7 @@ template&lt;class F1 , class F2 , class F3 &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">F3 &amp;&amp;&#160;</td>
-          <td class="paramname"><em>overflow</em>&#160;</td>
+          <td class="paramname"><em>avoid</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -312,16 +310,16 @@ template&lt;class F1 , class F2 , class F3 &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">transition_function</td><td>- the result of the computation</td></tr>
-    <tr><td class="paramname">system_post</td><td>- lambda function as above</td></tr>
-    <tr><td class="paramname">radius_post</td><td>- lambda function as above</td></tr>
-    <tr><td class="paramname">overflow</td><td>- lambda function with signature <pre class="fragment">[] (abs_type &amp;i) -&gt; bool </pre> returns true if the abstract state i is in the avoid set; otherwise returns false </td></tr>
+    <tr><td class="paramname">system_post</td><td>- lambda expression as above</td></tr>
+    <tr><td class="paramname">radius_post</td><td>- lambda expression as above</td></tr>
+    <tr><td class="paramname">avoid</td><td>- lambda of the form <pre class="fragment">[] (abs_type &amp;i) -&gt; bool </pre> returns true if the abstract state i is in the avoid set; otherwise returns false </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="a589fdd6b8760f2f6077ba7d0893b2ecf"></a>
+<a class="anchor" id="a822a5b17895bd65481cbc6c7be7874a5"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -333,7 +331,7 @@ template&lt;class F1 , class F2 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;state_type&gt; <a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::get_post </td>
+          <td class="memname">std::vector&lt;state_type&gt; <a class="el" href="classscots_1_1_abstraction.html">scots::Abstraction</a>&lt; state_type, input_type &gt;::get_post </td>
           <td>(</td>
           <td class="paramtype">F1 &amp;&#160;</td>
           <td class="paramname"><em>system_post</em>, </td>
@@ -373,8 +371,8 @@ template&lt;class F1 , class F2 &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>std::vector&lt;abs_type&gt; </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">system_post</td><td>- lambda function as in compute </td></tr>
-    <tr><td class="paramname">radius_post</td><td>- lambda function as in compute </td></tr>
+    <tr><td class="paramname">system_post</td><td>- lambda expression as in compute_gb </td></tr>
+    <tr><td class="paramname">radius_post</td><td>- lambda expression as in compute_gb </td></tr>
     <tr><td class="paramname">x</td><td>- center of cell </td></tr>
     <tr><td class="paramname">u</td><td>- input </td></tr>
   </table>
@@ -383,7 +381,7 @@ template&lt;class F1 , class F2 &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a446fefb61b297b051764def2e4aae20e"></a>
+<a class="anchor" id="a9de7c62deafae61f912057342591d913"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -393,7 +391,7 @@ template&lt;class state_type , class input_type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;state_type&gt; <a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::get_post </td>
+          <td class="memname">void <a class="el" href="classscots_1_1_abstraction.html">scots::Abstraction</a>&lt; state_type, input_type &gt;::print_post </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;&#160;</td>
           <td class="paramname"><em>transition_function</em>, </td>
@@ -423,8 +421,7 @@ template&lt;class state_type , class input_type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>get the center of cells that are used to over-approximated the attainable set associated with cell with center x and input u </p>
-<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;state_type&gt; </dd></dl>
+<p>print the center of cells that are stored in the transition function as post of the cell with center x and input u </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">transition_function</td><td>- the transition function of the abstraction </td></tr>
@@ -436,59 +433,7 @@ template&lt;class state_type , class input_type &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a1230c80c603526d1d2dce50fd985df9d"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class state_type , class input_type &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::print_post </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;&#160;</td>
-          <td class="paramname"><em>transition_function</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const state_type &amp;&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const input_type &amp;&#160;</td>
-          <td class="paramname"><em>u</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>print the center of cells that are used to over-approximated the attainable set associated with cell with center x and input u </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">transition_function</td><td>- the transition function of the abstraction </td></tr>
-    <tr><td class="paramname">x</td><td>- center of cell </td></tr>
-    <tr><td class="paramname">u</td><td>- input </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ac3155f8ac66c641302a5c64209758359"></a>
+<a class="anchor" id="a509fe1f3806c79a14468c8dcf83ace85"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -500,7 +445,7 @@ template&lt;class F1 , class F2 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classscots_1_1_abstraction_g_b.html">scots::AbstractionGB</a>&lt; state_type, input_type &gt;::print_post </td>
+          <td class="memname">void <a class="el" href="classscots_1_1_abstraction.html">scots::Abstraction</a>&lt; state_type, input_type &gt;::print_post_gb </td>
           <td>(</td>
           <td class="paramtype">F1 &amp;&#160;</td>
           <td class="paramname"><em>system_post</em>, </td>
@@ -536,11 +481,11 @@ template&lt;class F1 , class F2 &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>print the center of cells that are used to over-approximated the attainable set associated with cell (with center x) and input u </p>
+<p>print the center of cells that are used to over-approximated the attainable set (computed according to the growth bound) associated with the cell with center x and input u </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">system_post</td><td>- lambda function as in compute </td></tr>
-    <tr><td class="paramname">radius_post</td><td>- lambda function as in compute </td></tr>
+    <tr><td class="paramname">system_post</td><td>- lambda expression as in compute_gb </td></tr>
+    <tr><td class="paramname">radius_post</td><td>- lambda expression as in compute_gb </td></tr>
     <tr><td class="paramname">x</td><td>- center of cell </td></tr>
     <tr><td class="paramname">u</td><td>- input </td></tr>
   </table>
@@ -550,7 +495,7 @@ template&lt;class F1 , class F2 &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_abstraction_g_b_8hh_source.html">AbstractionGB.hh</a></li>
+<li>src/<a class="el" href="_abstraction_8hh_source.html">Abstraction.hh</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['verbose_5foff',['verbose_off',['../classscots_1_1_abstraction.html#adac3ca551cf6a4cc134f210440f52079',1,'scots::Abstraction']]],
-  ['verbose_5fon',['verbose_on',['../classscots_1_1_abstraction.html#a92e00bc7b690699bba48579c5abe045f',1,'scots::Abstraction']]]
+  ['uniformgrid',['UniformGrid',['../classscots_1_1_uniform_grid.html#a7e4f275434f57d62251d9a710b6628ca',1,'scots::UniformGrid']]]
 ];
