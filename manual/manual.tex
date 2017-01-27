@@ -1377,7 +1377,9 @@ WinningDomain solve_reachability_game(const TransitionFunction& tf, F& ap)
 [](const scots::abs_type& abs_state) -> bool {}
 \end{lstlisting}
   {\tt ap(abs\_state)} returns {\tt true} if and only if the abstract state $x_2\in\bar X_2$, represented by
-  the ID {\tt abs\_state}, is  an element of the safe set $Z_2$.
+  the ID {\tt abs\_state}, is  an element of the safe set $Z_2$. Additionally, a
+  lambda expression as above can be supplemented to {\tt
+  solve\_reachability\_game} to define the avoid set $A_2$.
 
   \item Optionally, the IDs of the cells contained in the set $Z_2$ together
   with the uniform grid information can be stored to a file using the function

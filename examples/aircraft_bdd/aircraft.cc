@@ -200,7 +200,7 @@ int main() {
   /* symbolic set for the controller */
   scots::SymbolicSet controller(ss_pre,ss_input);
   std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(controller,C,"controller"))
+  if(write_to_file(mgr,controller,C,"controller"))
     std::cout << "Done. \n";
 
    if(!getrusage(RUSAGE_SELF, &usage))

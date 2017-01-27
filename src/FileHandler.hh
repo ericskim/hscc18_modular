@@ -168,7 +168,12 @@ public:
   }
 #ifdef SCOTS_BDD 
 	/* functions are only availabe if BDD support is activated */  
-  bool add_BDD(const BDD& bdd, char mode='B') {
+  bool add_BDD(const Cudd& manager, const BDD& bdd, char mode='B') {
+    /* disable reordering (if enabled) */
+    Cudd_ReorderingType *method=nullptr;
+    if(manager.ReorderingStatus(method))
+      manager.AutodynDisable();
+
    /* before we save the BDD to file, we transfer it to another manager */
     Cudd manager_temp;
     BDD tosave = bdd.Transfer(manager_temp);
@@ -185,6 +190,10 @@ public:
 			return false;
     if (store!=DDDMP_SUCCESS) 
       return false;
+    /* reactivate reordering if it was enabled */
+    if(method!=nullptr)
+      manager.AutodynEnable(*method);
+
 		return true;
   }
 #endif
@@ -439,6 +448,10 @@ public:
 #ifdef SCOTS_BDD 
 	/* functions are only availabe if BDD support is activated */  
   bool get_BDD(const Cudd& manager, BDD& bdd, char mode='B') {
+    /* disable reordering (if enabled) */
+    Cudd_ReorderingType *method=nullptr;
+    if(manager.ReorderingStatus(method))
+      manager.AutodynDisable();
 
     /* open file1name */
 		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
@@ -455,6 +468,10 @@ public:
 		if(!node) 
 			return false;
 	  bdd=BDD(manager,node);
+    /* reactivate reordering if it was enabled */
+    if(method!=nullptr)
+      manager.AutodynEnable(*method);
+
 		return true;
   }
 #endif

@@ -56,7 +56,7 @@ int main() {
   /* read controller from file */
   BDD C;
   scots::SymbolicSet con;
-  if(!read_from_file(con,C,manager,"controller")) {
+  if(!read_from_file(manager,con,C,"controller")) {
     std::cout << "Could not read controller from controller.scs\n";
     return 0;
   }

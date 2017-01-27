@@ -1,7 +1,7 @@
 classdef SymbolicSet < handle 
 % Access the grid points stored in a BDD produced by 
 %
-% scots::write_to_file(const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B')
+% scots::write_to_file(const Cudd& manager, const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B')
 % 
 % USAGE:
 % 

@@ -26,28 +26,11 @@
 /** @namespace scots **/ 
 namespace scots {
 
-/**
- * @brief val_functionction_type (value function type) is used in solve_reachability_game \n
- * to represent the value function 
- **/
-using val_functionction_type = std::vector<double>;
-
 /** @cond **/
-template<class F>
-WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F& target) { 
-  val_functionction_type value;
-  return solve_reachability_game<F>(trans_function, target, [](const abs_type&) noexcept {return false;}, value);
-}
-
-template<class F>
-WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F& target, val_functionction_type& value) { 
-  return solve_reachability_game<F>(trans_function, target, [](const abs_type&) noexcept {return false;}, value);
-}
-
-template<class F1, class F2>
-WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F1& target, F2&& avoid) { 
-  val_functionction_type value;
-  return solve_reachability_game<F1,F2>(trans_function, target, std::forward<F2>(avoid), value);
+/* default parameters for the solve_reachability_game */
+namespace params {
+  auto avoid = [](const abs_type&) noexcept {return false;};
+  std::vector<double> value {};
 }
 /** @endcond **/
 
@@ -55,20 +38,23 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
  * @brief solve reachability game according to Algorithm 2 in  <a href="./../../manual/manual.pdf">manual</a>
  * 
  * @param[in] trans_function - TransitionFunction of the symbolic model
- * @param[in]  target - lambda expression of the form
+ * @param[in] target - lambda expression of the form
  *                      \verbatim [] (abs_type &i) -> bool \endverbatim 
  *                      returns true if state i is in target set and false otherwise
  *                       
  * @param[in] avoid  - OPTIONALLY provide lambda expression of the form
- *                      \verbatim [] (abs_type &i) -> bool \endverbatim
+ *                      \verbatim [] (const abs_type &i) -> bool \endverbatim
  *                      returns true if state i is in avoid set and false otherwise
  * 
- * @param[out] value - OPTIONALLY provide val_functionction_type value to obtain the value function 
+ * @param[out] value - OPTIONALLY provide std::vector<double> value to obtain the value function 
  *
  * @return -  WinningDomain that contains the set of winning states and valid inputs 
  **/
-template<class F1, class F2>
-WinningDomain solve_reachability_game(const TransitionFunction& trans_function, F1& target, F2&& avoid, val_functionction_type& value) {
+template<class F1, class F2=decltype(params::avoid)>
+WinningDomain solve_reachability_game(const TransitionFunction& trans_function,
+                                      F1& target, 
+                                      F2& avoid = params::avoid,
+                                      std::vector<double> & value = params::value ) {
   /* size of state alphabet */
   abs_type N=trans_function.m_no_states;
   /* size of input alphabet */

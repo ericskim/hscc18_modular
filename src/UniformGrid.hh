@@ -173,23 +173,23 @@ public:
       int sign_l, sign_u;
       for(int index=0; index<m_dim; index++) {
         m_eta[index] = eta[index];
-        /* ceil */
+        /* rounding heuristic */
+        double delta = m_eta[index]/1E10;
         try {
           /* get sign */
           sign_l = (lb[index] > 0) ? 1 : ((lb[index] < 0) ? -1 : 0);
           /* compute number of grid points from zero to lower bound */
-          no_l=std::llround(std::abs(lb[index])/eta[index]+sign_l*0.5);
+          no_l=std::llround(std::abs(lb[index])/eta[index]+sign_l*(0.5-delta));
         } catch (...) {
           std::ostringstream os;
           os << "\nscots::UniformGrid: something wrong in the division of " << lb[index] << " by " << eta[index] ;
           throw std::runtime_error(os.str().c_str());
         }
-        /* floor */
         try {
           /* get sign */
           sign_u = (ub[index] > 0) ? 1 : ((ub[index] < 0) ? -1 : 0);
           /* compute number of grid points from zero to upper bound */
-          no_u=std::llround(std::abs(ub[index])/eta[index]-sign_u*0.5);
+          no_u=std::llround(std::abs(ub[index])/eta[index]-sign_u*(0.5-delta));
         } catch (...) {
           std::ostringstream os;
           os << "\nscots::UniformGrid: something wrong in the division of " << ub[index] << " by " << eta[index] ;
@@ -265,7 +265,7 @@ public:
 
   /** @brief do a index to state conversion for vectors **/
   template<class grid_point_t>
-  std::vector<grid_point_t> ItoX(std::vector<abs_type>& Ivector){
+  std::vector<grid_point_t> ItoX(std::vector<abs_type>& Ivector) const{
 
         std::vector<grid_point_t> Xvector;
         grid_point_t x;
@@ -279,7 +279,7 @@ public:
 
   /** @brief do a state to index conversion for vectors **/
   template<class grid_point_t>
-  std::vector<abs_type> XtoI(std::vector<grid_point_t>& Xvector){
+  std::vector<abs_type> XtoI(std::vector<grid_point_t>& Xvector) const{
 
         std::vector<abs_type> Ivector;
 

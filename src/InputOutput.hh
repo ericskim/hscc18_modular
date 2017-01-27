@@ -218,12 +218,12 @@ bool write_to_file(const SymbolicSet& set, const std::string& filename) {
  * See dddmp.h for the different modes of writing.
  **/
 inline
-bool write_to_file(const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B') {
+bool write_to_file(const Cudd& manager, const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B') {
   FileWriter writer(filename);
   if(!write_to_file(set,filename)) {
     return false;
   }
-  if(!writer.add_BDD(bdd,mode)) {
+  if(!writer.add_BDD(manager, bdd,mode)) {
     return false;
   }
 	return true;
@@ -375,7 +375,7 @@ bool read_from_file(TransitionFunction& tf, const std::string& filename) {
 #ifdef SCOTS_BDD
 /** @brief write SymbolicSet to file **/
 inline
-bool read_from_file(SymbolicSet& set, const Cudd& manager, const std::string& filename) {
+bool read_from_file(const Cudd& manager, SymbolicSet& set, const std::string& filename) {
   /* read UniformGrid from file */
   UniformGrid grid;
   if(!read_from_file(grid,filename)){
@@ -410,8 +410,8 @@ bool read_from_file(SymbolicSet& set, const Cudd& manager, const std::string& fi
  * See dddmp.h for the different modes of reading.
  **/
 inline
-bool read_from_file(SymbolicSet& set, BDD& bdd, Cudd& manager, const std::string& filename, char mode = 'B') {
-  if(!read_from_file(set,manager,filename))
+bool read_from_file(const Cudd& manager, SymbolicSet& set, BDD& bdd, const std::string& filename, char mode = 'B') {
+  if(!read_from_file(manager,set,filename))
     return false;
   FileReader reader(filename);
   if(!reader.get_BDD(manager,bdd,mode)) {

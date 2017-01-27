@@ -93,8 +93,8 @@ public:
     if(!m_winning_domain.is_winning(i)) {
         return std::vector<input_type>{};
     }
-    std::vector<input_type> abs_inputs = m_winning_domain.get_inputs(i);
-    return m_input_grid.ItoX(abs_inputs);
+    std::vector<abs_type> abs_inputs = m_winning_domain.get_inputs(i);
+    return m_input_grid.ItoX<input_type>(abs_inputs);
   }
 
   /** @brief get a std::vector containing the states in the winning domain **/

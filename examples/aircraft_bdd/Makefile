@@ -17,7 +17,7 @@ CUDD		    =  -I/opt/local/include -L/opt/local/lib -lcudd
 
 .PHONY: aircraft simulate
 
-TARGET = aircraft 
+TARGET = aircraft simulate
 
 all: $(TARGET)
 

@@ -74,8 +74,8 @@ int main() {
   /* try to read data from files */
   scots::SymbolicSet ss_pre;
   scots::SymbolicSet ss_post;
-  if(!scots::read_from_file(ss_pre,mgr,"state_pre") ||
-     !scots::read_from_file(ss_post,mgr,"state_post")) {
+  if(!scots::read_from_file(mgr,ss_pre,"state_pre") ||
+     !scots::read_from_file(mgr,ss_post,"state_post")) {
    /* lower bounds of the hyper rectangle */
     state_type s_lb={{0,0,-M_PI-0.4}};
     /* upper bounds of the hyper rectangle */
@@ -97,7 +97,7 @@ int main() {
 
   /* try to read data from files */
   scots::SymbolicSet ss_input;
-  if(!scots::read_from_file(ss_input,mgr,"input_alphabet")) {
+  if(!scots::read_from_file(mgr,ss_input,"input_alphabet")) {
     /* construct grid for the input space */
     /* lower bounds of the hyper rectangle */
     input_type i_lb={{-1,-1}};
@@ -116,7 +116,7 @@ int main() {
   /* does there exist the transition function file ?*/
   scots::SymbolicSet set;
   set.print_info(1);
-  if(!scots::read_from_file(set,TF,mgr,"tf")) {
+  if(!scots::read_from_file(mgr,set,TF,"tf")) {
     /* set up constraint functions with obtacles */
     double H[15][4] = {
       { 1  , 1.2, 0  ,   9 },
@@ -151,7 +151,7 @@ int main() {
     /* compute BDD for the avoid set (returns the number of elements) */ 
     BDD A = ss_pre.ap_to_bdd(mgr,avoid);
     /* write ap to files avoid.scs/avoid.bdd */
-    scots::write_to_file(ss_pre,A,"obstacles");
+    scots::write_to_file(mgr,ss_pre,A,"obstacles");
 
     set = scots::SymbolicSet(scots::SymbolicSet(ss_pre,ss_input),ss_post);
 
@@ -164,7 +164,7 @@ int main() {
     if(!getrusage(RUSAGE_SELF, &usage))
       std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
-    scots::write_to_file(set,TF,"tf");
+    scots::write_to_file(mgr,set,TF,"tf");
   }
   mgr.DebugCheck();
 
@@ -182,7 +182,7 @@ int main() {
   };
   BDD T = ss_pre.ap_to_bdd(mgr,target);
   /* write target to file */
-  write_to_file(ss_pre,T,"target");
+  write_to_file(mgr,ss_pre,T,"target");
 
   std::cout << "\nSynthesis: " << std::endl;
 
@@ -223,7 +223,7 @@ int main() {
   /* symbolic set for the controller */
   scots::SymbolicSet controller(ss_pre,ss_input);
   std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(controller,C,"controller"))
+  if(write_to_file(mgr,controller,C,"controller"))
     std::cout << "Done. \n";
 
 
