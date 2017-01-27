@@ -6,7 +6,7 @@
 
 **SCOTS** is an open source software tool to compute discrete abstractions and symbolic controllers!
 
-Please consult the manual in ./manual/manual.pdf for installation instructions,
+Please consult the [manual](https://gitlab.lrz.de/matthias/SCOTSv0.2/raw/master/manual/manual.pdf) for installation instructions,
 usage description and background information.
 
 For implementation details please have a look in the C++ documentation ./doc/html/index.html

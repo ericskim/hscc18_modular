@@ -1448,17 +1448,17 @@ The number of states in the winning domain and the winning domain itself is obta
 It is possible to store the result as {\tt StaticController} to a file. The syntax for
 storing the controller to the file {\tt controller.scs} is given by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
-write_to_file(StaticController(ss,is,std::move(win)),"controller.scs");
+write_to_file(StaticController(ss,is,std::move(win)),"controller");
 \end{lstlisting}
 For various reasons it might be helpful to visualize the target set. To this
 end, we write the IDs of the grid points in the target set together with the
 uniform grid information to a file
 \begin{lstlisting}[basicstyle=\small\ttfamily]
-write_to_file(ss,target,"target.scs");
+write_to_file(ss,target,"target");
 \end{lstlisting}
 Subsequently, we access and plot the grid points in the MATLAB workspace by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
->> p = GridPoints('target.scs');
+>> p = GridPoints('target');
 >> plot3(p(:,1),p(:,2),p(:,3),'.');
 \end{lstlisting}
 
@@ -1503,7 +1503,7 @@ system until the target is reached
 \begin{lstlisting}[basicstyle=\small\ttfamily]
   /* read controller from file */
   scots::StaticController con;
-  if(!read_from_file(con,"controller.scs")) {
+  if(!read_from_file(con,"controller")) {
     std::cout << "Could not read controller from controller.scs\n";
     return 0;
   }
@@ -1524,7 +1524,7 @@ In order to access the {\tt StaticController} from the MATLAB workspace {\tt
 SCOTS} provides the MATLAB class {\tt StaticController}. The data can be loaded
 by
 \begin{lstlisting}[basicstyle=\small\ttfamily]
->> con = StaticController('controller.scs')
+>> con = StaticController('controller')
 \end{lstlisting}
 The inputs associated with a state $x\in \R^n$ and the center of cells in the
 winning domain $D^{-1}(U_2)$ are accessed by
