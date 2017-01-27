@@ -18,9 +18,18 @@
 #include <climits>
 #include <iomanip>
 
+#ifdef SCOTS_BDD
+/* writing and reading bdd files */
+#include <stdlib.h>
+#include "dddmp.h"
+#include "cuddObj.hh"
+#endif
+
 #define SCOTS_FH_VERSION    "v0.2"
 #define SCOTS_FH_SYMBOL     "#"
 #define SCOTS_FH_SEPERATOR  ";"
+#define SCOTS_FH_EXTENSION  ".scs"
+#define SCOTS_FH_BDD_EXTENSION  ".bdd"
 
 #define SCOTS_FH_KEY        "#SCOTS:"
 #define SCOTS_FH_TYPE       "#TYPE:"
@@ -36,7 +45,7 @@ namespace scots {
 /** @brief The FileHandler class stores the filename **/
 class FileHandler {
 protected:
-  std::string m_filename{"file.scs"};
+  std::string m_filename{};
 public:
   FileHandler(const std::string& filename) : m_filename(filename) {};
 
@@ -53,12 +62,12 @@ public:
   FileWriter(const std::string& filename) : FileHandler(filename) {};
   bool create() {
     m_file.close();
-    m_file.open(m_filename,std::fstream::out);
+    m_file.open(m_filename.append(SCOTS_FH_EXTENSION),std::fstream::out);
     return m_file.is_open();
   }
   bool open() {
     m_file.close();
-    m_file.open(m_filename,std::fstream::app);
+    m_file.open(m_filename.append(SCOTS_FH_EXTENSION),std::fstream::app);
     return m_file.is_open();
   }
   void close() {
@@ -157,6 +166,28 @@ public:
     }
     return false;
   }
+#ifdef SCOTS_BDD 
+	/* functions are only availabe if BDD support is activated */  
+  bool add_BDD(const BDD& bdd, char mode='B') {
+   /* before we save the BDD to file, we transfer it to another manager */
+    Cudd manager_temp;
+    BDD tosave = bdd.Transfer(manager_temp);
+
+    /* open filename */
+		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
+	 	FILE *file = fopen (filename.c_str(),"w");
+		if(!file)
+			return false;
+		int store = Dddmp_cuddBddStore(tosave.manager(),NULL,
+                                   tosave.getNode(),NULL,NULL,
+                                   (int)mode,DDDMP_VARIDS,NULL,file);
+		if(!fclose(file))
+			return false;
+    if (store!=DDDMP_SUCCESS) 
+      return false;
+		return true;
+  }
+#endif
 };
 
 /** @brief The FileReader class is used to read information from files **/
@@ -181,7 +212,7 @@ private:
 public:
   FileReader(const std::string& filename) : FileHandler(filename) {};
   bool open() {
-    m_file.open(m_filename);
+    m_file.open(m_filename.append(SCOTS_FH_EXTENSION));
     return m_file.good();
   }
   void close() {
@@ -405,6 +436,29 @@ public:
     }
     return 0;
   }
+#ifdef SCOTS_BDD 
+	/* functions are only availabe if BDD support is activated */  
+  bool get_BDD(const Cudd& manager, BDD& bdd, char mode='B') {
+
+    /* open file1name */
+		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
+	 	FILE *file = fopen(filename.c_str(),"r");
+		if(!file) 
+			return false;
+
+
+		DdNode *node =
+		Dddmp_cuddBddLoad(manager.getManager(),
+                      DDDMP_VAR_MATCHIDS,NULL,NULL,
+                      NULL,(int)mode,NULL,file);
+		fclose(file);
+		if(!node) 
+			return false;
+	  bdd=BDD(manager,node);
+		return true;
+  }
+#endif
+
 };
 
 } /*end of namepace scots*/

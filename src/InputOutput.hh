@@ -13,11 +13,14 @@
 #include <string>
 
 #include "FileHandler.hh"
-
 #include "UniformGrid.hh"
 #include "TransitionFunction.hh"
 #include "StaticController.hh"
 #include "WinningDomain.hh"
+
+#ifdef SCOTS_BDD
+#include "SymbolicSet.hh"
+#endif 
 
 /* StaticController definitions */
 #define  SCOTS_SC_TYPE          "STATICCONTROLLER"
@@ -32,6 +35,10 @@
 #define SCOTS_UG_ETA          "ETA"
 #define SCOTS_UG_LOWER_LEFT   "LOWER_LEFT"
 #define SCOTS_UG_UPPER_RIGHT  "UPPER_RIGHT"
+
+/* SymbolicSet definitions */
+#define SCOTS_SS_TYPE         "SYMBOLICSET"
+#define SCOTS_SS_BDD_VAR_ID   "BDD_VAR_ID_IN_DIM_"
 
 /* TransitionFunction definitions */
 #define SCOTS_TF_TYPE         "TRANSITIONFUNCTION"
@@ -150,9 +157,10 @@ bool write_to_file(const UniformGrid& grid, const std::string& filename) {
   return false;
 }
 
+
 /** @brief write atomic propositions to file **/
 template<class F>
-bool write_to_file(const UniformGrid& grid, F& atomic_prop, const std::string& filename) {
+bool write_to_file(const UniformGrid& grid, const F& atomic_prop, const std::string& filename) {
   FileWriter writer(filename);
 
   /* store grid information */
@@ -178,6 +186,51 @@ bool write_to_file(const UniformGrid& grid, F& atomic_prop, const std::string& f
   return true;
 }
 
+#ifdef SCOTS_BDD
+/** @brief write SymbolicSet to file **/
+inline
+bool write_to_file(const SymbolicSet& set, const std::string& filename) {
+  FileWriter writer(filename);
+  if(writer.create()) {
+
+    writer.add_VERSION();
+    writer.add_TYPE(SCOTS_SS_TYPE);
+    writer.add_MEMBER(SCOTS_UG_DIM,set.get_dim());
+    writer.add_VECTOR(SCOTS_UG_ETA,set.get_eta());
+    writer.add_VECTOR(SCOTS_UG_LOWER_LEFT,set.get_lower_left());
+    writer.add_VECTOR(SCOTS_UG_UPPER_RIGHT,set.get_upper_right());
+		auto intervals = set.get_bdd_intervals();
+		for(int i=0;i<set.get_dim(); i++) {
+		  std::string s = SCOTS_SS_BDD_VAR_ID;
+			writer.add_VECTOR(s.append(std::to_string(i+1)),intervals[i].get_bdd_var_ids());
+    }
+
+    writer.close();
+    return true;
+  }
+  return false;
+}
+
+/** 
+ * @brief write BDD with its SymbolicSet information to a file via a FileWriter
+ * The BDD is stored in filename.bdd\n
+ * The SymbolicSet is stored in filename.scs\n
+ * See dddmp.h for the different modes of writing.
+ **/
+inline
+bool write_to_file(const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B') {
+  FileWriter writer(filename);
+  if(!write_to_file(set,filename)) {
+    return false;
+  }
+  if(!writer.add_BDD(bdd,mode)) {
+    return false;
+  }
+	return true;
+}
+#endif
+
+
 /** @brief read WinningDomain from a file via a FileReader **/
 inline
 bool read_from_file(WinningDomain& wd, const std::string& filename, size_t offset=0) {
@@ -192,7 +245,7 @@ bool read_from_file(WinningDomain& wd, const std::string& filename, size_t offse
   if(!reader.get_WINNINGDOMAIN(SCOTS_WD_DATA,domain,inputs,N,M,offset)) {
     return false;
   } 
-  wd = WinningDomain(N,M,std::move(domain),std::move(inputs));
+  wd = WinningDomain(N,M,std::move(domain),std::move(inputs),std::numeric_limits<abs_type>::max());
   return true;
 }
 
@@ -222,8 +275,8 @@ bool read_from_file(UniformGrid& grid, const std::string& filename, size_t offse
   reader.close();
   /* make sure that rounding in the UniformGrid constructor works correctly */
   for(int i=0; i<dim; i++) {
-    lb[i]-=eta[i]/2.0;
-    ub[i]+=eta[i]/2.0;
+    lb[i]-=eta[i]/4.0;
+    ub[i]+=eta[i]/4.0;
   }
   grid = UniformGrid(dim,lb,ub,eta);
   return true;
@@ -258,7 +311,7 @@ bool read_from_file(StaticController& sc, const std::string& filename) {
   if(!read_from_file(wd,filename)) {
     return false;
   }
-  sc=StaticController(ss,is,std::move(wd));
+  sc = StaticController(ss,is,std::move(wd));
   return true;
 }
 
@@ -288,51 +341,86 @@ bool read_from_file(TransitionFunction& tf, const std::string& filename) {
   if(!reader.get_MEMBER(SCOTS_TF_NO_TRANS,T)) {
     return false;
   } 
-  abs_type* pre = new abs_type[T];
-  abs_type* no_pre = new abs_type[N*M];
-  abs_type* no_post = new abs_type[N*M];      
-  abs_ptr_type* pre_ptr = new abs_ptr_type[N*M];
-  auto cleanup = [&](void) {
-    delete[] pre;
-    delete[] no_pre;
-    delete[] no_post;
-    delete[] pre_ptr;
-  };
+  tf.init_infrastructure(N,M);
+  tf.init_transitions(T);
   size_t offset;
-  offset=reader.get_ARRAY(SCOTS_TF_NO_PRE,no_pre,N*M);
+  offset=reader.get_ARRAY(SCOTS_TF_NO_PRE,tf.m_no_pre,N*M);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
-  offset=reader.get_ARRAY(SCOTS_TF_NO_POST,no_post,N*M,offset);
+  offset=reader.get_ARRAY(SCOTS_TF_NO_POST,tf.m_no_post,N*M,offset);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
-  offset=reader.get_ARRAY(SCOTS_TF_PRE_PTR,pre_ptr,N*M,offset);
+  offset=reader.get_ARRAY(SCOTS_TF_PRE_PTR,tf.m_pre_ptr,N*M,offset);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
-  offset=reader.get_ARRAY(SCOTS_TF_PRE,pre,T,offset);
+  offset=reader.get_ARRAY(SCOTS_TF_PRE,tf.m_pre,T,offset);
       std::cout << "off " <<offset << "\n";
   if(!offset) {
-    cleanup();
+    tf.clear();
     return false;
   }
   reader.close();
-  tf.m_no_states=N;
-  tf.m_no_inputs=M;
-  tf.m_no_transitions=T;
-  tf.m_no_pre=no_pre;
-  tf.m_no_post=no_post;
-  tf.m_pre_ptr=pre_ptr;
-  tf.m_pre=pre;
   return true;
 }
+
+#ifdef SCOTS_BDD
+/** @brief write SymbolicSet to file **/
+inline
+bool read_from_file(SymbolicSet& set, const Cudd& manager, const std::string& filename) {
+  /* read UniformGrid from file */
+  UniformGrid grid;
+  if(!read_from_file(grid,filename)){
+    return false;
+  }
+  /* read the BDD variable IDs and create IntegerInterval*/
+  std::vector<IntegerInterval<abs_type>> bdd_interval{};
+  FileReader reader(filename);
+  if(reader.open()) {
+    size_t offset = 0;
+		for(int i=0;i<grid.get_dim(); i++) {
+      std::vector<unsigned int> var_id {};
+		  std::string s = SCOTS_SS_BDD_VAR_ID;
+			offset=reader.get_VECTOR(s.append(std::to_string(i+1)),var_id,offset);
+      if(!offset) 
+        return false;
+      bdd_interval.emplace_back(manager,abs_type{0},grid.get_no_gp_per_dim()[i]-abs_type{1},var_id);
+    }
+    reader.close();
+  } else {
+    return false;
+  }
+  /* initialize SymbolicSet  */
+  set = SymbolicSet(grid,bdd_interval);
+  return true;
+}
+
+/** 
+ * @brief read BDD with its SymbolicSet information from file 
+ * The SymbolicSet is read from filename.scs\n
+ * The BDD is read from filename.bdd\n
+ * See dddmp.h for the different modes of reading.
+ **/
+inline
+bool read_from_file(SymbolicSet& set, BDD& bdd, Cudd& manager, const std::string& filename, char mode = 'B') {
+  if(!read_from_file(set,manager,filename))
+    return false;
+  FileReader reader(filename);
+  if(!reader.get_BDD(manager,bdd,mode)) {
+    return false;
+  }
+	return true;
+}
+#endif
+
 
 } /* end namespace */
 #endif /* InputOutput_HH_ */

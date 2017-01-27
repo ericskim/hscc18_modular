@@ -82,6 +82,8 @@ backend=biber]{biblatex}
 }%
 \lstset{emph=[2]{UniformGrid, 
                  Abstraction, 
+                 SymbolicSet, 
+                 SymbolicModel, 
                  WinningDomain, 
                  TransitionFunction, 
                  StaticController},
@@ -119,13 +121,57 @@ backend=biber]{biblatex}
 	\newpage
 	
 
-%\section{ToDo}
-%
-%\begin{enumerate}
-%  \item Implement and explain support for BDD representation
-%  \item Demonstrate customized synthesis algorithms
-%\end{enumerate}
+\section{ToDo}
 
+\begin{enumerate}
+  \item Explain usage of the implementation using binary decision diagrams
+  (BDDs) as basic data structure
+  \item Provide performance tables comparing sparse matrix data structure vs BDD
+  \item Support for periodic dynamics
+\end{enumerate}
+
+
+
+
+
+%\subsection{Performance Comparison}
+%
+% {\color{red} some initial numbers}
+%
+%
+%Performance values for the construction of symbolic models.
+%
+%For the BDD performance values we distinguish with BDD\_E and BDD\_D
+%automatic variable reordering with the option {\tt CUDD\_REORDER\_SIFT} is enabled or not. The compressed file size
+%results in the BDD case from using the {\tt DDDMP\_MODE\_BINARY} vs. {\tt
+%DDDMP\_MODE\_TEXT} mode in the {\tt Dddmp\_cuddBddStore} command. For the
+%sparse matrix case, the compressed file size results form zipping the file
+%stored with {\tt SCOTS}.
+%
+%\begin{table}[h]
+%\begin{tabular}{l|N|N|N|N|N|N|N|N|N}
+%              \#T & \multicolumn{3}{c|}{$3.8\cdot10^6$} 
+%                  & \multicolumn{3}{c|}{$15.2\cdot10^6$} 
+%                  & \multicolumn{3}{c }{$60.7\cdot10^6$} \\
+%                  & BBD\_E & BDD\_D  & SPAR 
+%                  & BBD\_E & BDD\_D  & SPAR
+%                  & BBD\_E & BDD\_D  & SPAR\\\hline
+%run  time $[sec]$ & $25$   & $27$   & $0.5$ 
+%                  & $303$   & $183$  & $1.9$
+%                  & $2950$ & $1492$   & $7.5$ \\
+%memory  $[B]$/\#T & $13.9$ & $82.1$ & $12.6$ 
+%                  & $12.1$ & $49.2$ & $12.5$
+%                  & $4.2 $ & $41.3$  & $12.4$\\
+%file size $[MB]$  & 2.6   & 70 &  39 
+%                  & 12    & 293 &  170 
+%                  & 43    & 1228 &  710 \\
+%compressed $[MB]$ & .33   & 6.3 & 8.9 
+%                  & 1.6    & 27 &  39 
+%                  & 5.6    & 111 &  144 \\[2ex]
+%\end{tabular}
+%\caption{DC DC boost converter.}
+%\end{table}
+%
 
 
 
@@ -193,17 +239,17 @@ The three most easy-to-compile examples are found in
 The examples can be run without any additional software and require only a
 \Cpp compiler with \Cpp{\tt11} support. 
 
-%\subsection{Persistence and Recurrence} In the examples in
-%\begin{lstlisting}[basicstyle=\small\ttfamily]
-%./examples/dcdc_bdd        	/* reach-and-stay spec for a DCDC boost converter */ 
-%./examples/unicycle_bdd  	/* recurrence spec involving a unicycle dynamics */ 
-%\end{lstlisting}
-%we write customized controller synthesis algorithms to enforce persistence and recurrence specifications.
-%%using a binary decision diagram representation of the
-%%atomic propositions and transition relation. In order to run the examples, an
-%%installation of the 
-%%{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
-%
+\subsection{Customized Synthesis} In the examples in
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+./examples/dcdc_bdd        	/* reach-and-stay spec for a DCDC boost converter */ 
+./examples/vehicle_bdd  	  /* currently reachability only (more complex spec is planned) */ 
+\end{lstlisting}
+we use customized controller synthesis algorithms to enforce more complex
+specifications. Customized synthesis algorithms are supported only 
+using binary decision diagrams (BDDs) as underlying data structure.  In order to run the examples, an
+installation of the 
+{\tt CUDD} library is required, see Section~\ref{s:installation:cudd}.
+
 %\subsection{GR(1) specifications}
 %An example that demonstrates the usage of {\tt SCOTS} in combination with {\tt
 %slugs} is provided in the directory
@@ -258,6 +304,47 @@ For various reasons, one might consider to use additional software in combinatio
   \end{itemize}
   \end{enumerate}
 
+ To access the BDD files produced by {\tt SCOTS} from the MATLAB workspace the
+  mex file {\tt mexSymbolicSet.mex} needs to be compiled:
+	\begin{enumerate}
+  \item install the {\tt CUDD} library (see item~\ref{i:cudd})
+ 	\item setup the mex compiler with the MATLAB command
+	\begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
+	>> mex -setup C++
+	\end{lstlisting}
+	\item In a terminal, navigate to {\tt\small ./mfiles/mexfiles}:
+	\begin{itemize}
+		\item edit the {\tt makefile} and adjust the {\tt MATLABPATH} and {\tt CUDDPATH}
+		\item run  {\tt make bdd}
+	 \end{itemize}
+  \end{enumerate}
+
+
+  \item
+  \label{i:cudd}
+  {\tt CUDD}: {\bf  a)} to combine {\tt SCOTS} with {\tt slugs}, {\bf b)} to save atomic propositions
+  and transition relations as BDD to file and {\bf c)} to write customized
+  synthesis algorithms.\\
+  {\tt SCOTS} uses {\tt CUDD} with the following configuration options:
+     \begin{itemize}
+      \item the \Cpp{} object-oriented wrapper
+      \item the dddmp library and
+      \item the shared library 
+    \end{itemize}
+   The package (available at \url{http://vlsi.colorado.edu/~fabio/})
+ follows the usual installation routine of {\tt \small configure}, {\tt
+   \small make} and
+   {\tt \small make install}. We use {\tt \small cudd-3.0.0}, with the
+   configuration
+  \begin{lstlisting}[basicstyle=\small\ttfamily,frame=none]
+  ./configure --enable-shared --enable-obj --enable-dddmp --prefix=CUDDPATH
+  \end{lstlisting}
+  where {\tt CUDDPATH} is the desired installation directory, e.g., {\tt ./external/cudd}.
+
+  On some linux machines we experienced that the header files {\tt \small util.h} and
+  {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
+  copied them to {\tt \small CUDDPATH/include}.
+
   \item {\tt boost}: to use advance ode solvers. 
 
   For Linux {\tt boost} is usually
@@ -270,7 +357,9 @@ For various reasons, one might consider to use additional software in combinatio
   {\tt vnode-lp} is an open source software tool to compute validated solutions
   of initial value problems based on  interval arithmetic. It is available at
   \href{http://www.cas.mcmaster.ca/~nedialk/vnodelp}.
-\end{enumerate}
+
+
+	\end{enumerate}
 
 
 
@@ -1449,34 +1538,33 @@ A demonstration of the usage of the {\tt StaticController} from the MATLAB
 workspace can be found in the various m-files in the example directories.
 
 
-%\section{BDDs in {\tt SCOTS}}
-%
-%{\tt SCOTS} provides a number of classes and functions to obtain a \emph{binary decision
-%diagram} (BDD) representation of symbolic models, controllers and atomic
-%propositions. Although, in terms of computation times and memory usage
-%(see~Section~\ref{s:performance}) it is not advisable to use BDDs as underlying data
-%structure in the computation of symbolic models, there are several situations in which BDD representations are useful.
-%For example,
-%\begin{enumerate}
-%  \item to use {\tt SCOTS} in combination with other tools, such as {\tt slugs};
-%  \item to compactly save atomic propositions and controllers to a file;
-%  \item to write customized synthesis algorithms;
-%\end{enumerate}
-%Representations
-%\begin{enumerate}
-%  \item transition function $F_2$ as BDD
-%  \item synthesis
-%  \item writing BDDs to file
-%\end{enumerate}
-%
-%
-%
-%
-%It might be desirable to obtain a
+\section{Binary Decision Diagrams}
 
-%\section{MATLAB Interface}
-%
-%See the MATLAB commands {\tt StaticController} and {\tt GridPoints} 
+{\tt SCOTS} provides a number of classes and functions to obtain a \emph{binary decision
+diagram} (BDD) representation of symbolic models, controllers and atomic
+propositions. 
+
+
+Useful to 
+\begin{enumerate}
+  \item save memory (needs to be seen);
+  \item use {\tt SCOTS} in combination with other tools, such as {\tt slugs} and {\tt SENSE};
+  \item compactly save atomic propositions and controllers to a file;
+  \item write customized synthesis algorithms;
+\end{enumerate}
+For usage details have look in the examples
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+./examples/dcdc_bdd        	/* reach-and-stay */ 
+./examples/vehicle_bdd  	  /* reachability */ 
+./examples/aircraft_bdd  	  /* reachability */ 
+\end{lstlisting}
+and have a look in the class documentation in {\tt ./doc/html/} of
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+scots::SymbolicSet
+scots::SymbolicModel
+\end{lstlisting}
+and the companion functions
+{\tt read\_from\_file} and {\tt write\_to\_file}.
 
 %Things to come:
 %\subsection{Using the CUDD Library}

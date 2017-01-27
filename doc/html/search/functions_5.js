@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['print_5fbdd_5fids',['print_bdd_IDs',['../classscots_1_1_bdd_integer_interval.html#add13143db80863d994802f1c1eeeba9c',1,'scots::BddIntegerInterval']]],
-  ['print_5finfo',['print_info',['../classscots_1_1_uniform_grid.html#a4e44c9a1a5c4ddeb502f24f356cbb183',1,'scots::UniformGrid']]],
-  ['print_5fpost',['print_post',['../classscots_1_1_abstraction.html#ac5cf020298ff6bbb60670b2e8deea93c',1,'scots::Abstraction']]],
-  ['print_5fpost_5fgb',['print_post_gb',['../classscots_1_1_abstraction.html#a7fb3115986fc8ac42a4f980983ece720',1,'scots::Abstraction']]]
+  ['id_5fto_5fbdd',['id_to_bdd',['../classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5',1,'scots::SymbolicSet']]],
+  ['init_5finfrastructure',['init_infrastructure',['../classscots_1_1_transition_function.html#ad59ebf8ac9e7fc83d34a4c41c2c313e3',1,'scots::TransitionFunction']]],
+  ['init_5ftransitions',['init_transitions',['../classscots_1_1_transition_function.html#a2ed5b6910345a3550a023e25685b91a6',1,'scots::TransitionFunction']]],
+  ['int_5fto_5fbdd',['int_to_bdd',['../classscots_1_1_integer_interval.html#a0ba5f8dc6dcbee71ac2705716442c2bd',1,'scots::IntegerInterval']]],
+  ['integerinterval',['IntegerInterval',['../classscots_1_1_integer_interval.html#a08c285daf353a7623a35cafedfe04577',1,'scots::IntegerInterval']]],
+  ['interval_5fto_5fbdd',['interval_to_bdd',['../classscots_1_1_integer_interval.html#a31eff34edf847efd128f885a8cb1bedf',1,'scots::IntegerInterval::interval_to_bdd()'],['../classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743',1,'scots::SymbolicSet::interval_to_bdd()']]],
+  ['is_5fwinning',['is_winning',['../classscots_1_1_winning_domain.html#a6626852ab31edc79cf3ff3aff06e04ed',1,'scots::WinningDomain']]],
+  ['itox',['itox',['../classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69',1,'scots::UniformGrid::itox(abs_type id, grid_point_t &amp;x) const '],['../classscots_1_1_uniform_grid.html#afe53c83f0a6f9add9e8722b4081c5b5e',1,'scots::UniformGrid::itox(abs_type id, std::vector&lt; double &gt; &amp;x) const '],['../classscots_1_1_uniform_grid.html#af2e7a304985c73e21519e5a9bd816571',1,'scots::UniformGrid::ItoX(std::vector&lt; abs_type &gt; &amp;Ivector)']]]
 ];

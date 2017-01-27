@@ -15,11 +15,8 @@
 #include <iostream>
 #include <limits>
 
-/* to get abs_type */
-#include "TransitionFunction.hh"
-
-#define SCOTS_WD_TYPE   "WINNINGDOMAIN"
-#define SCOTS_WD_DATA   "DATA"
+/* to get abs_type alias */
+#include "UniformGrid.hh"
 
 /** @namespace scots **/ 
 namespace scots {
@@ -35,77 +32,93 @@ namespace scots {
  *
  * For a mathematical definition see the <a href="./../../manual/manual.pdf">manual.pdf</a>.
  *
- * The class can only be \b moved \b (not copied). Also the containers to store
- * the winning states and inputs can only be \b moved into the class via the
- * constructor or the set functions. 
  *
  **/
+
 class WinningDomain {
 /* allow the write_to_file function to access the private members */
 friend bool write_to_file(const WinningDomain&, const std::string&, bool);
 private:
-  /** @brief size of state alphabet N **/
-  abs_type m_no_states=0;
-  /** @brief size of input alphabet M **/
-  abs_type m_no_inputs=0;
-  /** @brief used to encode loosing states **/
-  abs_type m_max = std::numeric_limits<abs_type>::max();
-  /**
-   * @brief array of size N  \n
-   * (m_winning_domain[i]=m_max if i is not winning) 
-   **/
-  std::vector<abs_type> m_winning_domain{};
-  /**
-   * @brief bool array of size N*M encoding the valid inputs\n
-   *         m_inputs[i*M +j]==true iff j is a valid input at i) 
-   **/
-  std::vector<bool> m_inputs{}; 
+  /* size of state alphabet N */
+  abs_type m_no_states;
+  /* size of input alphabet M */
+  abs_type m_no_inputs;
+  /*
+   * array of size N  \n
+   * (m_winning_domain[i]=m_loosing if i is not winning) 
+   */
+  std::vector<abs_type> m_winning_domain;
+  /*
+   * bool array of size N*M encoding the valid inputs\n
+   * m_inputs[i*M +j]==true iff j is a valid input at i) 
+   */
+  std::vector<bool> m_inputs; 
+  /*
+   * constant that is used to indicate that a sate is not in 
+   * the winning domain; not intended to be chaned 
+   */
+  abs_type m_loosing;
 
 public:
   /** @cond  EXCLUDE from doxygen **/
   /* default constructor */
-  WinningDomain()=default;                      
+  WinningDomain() : m_no_states(0),
+                    m_no_inputs(0),
+                    m_winning_domain {},
+                    m_inputs {},
+                    m_loosing(std::numeric_limits<abs_type>::max()) {} 
   /* destructor */
   ~WinningDomain()=default;
-  /* copy constructor deleted (cannot be copied) */
-  WinningDomain(const WinningDomain&)=delete;
+  /* copy constructor  */
+  WinningDomain(const WinningDomain&)=default;
   /* move constructor */
   WinningDomain(WinningDomain&&)=default;
   /* copy assignment operator */
-  WinningDomain& operator=(const WinningDomain&)=delete; 
+  WinningDomain& operator=(const WinningDomain&)=default; 
   /* move assignment operator */
   WinningDomain& operator=(WinningDomain&&)=default;
   /* @endcond */
 
   /** @brief construct WinningDomain with number of states and number of abstract inputs **/
-  WinningDomain(const abs_type no_states, const abs_type no_inputs) :
-                m_no_states(no_states), m_no_inputs(no_inputs) {}
+  WinningDomain(abs_type no_states,
+                abs_type no_inputs,
+                abs_type loosing=std::numeric_limits<abs_type>::max()) : 
+                m_no_states(no_states), 
+                m_no_inputs(no_inputs),
+                m_loosing(loosing) {}
 
   /** @brief construct WinningDomain with array of winning states **/
-  WinningDomain(const abs_type no_states,
-                const abs_type no_inputs,
-                std::vector<abs_type>&& winning_domain) :
-                m_no_states(no_states), m_no_inputs(no_inputs),
-                m_winning_domain(std::move(winning_domain)) {}
+  WinningDomain(abs_type no_states,
+                abs_type no_inputs,
+                std::vector<abs_type>&& winning_domain,
+                abs_type loosing=std::numeric_limits<abs_type>::max()) : 
+                m_no_states(no_states), 
+                m_no_inputs(no_inputs),
+                m_winning_domain(std::move(winning_domain)),
+                m_loosing(loosing) {}
 
   /** @brief construct WinningDomain with array of winning states and valid inputs **/
-  WinningDomain(const abs_type no_states,
-                const abs_type no_inputs,
+  WinningDomain(abs_type no_states,
+                abs_type no_inputs,
                 std::vector<abs_type>&& winning_domain,
-                std::vector<bool>&& inputs) : 
-                m_no_states(no_states), m_no_inputs(no_inputs),
-                m_winning_domain(std::move(winning_domain)), m_inputs(std::move(inputs)) {}
+                std::vector<bool>&& inputs,
+                abs_type loosing=std::numeric_limits<abs_type>::max()) : 
+                m_no_states(no_states),
+                m_no_inputs(no_inputs),
+                m_winning_domain(std::move(winning_domain)),
+                m_inputs(std::move(inputs)),
+                m_loosing(loosing) {}
 
   /** @brief check if state i is winning **/
-  bool is_winning(const abs_type& i) {
-    if(i<m_winning_domain.size() && m_winning_domain[i]!=m_max) {
+  bool is_winning(const abs_type& i) const {
+    if(i<m_winning_domain.size() && m_winning_domain[i]!=m_loosing) {
       return true;
     }
     return false;
   }
 
   /** @brief return valid inputs associated with state i **/
-  std::vector<abs_type> get_inputs(const abs_type& i) {
+  std::vector<abs_type> get_inputs(const abs_type& i) const {
     std::vector<abs_type> inputs{};
     /* extract input information from m_inputs matrix */
     if(m_inputs.size()==m_no_states*m_no_inputs) {
@@ -125,7 +138,7 @@ public:
   }
 
   /** @brief get number of winning states (=size of winning domain) **/
-  abs_type get_size() {
+  abs_type get_size() const {
     abs_type count=0;
     for(abs_type i=0; i<m_no_states; i++) {
       if(is_winning(i)) {
@@ -134,9 +147,18 @@ public:
     }
     return count;
   }
+  /** @brief get the size of the state alphabet **/
+  abs_type get_no_states() const {
+    return m_no_states;
+  }
+
+  /** @brief get the size of the input alphabet **/
+  abs_type get_no_inputs() const {
+    return m_no_inputs;
+  }
 
   /** @brief get winning states **/
-  std::vector<abs_type> get_winning_domain() {
+  std::vector<abs_type> get_winning_domain() const {
     std::vector<abs_type> ws{};
     for(abs_type i=0; i<m_no_states; i++) {
       if(is_winning(i)) {

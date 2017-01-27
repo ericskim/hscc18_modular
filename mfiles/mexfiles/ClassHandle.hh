@@ -55,6 +55,12 @@ template<class base> inline mxArray *convertPtr2Mat(base *ptr)
     return out;
 }
 
+template<class base> inline uint64_t convertPtr2MatUINT64(base *ptr)
+{
+    mexLock();
+    return reinterpret_cast<uint64_t>(new class_handle<base>(ptr));
+}
+
 template<class base> inline class_handle<base> *convertMat2HandlePtr(const mxArray *in)
 {
     if (mxGetNumberOfElements(in) != 1 || mxGetClassID(in) != mxUINT64_CLASS || mxIsComplex(in))
@@ -65,15 +71,32 @@ template<class base> inline class_handle<base> *convertMat2HandlePtr(const mxArr
     return ptr;
 }
 
+template<class base> inline class_handle<base> *convertMat2HandlePtr(uint64_t in)
+{
+    class_handle<base> *ptr = reinterpret_cast<class_handle<base> *>(in);
+    if (!ptr->isValid())
+        mexErrMsgTxt("Handle not valid.");
+    return ptr;
+}
+
 template<class base> inline base *convertMat2Ptr(const mxArray *in)
 {
     return convertMat2HandlePtr<base>(in)->ptr();
 }
 
+template<class base> inline base *convertMat2Ptr(uint64_t in)
+{
+    return convertMat2HandlePtr<base>(in)->ptr();
+}
 template<class base> inline void destroyObject(const mxArray *in)
 {
     delete convertMat2HandlePtr<base>(in);
     mexUnlock();
 }
 
+template<class base> inline void destroyObject(uint64_t in)
+{
+    delete convertMat2HandlePtr<base>(in);
+    mexUnlock();
+}
 #endif // __CLASSHANDLE_HPP__

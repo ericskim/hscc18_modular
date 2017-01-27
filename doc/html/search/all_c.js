@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['val_5ffunctionction_5ftype',['val_functionction_type',['../namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d',1,'scots']]],
-  ['verbose_5foff',['verbose_off',['../classscots_1_1_abstraction.html#adac3ca551cf6a4cc134f210440f52079',1,'scots::Abstraction']]],
-  ['verbose_5fon',['verbose_on',['../classscots_1_1_abstraction.html#a92e00bc7b690699bba48579c5abe045f',1,'scots::Abstraction']]]
+  ['tic',['tic',['../class_tic_toc.html#ab50c9e4e8b0920e113d968a38420beb4',1,'TicToc']]],
+  ['tictoc',['TicToc',['../class_tic_toc.html',1,'']]],
+  ['toc',['toc',['../class_tic_toc.html#ab136de71c3869db779f90c389ebfbe5b',1,'TicToc']]],
+  ['transitionfunction',['TransitionFunction',['../classscots_1_1_transition_function.html',1,'scots']]],
+  ['transitionfunction_2ehh',['TransitionFunction.hh',['../_transition_function_8hh.html',1,'']]]
 ];

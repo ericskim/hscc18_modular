@@ -109,7 +109,7 @@ int main() {
   };
 
   /* avoid function returns 1 if x is in avoid set  */
-  auto avoid = [&H,ss,s_eta](const size_t idx) {
+  auto avoid = [&H,ss,s_eta](const abs_type& idx) {
     state_type x;
     ss.itox(idx,x);
     double c1= s_eta[0]/2.0+1e-10;
@@ -122,7 +122,7 @@ int main() {
     return false;
   };
   /* write obstacles to file */
-  write_to_file(ss,avoid,"obstacles.scs");
+  write_to_file(ss,avoid,"obstacles");
 
   std::cout << "Computing the transition function: " << std::endl;
   /* transition function of symbolic model */
@@ -136,8 +136,8 @@ int main() {
 
   if(!getrusage(RUSAGE_SELF, &usage))
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
-
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
+
   /* define target set */
   auto target = [&ss,&s_eta](const abs_type idx) {
     state_type x;

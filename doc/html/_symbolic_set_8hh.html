@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>SCOTS: scots::ReachabilityGame Class Reference</title>
+<title>SCOTS: src/SymbolicSet.hh File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -41,8 +41,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -63,10 +63,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -85,45 +82,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacescots.html">scots</a></li><li class="navelem"><a class="el" href="classscots_1_1_reachability_game.html">ReachabilityGame</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
-<a href="classscots_1_1_reachability_game-members.html">List of all members</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a>  </div>
   <div class="headertitle">
-<div class="title">scots::ReachabilityGame Class Reference</div>  </div>
+<div class="title">SymbolicSet.hh File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><code>#include &lt;vector&gt;</code><br />
+<code>#include &lt;iostream&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
+<code>#include &lt;numeric&gt;</code><br />
+<code>#include &quot;<a class="el" href="_uniform_grid_8hh_source.html">UniformGrid.hh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_integer_interval_8hh_source.html">IntegerInterval.hh</a>&quot;</code><br />
+<code>#include &quot;cuddObj.hh&quot;</code><br />
+</div>
+<p><a href="_symbolic_set_8hh_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a4929e05a1402b1d6ce51cccd0e49c8a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4929e05a1402b1d6ce51cccd0e49c8a9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ReachabilityGame</b> (const TransitionSystem &amp;ts)</td></tr>
-<tr class="separator:a4929e05a1402b1d6ce51cccd0e49c8a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af62438bb1a25219fb87019fc5f3744e8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af62438bb1a25219fb87019fc5f3744e8"></a>
-<a class="el" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> (void) const </td></tr>
-<tr class="separator:af62438bb1a25219fb87019fc5f3744e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4da258ace4450bcdba8a4f6ebb1afda"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac4da258ace4450bcdba8a4f6ebb1afda"></a>
-template&lt;class F &gt; </td></tr>
-<tr class="memitem:ac4da258ace4450bcdba8a4f6ebb1afda"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>solve</b> (F &amp;target)</td></tr>
-<tr class="separator:ac4da258ace4450bcdba8a4f6ebb1afda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d82bbbf7069f181355ac5127f258c48"><td class="memTemplParams" colspan="2"><a class="anchor" id="a1d82bbbf7069f181355ac5127f258c48"></a>
-template&lt;class F1 , class F2 &gt; </td></tr>
-<tr class="memitem:a1d82bbbf7069f181355ac5127f258c48"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>solve</b> (F1 &amp;target, F2 &amp;&amp;avoid)</td></tr>
-<tr class="separator:a1d82bbbf7069f181355ac5127f258c48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_symbolic_set.html">scots::SymbolicSet</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> class with the capability to represent sets of grid points as BDDs. See <a class="el" href="classscots_1_1_uniform_grid.html" title="Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. ">UniformGrid</a> for details.  <a href="classscots_1_1_symbolic_set.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a326e329be4ec9ba0cb88d0426291d89d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a326e329be4ec9ba0cb88d0426291d89d"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>IO</b></td></tr>
-<tr class="separator:a326e329be4ec9ba0cb88d0426291d89d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacescots"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html">scots</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/reach.cc</li>
-</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

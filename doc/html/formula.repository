@@ -1,10 +1,29 @@
-\form#0:$ S:=\{0,\ldots,N \}$
-\form#1:$ A:=\{0,\ldots,M \}$
-\form#2:$ (i,j,k) $
-\form#3:$i,k\in A$
-\form#4:$j\in A$
-\form#5:$i$
-\form#6:$k$
-\form#7:$j$
-\form#8:\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]
-\form#9:$ \xi(\tau) $
+\form#0:$ F:X\times U \rightrightarrows X$
+\form#1:$ Z\subseteq X$
+\form#2:$\mathrm{pre}(Z)=\{ (x,u) \in X\times U \mid F(x,u)\neq \emptyset \wedge F(x,u)\subseteq Z\}$
+\form#3:$ S:=\{0,\ldots,N \}$
+\form#4:$ A:=\{0,\ldots,M \}$
+\form#5:$ (i,j,k) $
+\form#6:$i,k\in A$
+\form#7:$j\in A$
+\form#8:$i$
+\form#9:$k$
+\form#10:$j$
+\form#11:$\eta/2$
+\form#12:\[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \]
+\form#13:$ \xi(\tau) $
+\form#14:$S$
+\form#15:$ S\subseteq ( [lb_0,ub_0] \times \cdots [lb_{n-1},ub_{n-1}] ) \cap \eta \mathbb Z^n $
+\form#16:$x=(x_{j_0},\ldots, x_{j_{m-1}})$
+\form#17:$m<n$
+\form#18:$p=n-m$
+\form#19:$j_i$
+\form#20:$j_i=i$
+\form#21:$ S(x):= \{ y\mid (x_{j_0},\ldots, x_{j_m},y_{0},\ldots,y_{p})\in S \}. $
+\form#22:$S(x) \subseteq [lb_{m},ub_{m}]\times\cdots\times [lb_{n-1},ub_{n-1}] ) \cap \eta \mathbb Z^n$
+\form#23:$j_0,\ldots,j_{m-1}$
+\form#24:$n=4$
+\form#25:$m=2$
+\form#26:$j_0=1,j_1=3$
+\form#27:$ S(x):= \{ (y_0,y_1)\mid (y_0,x_1,y_1,x_3)\in S \}. $
+\form#28:$ S(x) $
