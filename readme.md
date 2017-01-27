@@ -14,15 +14,20 @@ For implementation details please have a look in the C++ documentation ./doc/htm
 
 Bug reports and feature request are happily received at <matthias.rungger@tum.de> 
 
-Requirements:
+### Requirements:
 
-* The basic implementation of SCOTS is inlined and header only. Hence, only a working C++ compiler
+* The basic implementation of **SCOTS** is inlined and header only. Hence, only a working C++ compiler
   with C++11 support is needed.
 
-  Have a look in the directories 
+* The best way to find out about **SCOTS** is to clone the repository 
+  
 
-  * ./examples/dcdc/readme
-  * ./examples/vehicle/readme
+  `$ git clone https://gitlab.lrz.de/matthias/SCOTSv0.2.git`
+  
+  and run some of the examples in the example directory: 
 
-  for some examples and compiler options.
+  * ./examples/dcdc/
+  * ./examples/vehicle/
+
+  Have a look in the readme for some info and compiler options.
   

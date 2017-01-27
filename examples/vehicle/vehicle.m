@@ -29,7 +29,7 @@ x0=[0.6 0.6 0];
 
 
 % load controller from file
-controller=StaticController('controller.scs');
+controller=StaticController('controller');
 
 % simulate closed loop system
 y=x0;
@@ -61,12 +61,12 @@ end
 colors=get(groot,'DefaultAxesColorOrder');
 
 % load the symbolic set containig obstacles
-obs=GridPoints('obstacles.scs');
+obs=GridPoints('obstacles');
 obs=unique(obs(:,[1 2]),'rows');
 plot(obs(:,1),obs(:,2),'.');
 hold on
 
-target=GridPoints('target.scs');
+target=GridPoints('target');
 target=unique(target(:,[1 2]),'rows');
 plot(target(:,1),target(:,2),'.','color',colors(2,:));
 hold on

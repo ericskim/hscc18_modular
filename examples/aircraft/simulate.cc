@@ -55,7 +55,7 @@ int main() {
 
   /* read controller from file */
   scots::StaticController con;
-  if(!read_from_file(con,"controller.scs")) {
+  if(!read_from_file(con,"controller")) {
     std::cout << "Could not read controller from controller.scs\n";
     return 0;
   }

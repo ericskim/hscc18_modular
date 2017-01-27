@@ -23,7 +23,7 @@ x0=[1.35 5.755];
 tau_s=0.5;
 
 % load controller from file
-controller=StaticController('controller.scs');
+controller=StaticController('controller');
 
 % simulate closed loop system
 y=x0;
