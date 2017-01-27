@@ -29,9 +29,9 @@ using state_type = std::array<double,3>;
 using input_type = std::vector<double>;
 
 /* we integrate the vehicle ode by tau sec (the result is stored in x)  */
-auto  vehicle_post = [](state_type &x, const input_type &u) {
+auto  vehicle_post = [](state_type& x, const input_type& u) {
   /* the ode describing the vehicle */
-  auto rhs =[](state_type& xx,  const state_type &x, const input_type &u) {
+  auto rhs =[](state_type& xx,  const state_type& x, const input_type& u) {
     double alpha=std::atan(std::tan(u[1])/2.0);
     xx[0] = u[0]*std::cos(alpha+x[2])/std::cos(alpha);
     xx[1] = u[0]*std::sin(alpha+x[2])/std::cos(alpha);

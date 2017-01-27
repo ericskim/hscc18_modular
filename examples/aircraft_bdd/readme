@@ -1,23 +1,26 @@
 
-An aircraft landing maneuver taken from https://arxiv.org/abs/1503.03715
+An aircraft landing maneuver taken from https://arxiv.org/abs/1503.03715 
 
-0. for a successful execution of the this example you should have 32GB memory
-   available
+
+0. To run this example, you need to the Cudd libarary installed. Please see the
+   manual for installation nodes
 
 1. edit the Makefile 
    adjust the compiler to your programming environment
 
-1. compile the aircraft.cc file 
+
+2. compile the aircraft.cc and simulate.cc file 
    you should be able to compile the program simply by running 
    $ make
    in a terminal
 
-2. execute 
+3. execute 
   $./aircraft
   which produces
   ./controller.scs
+  ./controller.bdd
 
-3. simulate the closed loop by running
+4. simulate the closed loop by running
    $./simulate
 
 5. information on the example are found in

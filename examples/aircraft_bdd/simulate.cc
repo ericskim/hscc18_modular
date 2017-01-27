@@ -16,8 +16,6 @@
 
 /* state space dim */
 const int state_dim=3;
-/* input space dim */
-const int input_dim=2;
 
 /* sampling time */
 const double tau = 0.25;
@@ -27,7 +25,7 @@ using state_type = std::array<double,state_dim>;
 /* we integrate the aircraft ode by 0.25 sec (the result is stored in x)  */
 auto aircraft_post = [] (state_type& x, const std::vector<double>& u) {
   /* the ode describing the aircraft */
-  auto rhs =[] (state_type& xx,  const state_type& x, const input_type& u) {
+  auto rhs =[] (state_type& xx,  const state_type& x, const std::vector<double>& u) {
     double mg = 60000.0*9.81;
     double mi = 1.0/60000;
     double c=(1.25+4.2*u[1]);

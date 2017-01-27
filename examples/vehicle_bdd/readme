@@ -2,12 +2,14 @@
 A path planning problem for a vehicle using the bycicle model based on the BDD
 data structure
 
+0. To run this example, you need to the Cudd libarary installed. Please see the
+   manual for installation nodes
+
 1. edit the Makefile 
    adjust the compiler to your programming environment
 
 
-2. compile the vehicle.cc file 
-   you should be able to compile the program simply by running 
+2. compile the vehicle.cc and simulate.cc
    $ make
    in a terminal
 
