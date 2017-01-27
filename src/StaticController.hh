@@ -102,27 +102,26 @@ public:
   template<class grid_type>
   std::vector<grid_type> ItoX(std::vector<abs_type>& Ivector,UniformGrid& grid){
 
-        std::vector<grid_type> Xvector;
-        grid_type x;
+    std::vector<grid_type> Xvector;
+    grid_type x;
 
-        for(abs_type i=0; i<Ivector.size(); i++) {
-          grid.itox(Ivector[i],x);
-          Xvector.push_back(x);
-        }
-        return Xvector;
+    for(abs_type i=0; i<Ivector.size(); i++) {
+      grid.itox(Ivector[i],x);
+      Xvector.push_back(x);
+    }
+    return Xvector;
   }
 
   /** @brief do a state to index conversion for vectors **/
   template<class grid_type>
   std::vector<abs_type> XtoI(std::vector<grid_type>& Xvector,UniformGrid& grid){
 
-        std::vector<abs_type> Ivector;
-        abs_type i;
+    std::vector<abs_type> Ivector;
 
-        for(abs_type k=0; k<Xvector.size(); k++) {
-          Ivector.push_back(grid.xtoi(Xvector[k]));
-        }
-        return Ivector;
+    for(abs_type k=0; k<Xvector.size(); k++) {
+      Ivector.push_back(grid.xtoi(Xvector[k]));
+    }
+    return Ivector;
   }
 
   /** @brief get a std::vector containing the states in the winning domain **/

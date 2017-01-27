@@ -1,7 +1,7 @@
 /*
  * aircraft.cc
  *
- *  created: Oct 2016
+ * created: Jan 2017
  *  author: Matthias Rungger
  *
  */
@@ -82,6 +82,11 @@ int main() {
   /* to measure time */
   TicToc tt;
 
+  /* cudd manager */
+  Cudd mgr;
+  mgr.AutodynEnable();
+
+
   /* construct grid for the state space */
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* grid node distance diameter */
@@ -91,9 +96,14 @@ int main() {
   state_type s_lb={{58,-3*M_PI/180,0}};
   /* upper bounds of the hyper rectangle */
   state_type s_ub={{83,0,56}}; 
-  scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
+  /* construct SymbolicSet with the UniformGrid information for the state space
+   * and BDD variable IDs for the pre */
+  scots::SymbolicSet ss_pre(mgr, state_dim,s_lb,s_ub,s_eta);
+  /* construct SymbolicSet with the UniformGrid information for the state space
+   * and BDD variable IDs for the post */
+  scots::SymbolicSet ss_post(mgr, state_dim,s_lb,s_ub,s_eta);
   std::cout << "Unfiorm grid details:" << std::endl;
-  ss.print_info();
+  ss_pre.print_info();
 
   /* construct grid for the input space */
   /* lower bounds of the hyper rectangle */
@@ -102,35 +112,39 @@ int main() {
   input_type i_ub={{32000,8*M_PI/180}};
   /* grid node distance diameter */
   input_type i_eta={{32000,8.0/9.0*M_PI/180}};
-  scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
-  is.print_info();
+  scots::SymbolicSet ss_input(mgr,input_dim,i_lb,i_ub,i_eta);
+  ss_input.print_info();
 
   /* transition function of symbolic model */
-  scots::TransitionFunction tf;
+  BDD TF;
 
   /* setup object to compute the transition function */
-  scots::Abstraction<state_type,input_type> abs(ss,is);
+  scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
   /* measurement disturbances  */
   state_type z={{0.0125,0.0025/180*M_PI,0.05}};
-  abs.set_measurement_error_bound(z);
+  sym_model.set_measurement_error_bound(z);
 
   std::cout << "Computing the transition function: " << std::endl;
   tt.tic();
-  abs.compute_gb(tf,aircraft_post,radius_post);
+  size_t no_trans;
+  TF = sym_model.compute_gb(mgr,aircraft_post,radius_post,no_trans);
   tt.toc();
+  std::cout << "Number of transitions: " << no_trans << std::endl;
   if(!getrusage(RUSAGE_SELF, &usage))
-    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)tf.get_no_transitions() << std::endl;
-  std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
+
+  scots::SymbolicSet  set(scots::SymbolicSet(ss_pre,ss_input),ss_post);
+  //scots::write_to_file(set,TF,"tf");
 
   /* define target set */
-  auto target = [&s_eta, &z, &ss](const scots::abs_type& abs_state) {
+  auto target = [&s_eta, &z, &ss_pre](const scots::abs_type& abs_state) {
     state_type t_lb = {{63,-3*M_PI/180,0}};
     state_type t_ub = {{75,0,2.5}};
     state_type c_lb;
     state_type c_ub;
     /* center of cell associated with abs_state is stored in x */
     state_type x;
-    ss.itox(abs_state,x);
+    ss_pre.itox(abs_state,x);
     /* hyper-interval of the quantizer symbol with perturbation */
     for(int i=0; i<state_dim; i++) {
       c_lb[i] = x[i]-s_eta[i]/2.0-z[i];
@@ -145,18 +159,52 @@ int main() {
     }
     return false;
   };
-  /* write grid point IDs with uniform grid information to file */
-  write_to_file(ss,target,"target");
- 
-  std::cout << "\nSynthesis: " << std::endl;
-  tt.tic();
-  scots::WinningDomain win=scots::solve_reachability_game(tf,target);
-  tt.toc();
-  std::cout << "Winning domain size: " << win.get_size() << std::endl;
 
+  BDD T = ss_pre.ap_to_bdd(mgr,target);
+
+  std::cout << "\nSynthesis: " << std::endl;
+
+  /* 
+   * we implement the fixed point algorithm 
+   *
+   * mu X. ( pre(X) & T ) 
+   *
+   */
+
+  /* setup enforcable predecessor */
+  scots::EnfPre enf_pre(mgr,TF,sym_model);
+  tt.tic();
+  BDD X = mgr.bddOne();
+  BDD XX =mgr.bddZero();
+  /* the controller */
+  BDD C = mgr.bddZero();
+  /* BDD cube for existential abstract inputs */
+  BDD U = ss_input.get_cube(mgr);
+  /* as long as not converged */
+  size_t i;
+  for(i=1; XX != X; i++ ) {
+    X=XX;
+    XX=enf_pre(X) | T;
+    /* new (state/input) pairs */
+    BDD N = XX & (!(C.ExistAbstract(U)));
+    /* add new (state/input) pairs to the controller */
+    C=C | N;
+    /* print progress */
+    scots::print_progress(i);
+  }
+  std::cout << "\nNumber of iterations: " << i << std::endl;
+  tt.toc();
+
+  std::cout << "Winning domain size: " << ss_pre.get_size(mgr,C) << std::endl;
+  
+  /* symbolic set for the controller */
+  scots::SymbolicSet controller(ss_pre,ss_input);
   std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(scots::StaticController(ss,is,std::move(win)),"controller"))
+  if(write_to_file(controller,C,"controller"))
     std::cout << "Done. \n";
 
-  return 1;
+   if(!getrusage(RUSAGE_SELF, &usage))
+    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
+
+ return 1;
 }

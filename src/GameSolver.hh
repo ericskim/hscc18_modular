@@ -87,9 +87,9 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
   /* initialize value */
   value.resize(N,std::numeric_limits<double>::infinity());
   /* keep track of the number of processed post */
-  abs_type* K = new abs_type[N*M];
+  std::unique_ptr<abs_type[]> K(new abs_type[N*M]);
   /* keep track of the values (corresponds to M in Alg.2)*/
-  double*  edge_val = new double[N*M];
+  std::unique_ptr<double[]>  edge_val(new double[N*M]);
 
   /* init fifo */
   std::queue<abs_type> fifo;
@@ -133,8 +133,6 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
       }  /* end loop over all pres of state i under input j */
     }  /* end loop over all input j */
   }  /* fifo is empty */
-  delete[] K;
-  delete[] edge_val;
 
   return WinningDomain(N,M,std::move(win_domain));
 }
