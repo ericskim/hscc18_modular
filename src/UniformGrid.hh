@@ -263,6 +263,32 @@ public:
     x[0]=m_first[0]+num*m_eta[0];
   }
 
+  /** @brief do a index to state conversion for vectors **/
+  template<class grid_point_t>
+  std::vector<grid_point_t> ItoX(std::vector<abs_type>& Ivector){
+
+        std::vector<grid_point_t> Xvector;
+        grid_point_t x;
+
+        for(abs_type k=0; k<Ivector.size(); k++) {
+          itox<grid_point_t>(Ivector[k],x);
+          Xvector.push_back(x);
+        }
+        return Xvector;
+  }
+
+  /** @brief do a state to index conversion for vectors **/
+  template<class grid_point_t>
+  std::vector<abs_type> XtoI(std::vector<grid_point_t>& Xvector){
+
+        std::vector<abs_type> Ivector;
+
+        for(abs_type k=0; k<Xvector.size(); k++) {
+          Ivector.push_back(xtoi<grid_point_t>(Xvector[k]));
+        }
+        return Ivector;
+  }
+
   /** @brief creates console output with grid information **/
   void print_info() const {
     std::cout << "Distance of grid points (eta): ";

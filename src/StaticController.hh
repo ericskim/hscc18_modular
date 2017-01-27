@@ -39,12 +39,12 @@ public:
   StaticController()=default;                      
   /* destructor */
   ~StaticController()=default;
-  /* copy constructor deleted (cannot be copied) */
-  StaticController(const StaticController&)=delete;
+  /* copy constructor  */
+  StaticController(const StaticController& other) = default;
   /* move constructor */
   StaticController(StaticController&&);
   /* copy assignment operator */
-  StaticController& operator=(const StaticController&)=delete; 
+  StaticController& operator=(const StaticController&)=default;
   /* move assignment operator */
   StaticController& operator=(StaticController&&)=default;
   /* @endcond */
@@ -52,16 +52,15 @@ public:
   /** @brief controller constructor **/
   StaticController(const UniformGrid& state_grid,
 									 const UniformGrid& input_grid,
-                   WinningDomain&& winning_domain) {
-    m_state_grid = state_grid;
-    m_input_grid = input_grid;
-		m_winning_domain = std::move(winning_domain);
-  }
+                   WinningDomain&& winning_domain) :
+                   m_input_grid(input_grid),
+                   m_state_grid(state_grid),
+                   m_winning_domain(std::move(winning_domain)) { }
 
   /** @brief get a std::vector containing the valid control inputs at state x \n
     * does throw a runtime error if state x is out of winning domain**/
   template<class state_type, class input_type>
-  std::vector<input_type> get_control(const state_type &x) {
+  std::vector<input_type> get_control(const state_type &x) const {
     /* abstract state index */
     abs_type i = m_state_grid.xtoi(x);
     std::vector<abs_type> abs_inputs = m_winning_domain.get_inputs(i);
@@ -87,7 +86,7 @@ public:
   /** @brief get a std::vector containing the valid control inputs at state x \n
     * does return an empty vector if state is out of winning domain**/
   template<class state_type, class input_type>
-  std::vector<input_type> peek_control(const state_type &x) {
+  std::vector<input_type> peek_control(const state_type &x) const {
     /* abstract state index */
     abs_type i = m_state_grid.xtoi(x);
 
@@ -95,38 +94,12 @@ public:
         return std::vector<input_type>{};
     }
     std::vector<input_type> abs_inputs = m_winning_domain.get_inputs(i);
-    return ItoX(abs_inputs,m_input_grid);
-  }
-
-  /** @brief do a index to state conversion for vectors **/
-  template<class grid_type>
-  std::vector<grid_type> ItoX(std::vector<abs_type>& Ivector,UniformGrid& grid){
-
-    std::vector<grid_type> Xvector;
-    grid_type x;
-
-    for(abs_type i=0; i<Ivector.size(); i++) {
-      grid.itox(Ivector[i],x);
-      Xvector.push_back(x);
-    }
-    return Xvector;
-  }
-
-  /** @brief do a state to index conversion for vectors **/
-  template<class grid_type>
-  std::vector<abs_type> XtoI(std::vector<grid_type>& Xvector,UniformGrid& grid){
-
-    std::vector<abs_type> Ivector;
-
-    for(abs_type k=0; k<Xvector.size(); k++) {
-      Ivector.push_back(grid.xtoi(Xvector[k]));
-    }
-    return Ivector;
+    return m_input_grid.ItoX(abs_inputs);
   }
 
   /** @brief get a std::vector containing the states in the winning domain **/
   template<class state_type>
-  std::vector<state_type> get_domain() {
+  std::vector<state_type> get_domain() const {
     /* abstract state indices */
     std::vector<abs_type> abs_domain = m_winning_domain.get_winning_domain();
 

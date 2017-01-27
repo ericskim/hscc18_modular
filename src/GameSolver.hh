@@ -74,16 +74,18 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
   /* size of input alphabet */
   abs_type M=trans_function.m_no_inputs;
 
-  abs_type max = std::numeric_limits<abs_type>::max();
-  if(M > max-1) {
+  /* used to encode that a state is not in the winning domain */
+  abs_type loosing = std::numeric_limits<abs_type>::max();
+  if(M > loosing-1) {
     throw std::runtime_error("scots::solve_reachability_game: Number of inputs exceeds maximum supported value");
   }
   /* win_domain[i] = j
    * contains the input j associated with state i
-   * j = max if the target is not reachable from i 
    *
-   * initialize all states to loosing (win_domain[i]=max) */
-  std::vector<abs_type> win_domain(N,max); 
+   * j = loosing if the target is not reachable from i 
+   *
+   * initialize all states to loosing (win_domain[i]=loosing) */
+  std::vector<abs_type> win_domain(N,loosing); 
   /* initialize value */
   value.resize(N,std::numeric_limits<double>::infinity());
   /* keep track of the number of processed post */
@@ -95,9 +97,10 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
   std::queue<abs_type> fifo;
   for(abs_type i=0; i<N; i++) {
     if(target(i) && !avoid(i)) {
-      win_domain[i]=0;
-      /* states in the target set have value zero */
-      value[i]=0; 
+      /* states in the target set are defined as loosing state */
+      win_domain[i]=loosing;
+      /* value is zero */
+      value[i]=0;
       /* states in the target are added to the fifo */
       fifo.push(i);
     }
@@ -134,7 +137,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function, 
     }  /* end loop over all input j */
   }  /* fifo is empty */
 
-  return WinningDomain(N,M,std::move(win_domain));
+  return WinningDomain(N,M,std::move(win_domain),std::vector<bool>{},loosing);
 }
 
 /**
@@ -152,8 +155,8 @@ WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F&
   abs_type N=trans_function.m_no_states;
   /* size of input alphabet */
   abs_type M=trans_function.m_no_inputs;
-  /* helper */
-  abs_type max = std::numeric_limits<abs_type>::max();
+  /* used to encode that a state is not in the winning domain */
+  abs_type loosing = std::numeric_limits<abs_type>::max();
 
   /* valid_inputs
    * boolean array of size N*M
@@ -162,7 +165,7 @@ WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F&
   std::vector<bool> valid_inputs(N*M,false); 
   /* no_input: keep track of the number of valid inputs.
    * If no_val_in[i]==0, then state i is not winning and 
-   * no_val_in[i] is set to max (see also WinningDomain) */
+   * no_val_in[i] is set to loosing (see also WinningDomain) */
   std::vector<abs_type> no_val_in(N,0);
   /* keep track if an unsafe state was already added to the fifo */
   std::vector<bool> added(N,false);
@@ -181,8 +184,8 @@ WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F&
     if(!no_val_in[i]) {
       fifo.push(i);
       added[i]=true;
-      /* mark no_val_in[i]=max to indicate that state i ist not winning */
-      no_val_in[i]=max;
+      /* mark no_val_in[i]=loosing to indicate that state i ist not winning */
+      no_val_in[i]=loosing;
     }
   }
 
@@ -205,13 +208,13 @@ WinningDomain solve_invariance_game(const TransitionFunction& trans_function, F&
         if(!no_val_in[i] && !added[i]) {
           fifo.push(i);
           added[i]=true;
-          /* mark no_val_in[i]=max to indicate that state i ist not winning */
-          no_val_in[i]=max;
+          /* mark no_val_in[i]=loosing to indicate that state i ist not winning */
+          no_val_in[i]=loosing;
         }
       }
     }
   }
-  return WinningDomain(N,M,std::move(no_val_in),std::move(valid_inputs));
+  return WinningDomain(N,M,std::move(no_val_in),std::move(valid_inputs),loosing);
 }
 
 } /* end of namespace scots */

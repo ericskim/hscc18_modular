@@ -245,7 +245,7 @@ bool read_from_file(WinningDomain& wd, const std::string& filename, size_t offse
   if(!reader.get_WINNINGDOMAIN(SCOTS_WD_DATA,domain,inputs,N,M,offset)) {
     return false;
   } 
-  wd = WinningDomain(N,M,std::move(domain),std::move(inputs));
+  wd = WinningDomain(N,M,std::move(domain),std::move(inputs),std::numeric_limits<abs_type>::max());
   return true;
 }
 
