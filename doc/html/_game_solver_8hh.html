@@ -88,7 +88,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">GameSolver.hh File Reference</div>  </div>
@@ -111,20 +110,12 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacescots"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html">scots</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:acab0e53b0e43f1f497373c33d59f5e2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acab0e53b0e43f1f497373c33d59f5e2d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d">scots::val_functionction_type</a> = std::vector&lt; double &gt;</td></tr>
-<tr class="memdesc:acab0e53b0e43f1f497373c33d59f5e2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">val_functionction_type (value function type) is used in solve_reachability_game <br />
-to represent the value function <br /></td></tr>
-<tr class="separator:acab0e53b0e43f1f497373c33d59f5e2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
-<tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplItemLeft" align="right" valign="top">WinningDomain&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#a83ed532f815589bd86e519a173ac63ac">scots::solve_reachability_game</a> (const TransitionFunction &amp;trans_function, F1 &amp;target, F2 &amp;&amp;avoid, val_functionction_type &amp;value)</td></tr>
-<tr class="memdesc:a83ed532f815589bd86e519a173ac63ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve reachability game according to Algorithm 2 in <a href="./../../manual/manual.pdf">manual</a>  <a href="namespacescots.html#a83ed532f815589bd86e519a173ac63ac">More...</a><br /></td></tr>
-<tr class="separator:a83ed532f815589bd86e519a173ac63ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a598defda429b350f26f9cf3ebf5df0c7"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2  = decltype(params::avoid)&gt; </td></tr>
+<tr class="memitem:a598defda429b350f26f9cf3ebf5df0c7"><td class="memTemplItemLeft" align="right" valign="top">WinningDomain&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#a598defda429b350f26f9cf3ebf5df0c7">scots::solve_reachability_game</a> (const TransitionFunction &amp;trans_function, F1 &amp;target, F2 &amp;avoid=params::avoid, std::vector&lt; double &gt; &amp;value=params::value)</td></tr>
+<tr class="memdesc:a598defda429b350f26f9cf3ebf5df0c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve reachability game according to Algorithm 2 in <a href="./../../manual/manual.pdf">manual</a>  <a href="namespacescots.html#a598defda429b350f26f9cf3ebf5df0c7">More...</a><br /></td></tr>
+<tr class="separator:a598defda429b350f26f9cf3ebf5df0c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf43fec67b5f56b8bdb466077eca2bd5"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
 <tr class="memitem:adf43fec67b5f56b8bdb466077eca2bd5"><td class="memTemplItemLeft" align="right" valign="top">WinningDomain&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#adf43fec67b5f56b8bdb466077eca2bd5">scots::solve_invariance_game</a> (const TransitionFunction &amp;trans_function, F &amp;safe)</td></tr>
 <tr class="memdesc:adf43fec67b5f56b8bdb466077eca2bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve invariance game according to Algorithm 1 in <a href="./../../manual/manual.pdf">manual</a>  <a href="namespacescots.html#adf43fec67b5f56b8bdb466077eca2bd5">More...</a><br /></td></tr>

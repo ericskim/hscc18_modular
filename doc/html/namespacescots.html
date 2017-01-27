@@ -133,11 +133,6 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:acab0e53b0e43f1f497373c33d59f5e2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acab0e53b0e43f1f497373c33d59f5e2d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d">val_functionction_type</a> = std::vector&lt; double &gt;</td></tr>
-<tr class="memdesc:acab0e53b0e43f1f497373c33d59f5e2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">val_functionction_type (value function type) is used in solve_reachability_game <br />
-to represent the value function <br /></td></tr>
-<tr class="separator:acab0e53b0e43f1f497373c33d59f5e2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c69a3c0145cbbe922de93a46e3bcf70"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c69a3c0145cbbe922de93a46e3bcf70"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a6c69a3c0145cbbe922de93a46e3bcf70">abs_ptr_type</a> = std::uint64_t</td></tr>
 <tr class="memdesc:a6c69a3c0145cbbe922de93a46e3bcf70"><td class="mdescLeft">&#160;</td><td class="mdescRight">abs_ptr_type defines type used to point to the array m_pre (default = uint64_t) <br />
@@ -153,10 +148,10 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescots.html#a7822fde213325b1ccdba9be76853356f">print_progress</a> (int i)</td></tr>
 <tr class="memdesc:a7822fde213325b1ccdba9be76853356f"><td class="mdescLeft">&#160;</td><td class="mdescRight">: small function to output progess of an iteration to the terminal <br /></td></tr>
 <tr class="separator:a7822fde213325b1ccdba9be76853356f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2 &gt; </td></tr>
-<tr class="memitem:a83ed532f815589bd86e519a173ac63ac"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#a83ed532f815589bd86e519a173ac63ac">solve_reachability_game</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;trans_function, F1 &amp;target, F2 &amp;&amp;avoid, <a class="el" href="namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d">val_functionction_type</a> &amp;value)</td></tr>
-<tr class="memdesc:a83ed532f815589bd86e519a173ac63ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve reachability game according to Algorithm 2 in <a href="./../../manual/manual.pdf">manual</a>  <a href="#a83ed532f815589bd86e519a173ac63ac">More...</a><br /></td></tr>
-<tr class="separator:a83ed532f815589bd86e519a173ac63ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a598defda429b350f26f9cf3ebf5df0c7"><td class="memTemplParams" colspan="2">template&lt;class F1 , class F2  = decltype(params::avoid)&gt; </td></tr>
+<tr class="memitem:a598defda429b350f26f9cf3ebf5df0c7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#a598defda429b350f26f9cf3ebf5df0c7">solve_reachability_game</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;trans_function, F1 &amp;target, F2 &amp;avoid=params::avoid, std::vector&lt; double &gt; &amp;value=params::value)</td></tr>
+<tr class="memdesc:a598defda429b350f26f9cf3ebf5df0c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve reachability game according to Algorithm 2 in <a href="./../../manual/manual.pdf">manual</a>  <a href="#a598defda429b350f26f9cf3ebf5df0c7">More...</a><br /></td></tr>
+<tr class="separator:a598defda429b350f26f9cf3ebf5df0c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf43fec67b5f56b8bdb466077eca2bd5"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
 <tr class="memitem:adf43fec67b5f56b8bdb466077eca2bd5"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescots.html#adf43fec67b5f56b8bdb466077eca2bd5">solve_invariance_game</a> (const <a class="el" href="classscots_1_1_transition_function.html">TransitionFunction</a> &amp;trans_function, F &amp;safe)</td></tr>
 <tr class="memdesc:adf43fec67b5f56b8bdb466077eca2bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">solve invariance game according to Algorithm 1 in <a href="./../../manual/manual.pdf">manual</a>  <a href="#adf43fec67b5f56b8bdb466077eca2bd5">More...</a><br /></td></tr>
@@ -336,11 +331,11 @@ template&lt;class F &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a83ed532f815589bd86e519a173ac63ac"></a>
+<a class="anchor" id="a598defda429b350f26f9cf3ebf5df0c7"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class F1 , class F2 &gt; </div>
+template&lt;class F1 , class F2  = decltype(params::avoid)&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a> scots::solve_reachability_game </td>
@@ -357,14 +352,14 @@ template&lt;class F1 , class F2 &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">F2 &amp;&amp;&#160;</td>
-          <td class="paramname"><em>avoid</em>, </td>
+          <td class="paramtype">F2 &amp;&#160;</td>
+          <td class="paramname"><em>avoid</em> = <code>params::avoid</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacescots.html#acab0e53b0e43f1f497373c33d59f5e2d">val_functionction_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>value</em> = <code>params::value</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -379,8 +374,8 @@ template&lt;class F1 , class F2 &gt; </div>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">trans_function</td><td>- <a class="el" href="classscots_1_1_transition_function.html" title="The transition function of the abstraction. ">TransitionFunction</a> of the symbolic model </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">target</td><td>- lambda expression of the form <pre class="fragment">[] (abs_type &amp;i) -&gt; bool </pre> returns true if state i is in target set and false otherwise</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">avoid</td><td>- OPTIONALLY provide lambda expression of the form <pre class="fragment">[] (abs_type &amp;i) -&gt; bool </pre> returns true if state i is in avoid set and false otherwise</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">value</td><td>- OPTIONALLY provide val_functionction_type value to obtain the value function</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">avoid</td><td>- OPTIONALLY provide lambda expression of the form <pre class="fragment">[] (const abs_type &amp;i) -&gt; bool </pre> returns true if state i is in avoid set and false otherwise</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">value</td><td>- OPTIONALLY provide std::vector&lt;double&gt; value to obtain the value function</td></tr>
   </table>
   </dd>
 </dl>
