@@ -20,7 +20,6 @@ Bug reports and feature request are happily received at <matthias.rungger@tum.de
 
 * The best way to find out about **SCOTS** is to clone the repository 
   
-
   `$ git clone https://gitlab.lrz.de/matthias/SCOTSv0.2.git`
   
   and run some of the examples in the example directory: 
