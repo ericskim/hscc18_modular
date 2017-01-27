@@ -1,6 +1,18 @@
 classdef StaticController < handle 
-% some matlab commands to acces the controller stored by
+% Acces the controller stored by
+%
 % scots::write_to_file(const scots::StaticController&, const std::string&) 
+%
+% USAGE:
+% 
+% con = StaticController('filename')  reads the StaticController from file
+%  
+% U = con.control(x);                 U is a matrix containing all valid control
+%                                     inputs at x
+%
+% X = con.domain;                     X is a matrix containing all centers of
+%                                     cells that are in the winning domain
+% 
 %
   properties (SetAccess=private)
     filename  % name of file which contains the StaticController
@@ -38,7 +50,7 @@ classdef StaticController < handle
     end
 
     function u=control(obj,x)
-      % return control input associated with grid point x  
+      % return control inputs associated with grid point x  
       u=mexStaticController('control',obj.handle,x(:));
       if(isempty(u))
         error(['scots::StaticController: state ',...

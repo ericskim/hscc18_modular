@@ -301,98 +301,123 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    x[0]=m_first[0]+num*m_eta[0];</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  }</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div>
-<div class="line"><a name="l00267"></a><span class="lineno"><a class="line" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">  267</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">print_info</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Distance of grid points (eta): &quot;</span>;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      std::cout &lt;&lt; m_eta[i] &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    }</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nLower-left grid point: &quot;</span>;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      std::cout &lt;&lt; m_first[i] &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nUpper-right grid point: &quot;</span>;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      std::cout &lt;&lt; m_first[i]+m_eta[i]*(m_no_grid_points[i]-1) &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    }</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNumber of grid points in each dimension: &quot;</span>;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        std::cout &lt;&lt; m_no_grid_points[i] &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    }</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNumber of grid points: &quot;</span>&lt;&lt; total_no_grid_points() &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  }</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="keywordtype">int</span> get_dim()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  }</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="comment">/* total number of grid points */</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> size()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    <span class="keywordflow">return</span> total_no_grid_points();</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  }</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  std::vector&lt;double&gt; get_eta()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    std::vector&lt;double&gt; eta;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      eta.push_back(m_eta[i]);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    }</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keywordflow">return</span> eta;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  }</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  std::vector&lt;double&gt; get_lower_left()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    std::vector&lt;double&gt; lower_left;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      lower_left.push_back(m_first[i]);</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordflow">return</span> lower_left;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  }</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  std::vector&lt;double&gt; get_upper_right()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    std::vector&lt;double&gt; upper_right;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      upper_right.push_back(m_first[i]+m_eta[i]*(m_no_grid_points[i]-1));</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    }</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="keywordflow">return</span> upper_right;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  }</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  std::vector&lt;abs_type&gt; get_no_gp_per_dim()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    std::vector&lt;abs_type&gt; no_grid_points;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      no_grid_points.push_back(m_no_grid_points[i]);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    }</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="keywordflow">return</span> no_grid_points;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;  }</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  std::vector&lt;abs_type&gt; get_nn()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    std::vector&lt;abs_type&gt; NN;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      NN.push_back(m_NN[i]);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    }</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="keywordflow">return</span> NN;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  }</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  <span class="keywordtype">void</span> calc_nn() {</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <span class="comment">/* compute m_NN */</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> max = std::numeric_limits&lt;abs_type&gt;::max();</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> total=1;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> gr<span class="keywordtype">id</span>_po<span class="keywordtype">int</span>_t&gt;</div>
+<div class="line"><a name="l00268"></a><span class="lineno"><a class="line" href="classscots_1_1_uniform_grid.html#af2e7a304985c73e21519e5a9bd816571">  268</a></span>&#160;  std::vector&lt;grid_point_t&gt; <a class="code" href="classscots_1_1_uniform_grid.html#af2e7a304985c73e21519e5a9bd816571">ItoX</a>(std::vector&lt;abs_type&gt;&amp; Ivector){</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        std::vector&lt;grid_point_t&gt; Xvector;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        grid_point_t x;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;Ivector.size(); k++) {</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;          itox&lt;grid_point_t&gt;(Ivector[k],x);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;          Xvector.push_back(x);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        }</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordflow">return</span> Xvector;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  }</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> gr<span class="keywordtype">id</span>_po<span class="keywordtype">int</span>_t&gt;</div>
+<div class="line"><a name="l00282"></a><span class="lineno"><a class="line" href="classscots_1_1_uniform_grid.html#a16625ffda0fd221acab29707275c589a">  282</a></span>&#160;  std::vector&lt;abs_type&gt; <a class="code" href="classscots_1_1_uniform_grid.html#a16625ffda0fd221acab29707275c589a">XtoI</a>(std::vector&lt;grid_point_t&gt;&amp; Xvector){</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        std::vector&lt;abs_type&gt; Ivector;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> k=0; k&lt;Xvector.size(); k++) {</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;          Ivector.push_back(xtoi&lt;grid_point_t&gt;(Xvector[k]));</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        }</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordflow">return</span> Ivector;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  }</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div>
+<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">  293</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">print_info</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Distance of grid points (eta): &quot;</span>;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      std::cout &lt;&lt; m_eta[i] &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    }</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nLower-left grid point: &quot;</span>;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      std::cout &lt;&lt; m_first[i] &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    }</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nUpper-right grid point: &quot;</span>;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      std::cout &lt;&lt; m_first[i]+m_eta[i]*(m_no_grid_points[i]-1) &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    }</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNumber of grid points in each dimension: &quot;</span>;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        std::cout &lt;&lt; m_no_grid_points[i] &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNumber of grid points: &quot;</span>&lt;&lt; total_no_grid_points() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  }</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <span class="keywordtype">int</span> get_dim()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  }</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="comment">/* total number of grid points */</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> size()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordflow">return</span> total_no_grid_points();</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  }</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  std::vector&lt;double&gt; get_eta()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    std::vector&lt;double&gt; eta;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      eta.push_back(m_eta[i]);</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    }</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">return</span> eta;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  }</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  std::vector&lt;double&gt; get_lower_left()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    std::vector&lt;double&gt; lower_left;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      lower_left.push_back(m_first[i]);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    }</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">return</span> lower_left;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  }</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  std::vector&lt;double&gt; get_upper_right()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    std::vector&lt;double&gt; upper_right;</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      m_NN[i] = total;</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      <span class="comment">/* check overflow */</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      <span class="keywordflow">if</span>(total &gt; (max/m_no_grid_points[i])) {</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in UniformGrid.hh).&quot;</span>);</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      }</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;      total *= m_no_grid_points[i];</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    }</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  }</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> total_no_grid_points()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> total=1;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      upper_right.push_back(m_first[i]+m_eta[i]*(m_no_grid_points[i]-1));</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    }</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    <span class="keywordflow">return</span> upper_right;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  }</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  std::vector&lt;abs_type&gt; get_no_gp_per_dim()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    std::vector&lt;abs_type&gt; no_grid_points;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      no_grid_points.push_back(m_no_grid_points[i]);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    }</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keywordflow">return</span> no_grid_points;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  }</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  std::vector&lt;abs_type&gt; get_nn()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    std::vector&lt;abs_type&gt; NN;</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      total *= m_no_grid_points[i];</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      NN.push_back(m_NN[i]);</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    }</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordflow">return</span> total;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordflow">return</span> NN;</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  }</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;};</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;} <span class="comment">/* close namespace */</span></div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* UNIFORMGRID_HH_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="keywordtype">void</span> calc_nn() {</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="comment">/* compute m_NN */</span></div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> max = std::numeric_limits&lt;abs_type&gt;::max();</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> total=1;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      m_NN[i] = total;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      <span class="comment">/* check overflow */</span></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      <span class="keywordflow">if</span>(total &gt; (max/m_no_grid_points[i])) {</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in UniformGrid.hh).&quot;</span>);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;      }</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;      total *= m_no_grid_points[i];</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    }</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  }</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> total_no_grid_points()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> total=1;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">m_dim</a>; i++) {</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      total *= m_no_grid_points[i];</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    }</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordflow">return</span> total;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  }</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;};</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;} <span class="comment">/* close namespace */</span></div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* UNIFORMGRID_HH_ */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html_afc7bace3d47c1407b3b539d211554195"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#afc7bace3d47c1407b3b539d211554195">scots::UniformGrid::xtoi</a></div><div class="ttdeci">abs_type xtoi(const grid_point_t &amp;x) const </div><div class="ttdoc">compute the index associated with a grid point </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:215</div></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html_af744074b941f3ca261bce49afe33fa9a"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#af744074b941f3ca261bce49afe33fa9a">scots::UniformGrid::m_no_grid_points</a></div><div class="ttdeci">std::unique_ptr&lt; abs_type[]&gt; m_no_grid_points</div><div class="ttdoc">scots::abs_type array[m_dim] containing the number of grid points in each dimension ...</div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:75</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_af2e7a304985c73e21519e5a9bd816571"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#af2e7a304985c73e21519e5a9bd816571">scots::UniformGrid::ItoX</a></div><div class="ttdeci">std::vector&lt; grid_point_t &gt; ItoX(std::vector&lt; abs_type &gt; &amp;Ivector)</div><div class="ttdoc">do a index to state conversion for vectors </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:268</div></div>
 <div class="ttc" id="namespacescots_html"><div class="ttname"><a href="namespacescots.html">scots</a></div></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html"><div class="ttname"><a href="classscots_1_1_uniform_grid.html">scots::UniformGrid</a></div><div class="ttdoc">Holds the information of a uniform grid confined by the hyper-interval [lb, ub]. </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:66</div></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html_ad4bd9ba0dcd545535eb942baec34ad6b"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#ad4bd9ba0dcd545535eb942baec34ad6b">scots::UniformGrid::m_dim</a></div><div class="ttdeci">int m_dim</div><div class="ttdoc">dimension of the Eucleadian space </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:69</div></div>
@@ -403,7 +428,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classscots_1_1_uniform_grid_html_a7e4f275434f57d62251d9a710b6628ca"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#a7e4f275434f57d62251d9a710b6628ca">scots::UniformGrid::UniformGrid</a></div><div class="ttdeci">UniformGrid(const int dim, const grid_point_t &amp;lb, const grid_point_t &amp;ub, const grid_point_t &amp;eta)</div><div class="ttdoc">provide uniform grid parameters and domain defining hyper-interval </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:153</div></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html_a77e61cc403e5e7c4d15b5a8102588354"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#a77e61cc403e5e7c4d15b5a8102588354">scots::UniformGrid::m_eta</a></div><div class="ttdeci">std::unique_ptr&lt; double[]&gt; m_eta</div><div class="ttdoc">m_dim-dimensional vector containing the grid node distances </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:71</div></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html_aba9f28f2647e4557794dc333caf1e593"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#aba9f28f2647e4557794dc333caf1e593">scots::UniformGrid::m_NN</a></div><div class="ttdeci">std::unique_ptr&lt; abs_type[]&gt; m_NN</div><div class="ttdoc">array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_grid_points[i-1]; </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:77</div></div>
-<div class="ttc" id="classscots_1_1_uniform_grid_html_acdf7467b400f3a30b9a5adbfbefdaa7e"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">scots::UniformGrid::print_info</a></div><div class="ttdeci">void print_info() const </div><div class="ttdoc">creates console output with grid information </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:267</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_acdf7467b400f3a30b9a5adbfbefdaa7e"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#acdf7467b400f3a30b9a5adbfbefdaa7e">scots::UniformGrid::print_info</a></div><div class="ttdeci">void print_info() const </div><div class="ttdoc">creates console output with grid information </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:293</div></div>
+<div class="ttc" id="classscots_1_1_uniform_grid_html_a16625ffda0fd221acab29707275c589a"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#a16625ffda0fd221acab29707275c589a">scots::UniformGrid::XtoI</a></div><div class="ttdeci">std::vector&lt; abs_type &gt; XtoI(std::vector&lt; grid_point_t &gt; &amp;Xvector)</div><div class="ttdoc">do a state to index conversion for vectors </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:282</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

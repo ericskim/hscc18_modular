@@ -109,16 +109,23 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classscots_1_1_static_controller.html#af9a022ff991cc3ec80ab83dae7f07ef3">StaticController</a> (const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;state_grid, const <a class="el" href="classscots_1_1_uniform_grid.html">UniformGrid</a> &amp;input_grid, <a class="el" href="classscots_1_1_winning_domain.html">WinningDomain</a> &amp;&amp;winning_domain)</td></tr>
 <tr class="memdesc:af9a022ff991cc3ec80ab83dae7f07ef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">controller constructor <br /></td></tr>
 <tr class="separator:af9a022ff991cc3ec80ab83dae7f07ef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bbdc76b030eb9215aaa72c44e730416"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7bbdc76b030eb9215aaa72c44e730416"></a>
+<tr class="memitem:aa71353ed4658ad5031906d1303d546e0"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa71353ed4658ad5031906d1303d546e0"></a>
 template&lt;class state_type , class input_type &gt; </td></tr>
-<tr class="memitem:a7bbdc76b030eb9215aaa72c44e730416"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; input_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_static_controller.html#a7bbdc76b030eb9215aaa72c44e730416">get_control</a> (const state_type &amp;x)</td></tr>
-<tr class="memdesc:a7bbdc76b030eb9215aaa72c44e730416"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a std::vector containing the valid control inputs at state x <br /></td></tr>
-<tr class="separator:a7bbdc76b030eb9215aaa72c44e730416"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ea477bd0a3a78a6b5f06cba19815fa4"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4ea477bd0a3a78a6b5f06cba19815fa4"></a>
+<tr class="memitem:aa71353ed4658ad5031906d1303d546e0"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; input_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_static_controller.html#aa71353ed4658ad5031906d1303d546e0">get_control</a> (const state_type &amp;x) const </td></tr>
+<tr class="memdesc:aa71353ed4658ad5031906d1303d546e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a std::vector containing the valid control inputs at state x <br />
+does throw a runtime error if state x is out of winning domain <br /></td></tr>
+<tr class="separator:aa71353ed4658ad5031906d1303d546e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16a4f893041e3a46ab6c972bde935e3b"><td class="memTemplParams" colspan="2"><a class="anchor" id="a16a4f893041e3a46ab6c972bde935e3b"></a>
+template&lt;class state_type , class input_type &gt; </td></tr>
+<tr class="memitem:a16a4f893041e3a46ab6c972bde935e3b"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; input_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_static_controller.html#a16a4f893041e3a46ab6c972bde935e3b">peek_control</a> (const state_type &amp;x) const </td></tr>
+<tr class="memdesc:a16a4f893041e3a46ab6c972bde935e3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a std::vector containing the valid control inputs at state x <br />
+does return an empty vector if state is out of winning domain <br /></td></tr>
+<tr class="separator:a16a4f893041e3a46ab6c972bde935e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d1d359a2fb9fae9b40bbbc6b3ffe801"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8d1d359a2fb9fae9b40bbbc6b3ffe801"></a>
 template&lt;class state_type &gt; </td></tr>
-<tr class="memitem:a4ea477bd0a3a78a6b5f06cba19815fa4"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; state_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_static_controller.html#a4ea477bd0a3a78a6b5f06cba19815fa4">get_domain</a> ()</td></tr>
-<tr class="memdesc:a4ea477bd0a3a78a6b5f06cba19815fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a std::vector containing the states in the winning domain <br /></td></tr>
-<tr class="separator:a4ea477bd0a3a78a6b5f06cba19815fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d1d359a2fb9fae9b40bbbc6b3ffe801"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; state_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classscots_1_1_static_controller.html#a8d1d359a2fb9fae9b40bbbc6b3ffe801">get_domain</a> () const </td></tr>
+<tr class="memdesc:a8d1d359a2fb9fae9b40bbbc6b3ffe801"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a std::vector containing the states in the winning domain <br /></td></tr>
+<tr class="separator:a8d1d359a2fb9fae9b40bbbc6b3ffe801"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>

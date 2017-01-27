@@ -1,8 +1,25 @@
 classdef SymbolicSet < handle 
-% two matlab commands to load grid points from a file stored by
-% write_to_file(const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B')
+% Access the grid points stored in a BDD produced by 
+%
+% scots::write_to_file(const SymbolicSet& set, const BDD& bdd, const std::string& filename, char mode='B')
 % 
-% Please have a look in ./manual/manual.pdf for usage details.
+% USAGE:
+% 
+% set = SymbolicSet('filename')  reads the SymbolicSet from file
+%  
+% X = set.points;                X is a matrix containing all grid points 
+%
+% X = set.points([2 3]);         X is a matrix containing all grid points projected 
+%                                on the dimensions 2 and 3
+%
+% Y = set.restriction(x);        Y is a matrix containing all grid points such
+%                                that for each grid point y in Y, the grid point (x,y)
+%                                is an element of the set
+%
+% Y = set.restriction(x,dim);    same as before, but the entries of x are placed
+%                                at the indices specified by dim (see also the
+%                                documentation in ./doc/html of SymbolicSet::restriction)
+% 
 %
   properties (SetAccess=private)
     filename  % name of file which contains the SymbolicSet
