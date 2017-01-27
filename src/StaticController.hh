@@ -42,7 +42,7 @@ public:
   /* copy constructor  */
   StaticController(const StaticController& other) = default;
   /* move constructor */
-  StaticController(StaticController&&);
+  StaticController(StaticController&&)=default;
   /* copy assignment operator */
   StaticController& operator=(const StaticController&)=default;
   /* move assignment operator */
