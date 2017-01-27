@@ -1,5 +1,5 @@
 
-#Welcome to SCOTSv0.2!
+# Welcome to SCOTSv0.2!
 
 **SCOTSv0.2 is currently under development. Although the core
 algorithms are stable and usable, the user interfaces might change...**
