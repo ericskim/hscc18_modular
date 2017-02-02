@@ -3,7 +3,7 @@ A path planning problem for a vehicle using the bycicle model based on the BDD
 data structure
 
 0. To run this example, you need to the Cudd libarary installed. Please see the
-   manual for installation nodes
+   manual for installation notes
 
 1. edit the Makefile 
    adjust the compiler to your programming environment

@@ -39,7 +39,7 @@ namespace params {
  * 
  * @param[in] trans_function - TransitionFunction of the symbolic model
  * @param[in] target - lambda expression of the form
- *                      \verbatim [] (abs_type &i) -> bool \endverbatim 
+ *                      \verbatim [] (const abs_type &i) -> bool \endverbatim 
  *                      returns true if state i is in target set and false otherwise
  *                       
  * @param[in] avoid  - OPTIONALLY provide lambda expression of the form
@@ -131,7 +131,7 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function,
  * 
  * @param[in] trans_function - TransitionFunction of the symbolic model
  * @param[in] safe - lambda expression of the form
- *                    \verbatim [] (abs_type &i) -> bool \endverbatim 
+ *                    \verbatim [] (const abs_type &i) -> bool \endverbatim 
  *                   returns true if state i is in safe set and false otherwise
  * @return -  WinningDomain that contains the set of winning states and valid inputs 
  **/

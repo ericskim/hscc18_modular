@@ -5,7 +5,6 @@
  *      author: Frederik Kunik
  */
 
-/** @file **/
 
 #ifndef FILEHANDLER_HH_
 #define FILEHANDLER_HH_
@@ -42,7 +41,10 @@
 
 namespace scots {
   
-/** @brief The FileHandler class stores the filename **/
+  
+/** @cond **/
+
+/* The FileHandler class stores the filename */
 class FileHandler {
 protected:
   std::string m_filename{};
@@ -54,7 +56,7 @@ public:
   }
 };
 
-/** @brief The FileWriter class is used to write information into files **/
+/* The FileWriter class is used to write information into files */
 class FileWriter : public FileHandler {
 private:
   std::ofstream m_file;
@@ -173,18 +175,13 @@ public:
     Cudd_ReorderingType *method=nullptr;
     if(manager.ReorderingStatus(method))
       manager.AutodynDisable();
-
-   /* before we save the BDD to file, we transfer it to another manager */
-    Cudd manager_temp;
-    BDD tosave = bdd.Transfer(manager_temp);
-
     /* open filename */
 		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
 	 	FILE *file = fopen (filename.c_str(),"w");
 		if(!file)
 			return false;
-		int store = Dddmp_cuddBddStore(tosave.manager(),NULL,
-                                   tosave.getNode(),NULL,NULL,
+		int store = Dddmp_cuddBddStore(bdd.manager(),NULL,
+                                   bdd.getNode(),NULL,NULL,
                                    (int)mode,DDDMP_VARIDS,NULL,file);
 		if(!fclose(file))
 			return false;
@@ -199,7 +196,7 @@ public:
 #endif
 };
 
-/** @brief The FileReader class is used to read information from files **/
+/* The FileReader class is used to read information from files */
 class FileReader : public FileHandler {
 private:
   std::ifstream       m_file;
@@ -477,6 +474,9 @@ public:
 #endif
 
 };
+
+
+/** @endcond **/
 
 } /*end of namepace scots*/
 #endif /* FILEHANDLER_HH_ */

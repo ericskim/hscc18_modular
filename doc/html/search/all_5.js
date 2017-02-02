@@ -1,21 +1,14 @@
 var searchData=
 [
-  ['gamesolver_2ehh',['GameSolver.hh',['../_game_solver_8hh.html',1,'']]],
-  ['get_5fall_5felements',['get_all_elements',['../classscots_1_1_integer_interval.html#ac4cb3449c3dbf982cba8a2052d421471',1,'scots::IntegerInterval']]],
-  ['get_5fbdd_5fintervals',['get_bdd_intervals',['../classscots_1_1_symbolic_set.html#a57f55675fa86c8d77db6bce8cc727806',1,'scots::SymbolicSet']]],
-  ['get_5fbdd_5fvar_5fids',['get_bdd_var_ids',['../classscots_1_1_integer_interval.html#af58b76fa0cce12dddd56d26d58ba7977',1,'scots::IntegerInterval::get_bdd_var_ids()'],['../classscots_1_1_symbolic_set.html#a72f44e48ef8a139b7c12f9f700b1aa28',1,'scots::SymbolicSet::get_bdd_var_ids()']]],
-  ['get_5fbdd_5fvars',['get_bdd_vars',['../classscots_1_1_integer_interval.html#a8d2e6a7aa2024936133342df4a9b388e',1,'scots::IntegerInterval::get_bdd_vars()'],['../classscots_1_1_symbolic_set.html#a56966f62b47c75a0de86c962ebf579c0',1,'scots::SymbolicSet::get_bdd_vars()']]],
-  ['get_5fcontrol',['get_control',['../classscots_1_1_static_controller.html#aa71353ed4658ad5031906d1303d546e0',1,'scots::StaticController']]],
-  ['get_5fcube',['get_cube',['../classscots_1_1_symbolic_set.html#a71bd180ab04fbeb4c6fab9d4a8a59abf',1,'scots::SymbolicSet']]],
-  ['get_5fdomain',['get_domain',['../classscots_1_1_static_controller.html#a8d1d359a2fb9fae9b40bbbc6b3ffe801',1,'scots::StaticController']]],
-  ['get_5finputs',['get_inputs',['../classscots_1_1_winning_domain.html#a46aa9ca41ce5dbbea7d4acabc3883efe',1,'scots::WinningDomain']]],
-  ['get_5fmeasruement_5ferror_5fbound',['get_measruement_error_bound',['../classscots_1_1_abstraction.html#a904d9bc1aa85329abf705306d05e53f5',1,'scots::Abstraction::get_measruement_error_bound()'],['../classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4',1,'scots::SymbolicModel::get_measruement_error_bound()']]],
-  ['get_5fno_5fbdd_5fvars',['get_no_bdd_vars',['../classscots_1_1_integer_interval.html#aec2ef4bac74c20c207c2c5bb89cfd3e4',1,'scots::IntegerInterval::get_no_bdd_vars()'],['../classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f',1,'scots::SymbolicSet::get_no_bdd_vars()']]],
-  ['get_5fno_5finputs',['get_no_inputs',['../classscots_1_1_winning_domain.html#a257e6009450262590163a88ef8b88dae',1,'scots::WinningDomain']]],
-  ['get_5fno_5fstates',['get_no_states',['../classscots_1_1_winning_domain.html#a5a22f30c022a2d5934ce53b1f76a9b6a',1,'scots::WinningDomain']]],
-  ['get_5fno_5ftransitions',['get_no_transitions',['../classscots_1_1_transition_function.html#ae3848823c1574ffd9fa9cc52b7bcb952',1,'scots::TransitionFunction']]],
-  ['get_5fpost',['get_post',['../classscots_1_1_abstraction.html#a822a5b17895bd65481cbc6c7be7874a5',1,'scots::Abstraction::get_post()'],['../classscots_1_1_transition_function.html#a041b56ddaeddde141f0dfd897c12008e',1,'scots::TransitionFunction::get_post()']]],
-  ['get_5fpre',['get_pre',['../classscots_1_1_transition_function.html#aabc1f0bbefd0a935deb2cb21019f46fe',1,'scots::TransitionFunction']]],
-  ['get_5fsize',['get_size',['../classscots_1_1_symbolic_set.html#a3f9238aecc0fb3f1304c789ac7051a12',1,'scots::SymbolicSet::get_size()'],['../classscots_1_1_winning_domain.html#a53b58ec653399d9851c6bd58bdf41710',1,'scots::WinningDomain::get_size()']]],
-  ['get_5fwinning_5fdomain',['get_winning_domain',['../classscots_1_1_winning_domain.html#a6dc242b645c2626697ae508513f43f85',1,'scots::WinningDomain']]]
+  ['id_5fto_5fbdd',['id_to_bdd',['../classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5',1,'scots::SymbolicSet']]],
+  ['init_5finfrastructure',['init_infrastructure',['../classscots_1_1_transition_function.html#ad59ebf8ac9e7fc83d34a4c41c2c313e3',1,'scots::TransitionFunction']]],
+  ['init_5ftransitions',['init_transitions',['../classscots_1_1_transition_function.html#a2ed5b6910345a3550a023e25685b91a6',1,'scots::TransitionFunction']]],
+  ['inputoutput_2ehh',['InputOutput.hh',['../_input_output_8hh.html',1,'']]],
+  ['int_5fto_5fbdd',['int_to_bdd',['../classscots_1_1_integer_interval.html#a0ba5f8dc6dcbee71ac2705716442c2bd',1,'scots::IntegerInterval']]],
+  ['integerinterval',['IntegerInterval',['../classscots_1_1_integer_interval.html',1,'scots']]],
+  ['integerinterval',['IntegerInterval',['../classscots_1_1_integer_interval.html#a08c285daf353a7623a35cafedfe04577',1,'scots::IntegerInterval']]],
+  ['integerinterval_2ehh',['IntegerInterval.hh',['../_integer_interval_8hh.html',1,'']]],
+  ['interval_5fto_5fbdd',['interval_to_bdd',['../classscots_1_1_integer_interval.html#a31eff34edf847efd128f885a8cb1bedf',1,'scots::IntegerInterval::interval_to_bdd()'],['../classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743',1,'scots::SymbolicSet::interval_to_bdd()']]],
+  ['is_5fwinning',['is_winning',['../classscots_1_1_winning_domain.html#a6626852ab31edc79cf3ff3aff06e04ed',1,'scots::WinningDomain']]],
+  ['itox',['itox',['../classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69',1,'scots::UniformGrid::itox(abs_type id, grid_point_t &amp;x) const '],['../classscots_1_1_uniform_grid.html#afe53c83f0a6f9add9e8722b4081c5b5e',1,'scots::UniformGrid::itox(abs_type id, std::vector&lt; double &gt; &amp;x) const '],['../classscots_1_1_uniform_grid.html#ab0ef7d9faf11a819514b7589144a820b',1,'scots::UniformGrid::ItoX(std::vector&lt; abs_type &gt; &amp;Ivector) const ']]]
 ];

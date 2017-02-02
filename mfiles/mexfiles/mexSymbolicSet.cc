@@ -28,7 +28,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     Cudd* mgr = new Cudd;
     BDD* bdd = new BDD;
     scots::SymbolicSet *set = new scots::SymbolicSet;
-    if(!scots::read_from_file(*set,*bdd,*mgr,filename)) {
+    if(!scots::read_from_file(*mgr,*set,*bdd,filename)) {
       mexErrMsgTxt("mexSymbolicSet: could not read SymbolicSet from filename.");
       plhs[0]=mxCreateDoubleMatrix(0,0,mxREAL);
       plhs[1]=mxCreateDoubleMatrix(0,0,mxREAL);

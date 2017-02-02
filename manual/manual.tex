@@ -111,7 +111,7 @@ backend=biber]{biblatex}
 
 \title{SCOTS (0.2) -- User Manual}
 
-\author{Matthias Rungger}
+\author{Matthias Rungger\\\today}
 
 \begin{document}
   \maketitle
@@ -344,6 +344,23 @@ For various reasons, one might consider to use additional software in combinatio
   On some linux machines we experienced that the header files {\tt \small util.h} and
   {\tt \small config.h} were missing in {\tt \small CUDDPATH} and we manually
   copied them to {\tt \small CUDDPATH/include}.
+
+  {\bf NOTE:} The {\tt dddmp} module of {\tt CUDD}, which is used to store BDDs
+  to file, is erroneous and the following changes should be applied in {\tt CUDDROOT/dddmp/dddmpNodeBdd.c} 
+  \begin{lstlisting}[basicstyle=\small\ttfamily,
+                     commentstyle=, % comment color
+                     keywordstyle= % keyword color
+                    ]
+  232: +   f->next = (DdNode *)(ptruint)(((ptruint)(f->next))|01ul);
+  232: -   f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next))|01);
+  256: +   f->next = (DdNode *)(ptruint)(((ptruint)(f->next)) & (~01ul));
+  256: -   f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next)) & (~01));
+  409: +   DddmpClearVisitedBdd (f);
+  409: -   /*DddmpClearVisitedBdd (f);*/   
+  410: +   /*f->next = NULL;*/
+  410: -   f->next = NULL;
+  \end{lstlisting}
+
 
   \item {\tt boost}: to use advance ode solvers. 
 

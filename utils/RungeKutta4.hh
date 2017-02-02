@@ -16,7 +16,7 @@ namespace scots {
  *  
  * @brief Fixed step size ODE solver implementing a RungeKutta scheme of order 4 
  * 
- * @param rhs - lambda function implementing the rhs of the ode
+ * @param rhs - lambda expression implementing the rhs of the ode
  *              \f[ \dot \xi(t) = rhs(\xi(t),u), \xi(0)=x \f]
  *              with signature 
  *              \verbatim [] (state_type& xx,  const state_type &x, const input_type &u) ->  void \endverbatim

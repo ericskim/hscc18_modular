@@ -19,6 +19,15 @@
 
 /** @namespace scots **/ 
 namespace scots {
+
+/** @cond **/
+/* default parameter for the third parameter of Abstraction::compute_gb  */
+namespace params {
+  auto avoid_abs = [](const abs_type&) noexcept {return false;};
+}
+/** @endcond **/
+
+
 /**
  * @class Abstraction
  * 
@@ -86,19 +95,24 @@ public:
   /** 
    * @brief computes the transition function
    *
-   * @param transition_function - the result of the computation
+   * @param[out] transition_function - the result of the computation
    *
-   * @param system_post - lambda expression of the form
-   *                      \verbatim [] (state_type &x, const input_type &u) ->  void  \endverbatim
-   *                      system_post(x,u) provides a numerical approximation of ODE 
-   *                      solution at time tau with initial state x and input u \n
-   *                      the result is stored in x
+   * @param[in] system_post - lambda expression of the form
+   *                          \verbatim [] (state_type &x, const input_type &u) ->  void  \endverbatim
+   *                          system_post(x,u) provides a numerical approximation of ODE 
+   *                          solution at time tau with initial state x and input u \n
+   *                          the result is stored in x
    *
-   * @param radius_post - lambda expression of the form
-   *                      \verbatim [] (state_type &r, const state_type& x, const input_type &u) -> void  \endverbatim
-   *                      radius_post(x,u) provides a numerical approximation of
-   *                      the growth bound for the cell (with center x, radius  r) and input u\n
-   *                      the result is stored in r
+   * @param[in] radius_post - lambda expression of the form
+   *                          \verbatim [] (state_type &r, const state_type& x, const input_type &u) -> void  \endverbatim
+   *                          radius_post(x,u) provides a numerical approximation of
+   *                          the growth bound for the cell (with center x, radius  r) and input u\n
+   *                          the result is stored in r
+   *
+   * @param[in] avoid  - OPTIONALLY provide lambda expression of the form
+   *                     \verbatim [] (const abs_type &i) -> bool \endverbatim
+   *                     returns true if the abstract state i is in the avoid
+   *                     set; otherwise returns false
    *
    * The computation proceeds in two loops. In the first loop the cornerIDs are
    * comuted, which represent the cell IDs that cover the over-approximation of the attainable set:
@@ -112,27 +126,11 @@ public:
    * In the second loop the data members of the TransitionFunction are computed.
    * 
    **/
-  template<class F1, class F2>
-  void compute_gb(TransitionFunction& transition_function, F1& system_post, F2& radius_post) {
-    compute_gb(transition_function,system_post, radius_post, [](const abs_type&) noexcept {return false;});
-  }
-
-  /** 
-   * @brief computes the transition function
-   *
-   * @param transition_function - the result of the computation
-   *
-   * @param system_post - lambda expression  as above
-   *
-   * @param radius_post - lambda expression as above
-   *
-   * @param avoid       - lambda of the form
-   *                      \verbatim [] (abs_type &i) -> bool \endverbatim
-   *                      returns true if the abstract state i is in the avoid
-   *                      set; otherwise returns false
-   **/
-  template<class F1, class F2, class F3>
-  void compute_gb(TransitionFunction& transition_function, F1& system_post, F2& radius_post, F3&& avoid) {
+  template<class F1, class F2, class F3=decltype(params::avoid_abs)>
+  void compute_gb(TransitionFunction& transition_function, 
+                  F1& system_post, 
+                  F2& radius_post, 
+                  F3& avoid=params::avoid_abs) {
     /* number of cells */
     abs_type N=m_state_alphabet.size(); 
     /* number of inputs */

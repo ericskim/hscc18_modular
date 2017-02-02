@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['uniformgrid',['UniformGrid',['../classscots_1_1_uniform_grid.html',1,'scots']]]
+  ['winningdomain',['WinningDomain',['../classscots_1_1_winning_domain.html',1,'scots']]]
 ];

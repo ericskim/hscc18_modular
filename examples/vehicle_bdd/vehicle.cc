@@ -70,6 +70,7 @@ int main() {
   /* cudd manager */
   Cudd mgr;
   mgr.AutodynEnable();
+  //mgr.AutodynDisable();
 
   /* try to read data from files */
   scots::SymbolicSet ss_pre;
@@ -115,7 +116,6 @@ int main() {
   scots::SymbolicModel<state_type,input_type> sym_model(ss_pre,ss_input,ss_post);
   /* does there exist the transition function file ?*/
   scots::SymbolicSet set;
-  set.print_info(1);
   if(!scots::read_from_file(mgr,set,TF,"tf")) {
     /* set up constraint functions with obtacles */
     double H[15][4] = {
@@ -166,7 +166,6 @@ int main() {
 
     scots::write_to_file(mgr,set,TF,"tf");
   }
-  mgr.DebugCheck();
 
   /* define target set */
   auto target = [&ss_pre](const abs_type& idx) {

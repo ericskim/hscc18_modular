@@ -134,7 +134,7 @@ int main() {
     std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
   scots::SymbolicSet  set(scots::SymbolicSet(ss_pre,ss_input),ss_post);
-  //scots::write_to_file(set,TF,"tf");
+  scots::write_to_file(mgr,set,TF,"tf");
 
   /* define target set */
   auto target = [&s_eta, &z, &ss_pre](const scots::abs_type& abs_state) {
@@ -204,7 +204,7 @@ int main() {
     std::cout << "Done. \n";
 
    if(!getrusage(RUSAGE_SELF, &usage))
-    std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
+    std::cout << "Total memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
 
  return 1;
 }
