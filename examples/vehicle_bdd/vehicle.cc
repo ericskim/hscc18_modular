@@ -189,7 +189,7 @@ int main() {
   /* 
    * we implement the fixed point algorithm 
    *
-   * mu X. ( pre(X) & T ) 
+   * mu X. ( pre(X) | T ) 
    *
    */
 
