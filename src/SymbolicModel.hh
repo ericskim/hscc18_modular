@@ -32,14 +32,14 @@ class SymbolicModel {
 private:
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
-	/* SymbolicSet conaining the BDD vars of the pre  */
+  /* SymbolicSet conaining the BDD vars of the pre  */
   const SymbolicSet m_pre;
-	/* SymbolicSet conaining the BDD vars of the inputs  */
+  /* SymbolicSet conaining the BDD vars of the inputs  */
   const SymbolicSet m_input;
-	/* SymbolicSet conaining the BDD vars of the post  */
+  /* SymbolicSet conaining the BDD vars of the post  */
   const SymbolicSet m_post;
-	/* measurement error bound */
-	std::unique_ptr<double[]> m_z;
+  /* measurement error bound */
+  std::unique_ptr<double[]> m_z;
 
   void progress(const abs_type& i, const abs_type& N, abs_type& counter) {
     if(!m_verbose)
@@ -79,7 +79,12 @@ public:
                 const SymbolicSet& input,
                 const SymbolicSet& post) :
                 m_pre(pre), m_input(input), m_post(post),
-                m_z(new double[m_pre.get_dim()]()) {}
+                m_z(new double[m_pre.get_dim()]()) {
+    /* default value of the measurement error 
+     * (heurisitc to prevent rounding errors)*/
+    for(int i=0; i<m_pre.get_dim(); i++)
+      m_z[i]=m_pre.get_eta()[i]/1e10;
+  }
 
   template<class F1, class F2>
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, size_t& no_trans) {

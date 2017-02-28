@@ -46,12 +46,12 @@ namespace params {
 template<class state_type, class input_type>
 class Abstraction {
 private:
-	/* grid information of state alphabet */
+  /* grid information of state alphabet */
   const UniformGrid m_state_alphabet;
-	/* grid information of input alphabet */
+  /* grid information of input alphabet */
   const UniformGrid m_input_alphabet;
-	/* measurement error bound */
-	std::unique_ptr<double[]> m_z;
+  /* measurement error bound */
+  std::unique_ptr<double[]> m_z;
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
   /* to display the progress of the computation of the abstraction */
@@ -90,7 +90,12 @@ public:
               const UniformGrid& input_alphabet) :
               m_state_alphabet(state_alphabet),
               m_input_alphabet(input_alphabet),
-              m_z(new double[state_alphabet.get_dim()]()) { }
+              m_z(new double[state_alphabet.get_dim()]()) {
+  /* default value of the measurement error 
+     * (heurisitc to prevent rounding errors)*/
+    for(int i=0; i<m_state_alphabet.get_dim(); i++)
+      m_z[i]=m_state_alphabet.get_eta()[i]/1e10;
+  }
 
   /** 
    * @brief computes the transition function
@@ -180,7 +185,7 @@ public:
       if(avoid(i)) {
         for(abs_type j=0; j<M; j++) {
           out_of_domain[i*M+j]=true;
-  			}
+        }
         continue;
       }
       /* loop over all inputs */
@@ -207,10 +212,11 @@ public:
           /* check for out of bounds */
           double left = x[k]-r[k]-m_z[k];
           double right = x[k]+r[k]+m_z[k];
-          if(left <= lower_left[k]-eta[k]/2.0  || right >= upper_right[k]+eta[k]/2.0) {
+          if(left <= lower_left[k]-eta[k]/2.0  || right >= upper_right[k]+eta[k]/2.0)  {
             out_of_domain[i*M+j]=true;
             break;
           } 
+
           /* integer coordinate of lower left corner of post */
           lb[k] = static_cast<abs_type>((left-lower_left[k]+eta[k]/2.0)/eta[k]);
           /* integer coordinate of upper right corner of post */
@@ -225,6 +231,7 @@ public:
         corner_IDs[i*(2*M)+2*j+1]=0;
         if(out_of_domain[i*M+j]) 
           continue;
+
         /* compute indices of post */
         for(abs_type k=0; k<npost; k++) {
           abs_type q=0;
@@ -280,6 +287,7 @@ public:
         abs_type k_lb=corner_IDs[i*2*M+2*j];
         abs_type k_ub=corner_IDs[i*2*M+2*j+1];
         abs_type npost=1;
+
         /* cell idx to coordinates */
         for(int k=dim-1; k>=0; k--) {
           /* integer coordinate of lower left corner */
@@ -293,7 +301,9 @@ public:
           /* total no of post of (i,j) */
           npost*=no[k];
           cc[k]=0;
+
         }
+
         for(abs_type k=0; k<npost; k++) {
           abs_type q=0;
           for(int l=0; l<dim; l++) 
@@ -430,7 +440,7 @@ public:
    **/
   template<class F1, class F2>
   void print_post_gb(F1& system_post,
-								     F2& radius_post,
+                     F2& radius_post,
                      const state_type& x,
                      const input_type& u) const {
     std::vector<state_type> post = get_post(system_post,radius_post,x,u);

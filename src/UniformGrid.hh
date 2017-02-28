@@ -69,11 +69,11 @@ protected:
   int m_dim;                
   /** @brief m_dim-dimensional vector containing the grid node distances **/
   std::unique_ptr<double[]> m_eta;                      
-	/** @brief m_dim-dimensional vector containing the real values of the first grid point **/
+  /** @brief m_dim-dimensional vector containing the real values of the first grid point **/
   std::unique_ptr<double[]> m_first;        
-	/** @brief scots::abs_type array[m_dim] containing the number of grid points in each dimension **/
+  /** @brief scots::abs_type array[m_dim] containing the number of grid points in each dimension **/
   std::unique_ptr<abs_type[]> m_no_grid_points;        
-	/** @brief array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_grid_points[i-1]; **/
+  /** @brief array recursively defined by: m_NN[0]=1; m_NN[i]=m_NN[i-1}*no_grid_points[i-1]; **/
   std::unique_ptr<abs_type[]> m_NN;                       
 
 public:

@@ -188,9 +188,9 @@ public:
     if(manager.ReorderingStatus(method))
       manager.AutodynDisable();
     /* get variable ids */
-	  auto var_id = get_bdd_var_ids();
-		/* find the variables in the support of the BDD but outside the SymbolicSet */
-		auto support_id = bdd.SupportIndices();
+    auto var_id = get_bdd_var_ids();
+    /* find the variables in the support of the BDD but outside the SymbolicSet */
+    auto support_id = bdd.SupportIndices();
     std::vector<BDD> out{}; 
     for(const auto& id : support_id) {
         if(std::find(std::begin(var_id), std::end(var_id), id)==std::end(var_id))
@@ -209,14 +209,14 @@ public:
       for(int j=0; j<m_dim; j++)
         gp[i*m_dim+j]=m_first[j];
     }
-		/* set up iteration to iterate over BDD cubes */
-		DdManager* dd = manager.getManager();
-	  int *cube;
+    /* set up iteration to iterate over BDD cubes */
+    DdManager* dd = manager.getManager();
+    int *cube;
     CUDD_VALUE_TYPE value;
     DdGen *gen;
     abs_type counter=0;
-		/* iterate over BDD cubes */
- 		Cudd_ForeachCube(dd,bdd.getNode(),gen,cube,value) {
+    /* iterate over BDD cubes */
+    Cudd_ForeachCube(dd,bdd.getNode(),gen,cube,value) {
       abs_type offset=1;
       for(int i=0; i<m_dim; i++) {
         unsigned int no_vars = m_bdd_interval[i].get_no_bdd_vars();
@@ -351,9 +351,9 @@ public:
 
   /** @brief get number grid points represented by the BDD  **/
   abs_type get_size(const Cudd& manager, BDD bdd) const {
-		/* find the variables in the support of the BDD but outside the SymbolicSet */
-	  auto var_id = get_bdd_var_ids();
-		auto support_id = bdd.SupportIndices();
+    /* find the variables in the support of the BDD but outside the SymbolicSet */
+    auto var_id = get_bdd_var_ids();
+    auto support_id = bdd.SupportIndices();
     std::vector<BDD> out{}; 
     for(const auto& id : support_id) {
         if(std::find(std::begin(var_id), std::end(var_id), id)==std::end(var_id))

@@ -139,7 +139,7 @@ int main() {
   std::cout << "Number of transitions: " << tf.get_no_transitions() << std::endl;
 
   /* define target set */
-  auto target = [&ss,&s_eta](const abs_type idx) {
+  auto target = [&ss,&s_eta](const abs_type& idx) {
     state_type x;
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */

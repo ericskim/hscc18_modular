@@ -169,29 +169,29 @@ public:
     return false;
   }
 #ifdef SCOTS_BDD 
-	/* functions are only availabe if BDD support is activated */  
+  /* functions are only availabe if BDD support is activated */  
   bool add_BDD(const Cudd& manager, const BDD& bdd, char mode='B') {
     /* disable reordering (if enabled) */
     Cudd_ReorderingType *method=nullptr;
     if(manager.ReorderingStatus(method))
       manager.AutodynDisable();
     /* open filename */
-		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
-	 	FILE *file = fopen (filename.c_str(),"w");
-		if(!file)
-			return false;
-		int store = Dddmp_cuddBddStore(bdd.manager(),NULL,
+    std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
+    FILE *file = fopen (filename.c_str(),"w");
+    if(!file) 
+      return false;
+    int store = Dddmp_cuddBddStore(bdd.manager(),NULL,
                                    bdd.getNode(),NULL,NULL,
                                    (int)mode,DDDMP_VARIDS,NULL,file);
-		if(!fclose(file))
-			return false;
-    if (store!=DDDMP_SUCCESS) 
+    if(fclose(file))
+      return false;
+    if (store!=DDDMP_SUCCESS)  
       return false;
     /* reactivate reordering if it was enabled */
     if(method!=nullptr)
       manager.AutodynEnable(*method);
 
-		return true;
+    return true;
   }
 #endif
 };
@@ -443,7 +443,7 @@ public:
     return 0;
   }
 #ifdef SCOTS_BDD 
-	/* functions are only availabe if BDD support is activated */  
+  /* functions are only availabe if BDD support is activated */  
   bool get_BDD(const Cudd& manager, BDD& bdd, char mode='B') {
     /* disable reordering (if enabled) */
     Cudd_ReorderingType *method=nullptr;
@@ -451,25 +451,25 @@ public:
       manager.AutodynDisable();
 
     /* open file1name */
-		std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
-	 	FILE *file = fopen(filename.c_str(),"r");
-		if(!file) 
-			return false;
+    std::string filename = m_filename.append(SCOTS_FH_BDD_EXTENSION);
+    FILE *file = fopen(filename.c_str(),"r");
+    if(!file) 
+      return false;
 
 
-		DdNode *node =
-		Dddmp_cuddBddLoad(manager.getManager(),
+    DdNode *node =
+    Dddmp_cuddBddLoad(manager.getManager(),
                       DDDMP_VAR_MATCHIDS,NULL,NULL,
                       NULL,(int)mode,NULL,file);
-		fclose(file);
-		if(!node) 
-			return false;
-	  bdd=BDD(manager,node);
+    fclose(file);
+    if(!node) 
+      return false;
+    bdd=BDD(manager,node);
     /* reactivate reordering if it was enabled */
     if(method!=nullptr)
       manager.AutodynEnable(*method);
 
-		return true;
+    return true;
   }
 #endif
 

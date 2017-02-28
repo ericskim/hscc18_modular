@@ -119,7 +119,7 @@ int main() {
 
   /* continue with synthesis */
   /* define function to check if the cell is in the safe set  */
-  auto safeset = [&lb, &ub, &ss, &eta](const size_t idx) noexcept {
+  auto safeset = [&lb, &ub, &ss, &eta](const scots::abs_type& idx) noexcept {
     state_type x;
     ss.itox(idx,x);
     /* function returns 1 if cell associated with x is in target set  */

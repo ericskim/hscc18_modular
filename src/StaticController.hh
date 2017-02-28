@@ -51,7 +51,7 @@ public:
 
   /** @brief controller constructor **/
   StaticController(const UniformGrid& state_grid,
-									 const UniformGrid& input_grid,
+                   const UniformGrid& input_grid,
                    WinningDomain&& winning_domain) :
                    m_input_grid(input_grid),
                    m_state_grid(state_grid),

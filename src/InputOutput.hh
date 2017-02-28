@@ -199,10 +199,10 @@ bool write_to_file(const SymbolicSet& set, const std::string& filename) {
     writer.add_VECTOR(SCOTS_UG_ETA,set.get_eta());
     writer.add_VECTOR(SCOTS_UG_LOWER_LEFT,set.get_lower_left());
     writer.add_VECTOR(SCOTS_UG_UPPER_RIGHT,set.get_upper_right());
-		auto intervals = set.get_bdd_intervals();
-		for(int i=0;i<set.get_dim(); i++) {
-		  std::string s = SCOTS_SS_BDD_VAR_ID;
-			writer.add_VECTOR(s.append(std::to_string(i+1)),intervals[i].get_bdd_var_ids());
+    auto intervals = set.get_bdd_intervals();
+    for(int i=0;i<set.get_dim(); i++) {
+      std::string s = SCOTS_SS_BDD_VAR_ID;
+      writer.add_VECTOR(s.append(std::to_string(i+1)),intervals[i].get_bdd_var_ids());
     }
 
     writer.close();
@@ -226,7 +226,7 @@ bool write_to_file(const Cudd& manager, const SymbolicSet& set, const BDD& bdd, 
   if(!writer.add_BDD(manager, bdd,mode)) {
     return false;
   }
-	return true;
+  return true;
 }
 #endif
 
@@ -386,10 +386,10 @@ bool read_from_file(const Cudd& manager, SymbolicSet& set, const std::string& fi
   FileReader reader(filename);
   if(reader.open()) {
     size_t offset = 0;
-		for(int i=0;i<grid.get_dim(); i++) {
+    for(int i=0;i<grid.get_dim(); i++) {
       std::vector<unsigned int> var_id {};
-		  std::string s = SCOTS_SS_BDD_VAR_ID;
-			offset=reader.get_VECTOR(s.append(std::to_string(i+1)),var_id,offset);
+      std::string s = SCOTS_SS_BDD_VAR_ID;
+      offset=reader.get_VECTOR(s.append(std::to_string(i+1)),var_id,offset);
       if(!offset) 
         return false;
       bdd_interval.emplace_back(manager,abs_type{0},grid.get_no_gp_per_dim()[i]-abs_type{1},var_id);
@@ -417,7 +417,7 @@ bool read_from_file(const Cudd& manager, SymbolicSet& set, BDD& bdd, const std::
   if(!reader.get_BDD(manager,bdd,mode)) {
     return false;
   }
-	return true;
+  return true;
 }
 #endif
 
