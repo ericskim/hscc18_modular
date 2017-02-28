@@ -112,14 +112,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">/* print progress to the console (default m_verbose=true) */</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordtype">bool</span> m_verbose=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="comment">/* SymbolicSet conaining the BDD vars of the pre  */</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="comment">/* SymbolicSet conaining the BDD vars of the pre  */</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a> m_pre;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">/* SymbolicSet conaining the BDD vars of the inputs  */</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="comment">/* SymbolicSet conaining the BDD vars of the inputs  */</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a> m_input;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">/* SymbolicSet conaining the BDD vars of the post  */</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">/* SymbolicSet conaining the BDD vars of the post  */</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a> m_post;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">/* measurement error bound */</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::unique_ptr&lt;double[]&gt; m_z;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">/* measurement error bound */</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::unique_ptr&lt;double[]&gt; m_z;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">void</span> progress(<span class="keyword">const</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&amp; i, <span class="keyword">const</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&amp; N, <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&amp; counter) {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">if</span>(!m_verbose)</div>
@@ -155,153 +155,158 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; input,</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; post) :</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                m_pre(pre), m_input(input), m_post(post),</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                m_z(new double[m_pre.get_dim()]()) {}</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> F1, <span class="keyword">class</span> F2&gt;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  BDD compute_gb(<span class="keyword">const</span> Cudd&amp; manager, F1&amp; system_post, F2&amp; radius_post, <span class="keywordtype">size_t</span>&amp; no_trans) {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">return</span> compute_gb(manager, system_post, radius_post, [](<span class="keyword">const</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&amp;) noexcept {<span class="keywordflow">return</span> <span class="keyword">false</span>;}, no_trans);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                m_z(new double[m_pre.get_dim()]()) {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">/* default value of the measurement error </span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">     * (heurisitc to prevent rounding errors)*/</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_pre.get_dim(); i++)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      m_z[i]=m_pre.get_eta()[i]/1e10;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  }</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> F1, <span class="keyword">class</span> F2, <span class="keyword">class</span> F3&gt;</div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">  105</a></span>&#160;  BDD <a class="code" href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">compute_gb</a>(<span class="keyword">const</span> Cudd&amp; manager, F1&amp; system_post, F2&amp; radius_post, F3&amp;&amp; avoid, <span class="keywordtype">size_t</span>&amp; no_trans) {</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="comment">/* number of cells */</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> N=m_pre.size(); </div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">/* number of inputs */</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> M=m_input.size();</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="comment">/* state space dimension */</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordtype">int</span> dim=m_pre.get_dim();</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="comment">/* for display purpose */</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> counter=0;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">/* variables for managing the post */</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    std::vector&lt;abs_type&gt; lb(dim);  <span class="comment">/* lower-left corner */</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    std::vector&lt;abs_type&gt; ub(dim);  <span class="comment">/* upper-right corner */</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">/* radius of hyper interval containing the attainable set */</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    state_type eta;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    state_type r;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="comment">/* state and input variables */</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    state_type x;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    input_type u;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">/* for out of bounds check */</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    state_type lower_left;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    state_type upper_right;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">/* copy data from m_state_alphabet */</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;dim; i++) {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      eta[i]=m_pre.get_eta()[i];</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      lower_left[i]=m_pre.get_lower_left()[i];</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      upper_right[i]=m_pre.get_upper_right()[i];</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="comment">/* the BDD to encode the transition function */</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    BDD tf = manager.bddZero();</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">/* is post of (i,j) out of domain ? */</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordtype">bool</span> out_of_domain;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">/* loop over all cells */</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> i=0; i&lt;N; i++) {</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      BDD bdd_i = m_pre.<a class="code" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">id_to_bdd</a>(i);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="comment">/* is i an element of the avoid symbols ? */</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <span class="keywordflow">if</span>(avoid(i)) {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="comment">/* loop over all inputs */</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> j=0; j&lt;M; j++) {</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        BDD bdd_j = m_input.<a class="code" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">id_to_bdd</a>(j);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <span class="comment">/* get center x of cell */</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        m_pre.<a class="code" href="classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69">itox</a>(i,x);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="comment">/* cell radius (including measurement errors) */</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k=0; k&lt;dim; k++)</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;          r[k]=eta[k]/2.0+m_z[k];</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="comment">/* current input */</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        m_input.<a class="code" href="classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69">itox</a>(j,u);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="comment">/* integrate system and radius growth bound */</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="comment">/* the result is stored in x and r */</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        radius_post(r,x,u);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        system_post(x,u);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <span class="comment">/* determine the cells which intersect with the attainable set: </span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment">         * discrete hyper interval of cell indices </span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment">         * [lb[0]; ub[0]] x .... x [lb[dim-1]; ub[dim-1]]</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment">         * covers attainable set */</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k=0; k&lt;dim; k++) {</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;          <span class="comment">/* check for out of bounds */</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;          <span class="keywordtype">double</span> left = x[k]-r[k]-m_z[k];</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;          <span class="keywordtype">double</span> right = x[k]+r[k]+m_z[k];</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;          <span class="keywordflow">if</span>(left &lt;= lower_left[k]-eta[k]/2.0  || right &gt;= upper_right[k]+eta[k]/2.0) {</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            out_of_domain=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;          } </div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;          <span class="comment">/* integer coordinate of lower left corner of post */</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;          lb[k] = <span class="keyword">static_cast&lt;</span><a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a><span class="keyword">&gt;</span>((left-lower_left[k]+eta[k]/2.0)/eta[k]);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          <span class="comment">/* integer coordinate of upper right corner of post */</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;          ub[k] = <span class="keyword">static_cast&lt;</span><a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a><span class="keyword">&gt;</span>((right-lower_left[k]+eta[k]/2.0)/eta[k]);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        }</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">if</span>(out_of_domain) {</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;          out_of_domain=<span class="keyword">false</span>;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;          <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        }</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <span class="comment">/* compute BDD of post */</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        BDD bdd_k = m_post.<a class="code" href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">interval_to_bdd</a>(manager,lb,ub);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="comment">/* add to transition function */</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        tf = tf | (bdd_i &amp; bdd_j &amp; bdd_k);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      }</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="comment">/* print progress */</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      progress(i,N,counter);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">/* count number of transitions */</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">size_t</span> nvars = m_pre.<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>() +</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                   m_input.<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>() +</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                   m_post.<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>();</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    no_trans=tf.CountMinterm(nvars);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">return</span> tf;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  }</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  </div>
-<div class="line"><a name="l00196"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">  196</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">set_measurement_error_bound</a>(<span class="keyword">const</span> state_type&amp; error_bound) {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_pre.get_dim(); i++) {</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      m_z[i]=error_bound[i];</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  }</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00203"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#aa430aa8275b6e22ad110744e3f5d3496">  203</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_model.html#aa430aa8275b6e22ad110744e3f5d3496">verbose_on</a>() {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    m_verbose=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> F1, <span class="keyword">class</span> F2&gt;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  BDD compute_gb(<span class="keyword">const</span> Cudd&amp; manager, F1&amp; system_post, F2&amp; radius_post, <span class="keywordtype">size_t</span>&amp; no_trans) {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">return</span> compute_gb(manager, system_post, radius_post, [](<span class="keyword">const</span> <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>&amp;) noexcept {<span class="keywordflow">return</span> <span class="keyword">false</span>;}, no_trans);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  }</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> F1, <span class="keyword">class</span> F2, <span class="keyword">class</span> F3&gt;</div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">  110</a></span>&#160;  BDD <a class="code" href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">compute_gb</a>(<span class="keyword">const</span> Cudd&amp; manager, F1&amp; system_post, F2&amp; radius_post, F3&amp;&amp; avoid, <span class="keywordtype">size_t</span>&amp; no_trans) {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="comment">/* number of cells */</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> N=m_pre.size(); </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="comment">/* number of inputs */</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> M=m_input.size();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="comment">/* state space dimension */</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">int</span> dim=m_pre.get_dim();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">/* for display purpose */</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> counter=0;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">/* variables for managing the post */</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    std::vector&lt;abs_type&gt; lb(dim);  <span class="comment">/* lower-left corner */</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    std::vector&lt;abs_type&gt; ub(dim);  <span class="comment">/* upper-right corner */</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">/* radius of hyper interval containing the attainable set */</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    state_type eta;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    state_type r;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">/* state and input variables */</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    state_type x;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    input_type u;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">/* for out of bounds check */</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    state_type lower_left;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    state_type upper_right;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">/* copy data from m_state_alphabet */</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;dim; i++) {</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      eta[i]=m_pre.get_eta()[i];</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      lower_left[i]=m_pre.get_lower_left()[i];</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      upper_right[i]=m_pre.get_upper_right()[i];</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="comment">/* the BDD to encode the transition function */</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    BDD tf = manager.bddZero();</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">/* is post of (i,j) out of domain ? */</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordtype">bool</span> out_of_domain;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="comment">/* loop over all cells */</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> i=0; i&lt;N; i++) {</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      BDD bdd_i = m_pre.<a class="code" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">id_to_bdd</a>(i);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="comment">/* is i an element of the avoid symbols ? */</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">if</span>(avoid(i)) {</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;      }</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      <span class="comment">/* loop over all inputs */</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <span class="keywordflow">for</span>(<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a> j=0; j&lt;M; j++) {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        BDD bdd_j = m_input.<a class="code" href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">id_to_bdd</a>(j);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="comment">/* get center x of cell */</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        m_pre.<a class="code" href="classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69">itox</a>(i,x);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="comment">/* cell radius (including measurement errors) */</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k=0; k&lt;dim; k++)</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          r[k]=eta[k]/2.0+m_z[k];</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="comment">/* current input */</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        m_input.<a class="code" href="classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69">itox</a>(j,u);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="comment">/* integrate system and radius growth bound */</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="comment">/* the result is stored in x and r */</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        radius_post(r,x,u);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        system_post(x,u);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="comment">/* determine the cells which intersect with the attainable set: </span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment">         * discrete hyper interval of cell indices </span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment">         * [lb[0]; ub[0]] x .... x [lb[dim-1]; ub[dim-1]]</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment">         * covers attainable set */</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k=0; k&lt;dim; k++) {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;          <span class="comment">/* check for out of bounds */</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;          <span class="keywordtype">double</span> left = x[k]-r[k]-m_z[k];</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;          <span class="keywordtype">double</span> right = x[k]+r[k]+m_z[k];</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;          <span class="keywordflow">if</span>(left &lt;= lower_left[k]-eta[k]/2.0  || right &gt;= upper_right[k]+eta[k]/2.0) {</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            out_of_domain=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;          } </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;          <span class="comment">/* integer coordinate of lower left corner of post */</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;          lb[k] = <span class="keyword">static_cast&lt;</span><a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a><span class="keyword">&gt;</span>((left-lower_left[k]+eta[k]/2.0)/eta[k]);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;          <span class="comment">/* integer coordinate of upper right corner of post */</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;          ub[k] = <span class="keyword">static_cast&lt;</span><a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a><span class="keyword">&gt;</span>((right-lower_left[k]+eta[k]/2.0)/eta[k]);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        <span class="keywordflow">if</span>(out_of_domain) {</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;          out_of_domain=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;          <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="comment">/* compute BDD of post */</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        BDD bdd_k = m_post.<a class="code" href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">interval_to_bdd</a>(manager,lb,ub);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="comment">/* add to transition function */</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        tf = tf | (bdd_i &amp; bdd_j &amp; bdd_k);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <span class="comment">/* print progress */</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      progress(i,N,counter);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    }</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">/* count number of transitions */</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordtype">size_t</span> nvars = m_pre.<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>() +</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                   m_input.<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>() +</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                   m_post.<a class="code" href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">get_no_bdd_vars</a>();</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    no_trans=tf.CountMinterm(nvars);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">return</span> tf;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  </div>
+<div class="line"><a name="l00201"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">  201</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">set_measurement_error_bound</a>(<span class="keyword">const</span> state_type&amp; error_bound) {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_pre.get_dim(); i++) {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      m_z[i]=error_bound[i];</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  }</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
-<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">  208</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">get_measruement_error_bound</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    std::vector&lt;double&gt; z;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_pre.get_dim(); i++) {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      z.push_back(m_z[i]);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordflow">return</span> z;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  }</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
-<div class="line"><a name="l00217"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#ae83057b7a7b97f9622c20dfa9a21b217">  217</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_model.html#ae83057b7a7b97f9622c20dfa9a21b217">verbose_off</a>() {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    m_verbose=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#aa430aa8275b6e22ad110744e3f5d3496">  208</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_model.html#aa430aa8275b6e22ad110744e3f5d3496">verbose_on</a>() {</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    m_verbose=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  }</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;</div>
+<div class="line"><a name="l00213"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">  213</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">get_measruement_error_bound</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    std::vector&lt;double&gt; z;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;m_pre.get_dim(); i++) {</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      z.push_back(m_z[i]);</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    }</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">return</span> z;</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  }</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; get_sym_set_pre()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">return</span> m_pre;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keyword">const</span> SymbolicSet&amp; get_sym_set_post()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">return</span> m_post;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  }</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="keyword">const</span> SymbolicSet&amp; get_sym_set_input()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordflow">return</span> m_input;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  }</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;};</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;} <span class="comment">/* close namespace */</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* SYMBOLICMODEL_HH_ */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="classscots_1_1_symbolic_model_html_ae83057b7a7b97f9622c20dfa9a21b217"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#ae83057b7a7b97f9622c20dfa9a21b217">scots::SymbolicModel::verbose_off</a></div><div class="ttdeci">void verbose_off()</div><div class="ttdoc">deactivate console output </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:217</div></div>
+<div class="line"><a name="l00222"></a><span class="lineno"><a class="line" href="classscots_1_1_symbolic_model.html#ae83057b7a7b97f9622c20dfa9a21b217">  222</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classscots_1_1_symbolic_model.html#ae83057b7a7b97f9622c20dfa9a21b217">verbose_off</a>() {</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    m_verbose=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keyword">const</span> <a class="code" href="classscots_1_1_symbolic_set.html">SymbolicSet</a>&amp; get_sym_set_pre()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">return</span> m_pre;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  }</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="keyword">const</span> SymbolicSet&amp; get_sym_set_post()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordflow">return</span> m_post;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keyword">const</span> SymbolicSet&amp; get_sym_set_input()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordflow">return</span> m_input;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  }</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;};</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;} <span class="comment">/* close namespace */</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* SYMBOLICMODEL_HH_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="classscots_1_1_symbolic_model_html_ae83057b7a7b97f9622c20dfa9a21b217"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#ae83057b7a7b97f9622c20dfa9a21b217">scots::SymbolicModel::verbose_off</a></div><div class="ttdeci">void verbose_off()</div><div class="ttdoc">deactivate console output </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:222</div></div>
 <div class="ttc" id="namespacescots_html"><div class="ttname"><a href="namespacescots.html">scots</a></div></div>
 <div class="ttc" id="classscots_1_1_symbolic_set_html"><div class="ttname"><a href="classscots_1_1_symbolic_set.html">scots::SymbolicSet</a></div><div class="ttdoc">The UniformGrid class with the capability to represent sets of grid points as BDDs. See UniformGrid for details. </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:34</div></div>
 <div class="ttc" id="classscots_1_1_uniform_grid_html_a860edfce745852f43ccd2fb0643f3e69"><div class="ttname"><a href="classscots_1_1_uniform_grid.html#a860edfce745852f43ccd2fb0643f3e69">scots::UniformGrid::itox</a></div><div class="ttdeci">void itox(abs_type id, grid_point_t &amp;x) const </div><div class="ttdoc">compute the grid point associated with a index </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:240</div></div>
 <div class="ttc" id="classscots_1_1_symbolic_set_html_ad862f290e4cb0b0ea3a1442a5746508f"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#ad862f290e4cb0b0ea3a1442a5746508f">scots::SymbolicSet::get_no_bdd_vars</a></div><div class="ttdeci">abs_type get_no_bdd_vars() const </div><div class="ttdoc">get number of BDD variables used to represent the SymbolicSet </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:323</div></div>
 <div class="ttc" id="classscots_1_1_symbolic_set_html_aa8173e1107c0a2a6230ebb163f07f743"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#aa8173e1107c0a2a6230ebb163f07f743">scots::SymbolicSet::interval_to_bdd</a></div><div class="ttdeci">BDD interval_to_bdd(const Cudd &amp;manager, const std::vector&lt; abs_type &gt; &amp;lb, const std::vector&lt; abs_type &gt; &amp;ub) const </div><div class="ttdoc">get a BDD representation of the grid points whose IDs are an element of the integer hyper-interval [l...</div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:152</div></div>
 <div class="ttc" id="namespacescots_html_ada6a0cbabc01e198ebc8e503689de43a"><div class="ttname"><a href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">scots::abs_type</a></div><div class="ttdeci">std::uint32_t abs_type</div><div class="ttdoc">abs_type defines type of abstract states (default = uint32_t) </div><div class="ttdef"><b>Definition:</b> UniformGrid.hh:32</div></div>
-<div class="ttc" id="classscots_1_1_symbolic_model_html_a14a9a78dea42690e9c084ed8a827f0a4"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">scots::SymbolicModel::get_measruement_error_bound</a></div><div class="ttdeci">std::vector&lt; double &gt; get_measruement_error_bound() const </div><div class="ttdoc">get measurement error bound </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:208</div></div>
-<div class="ttc" id="classscots_1_1_symbolic_model_html_a8c5f92e5ee820f052995590c7961b139"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">scots::SymbolicModel::compute_gb</a></div><div class="ttdeci">BDD compute_gb(const Cudd &amp;manager, F1 &amp;system_post, F2 &amp;radius_post, F3 &amp;&amp;avoid, size_t &amp;no_trans)</div><div class="ttdoc">computes the transition function </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:105</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_model_html_a14a9a78dea42690e9c084ed8a827f0a4"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a14a9a78dea42690e9c084ed8a827f0a4">scots::SymbolicModel::get_measruement_error_bound</a></div><div class="ttdeci">std::vector&lt; double &gt; get_measruement_error_bound() const </div><div class="ttdoc">get measurement error bound </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:213</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_model_html_a8c5f92e5ee820f052995590c7961b139"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a8c5f92e5ee820f052995590c7961b139">scots::SymbolicModel::compute_gb</a></div><div class="ttdeci">BDD compute_gb(const Cudd &amp;manager, F1 &amp;system_post, F2 &amp;radius_post, F3 &amp;&amp;avoid, size_t &amp;no_trans)</div><div class="ttdoc">computes the transition function </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:110</div></div>
 <div class="ttc" id="classscots_1_1_symbolic_set_html_a7648b878fc7ed9a8955bb843c283eff5"><div class="ttname"><a href="classscots_1_1_symbolic_set.html#a7648b878fc7ed9a8955bb843c283eff5">scots::SymbolicSet::id_to_bdd</a></div><div class="ttdeci">BDD id_to_bdd(abs_type id) const </div><div class="ttdoc">function to obtain a BDD representation of the grid point id </div><div class="ttdef"><b>Definition:</b> SymbolicSet.hh:135</div></div>
-<div class="ttc" id="classscots_1_1_symbolic_model_html_aa430aa8275b6e22ad110744e3f5d3496"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#aa430aa8275b6e22ad110744e3f5d3496">scots::SymbolicModel::verbose_on</a></div><div class="ttdeci">void verbose_on()</div><div class="ttdoc">activate console output </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:203</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_model_html_aa430aa8275b6e22ad110744e3f5d3496"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#aa430aa8275b6e22ad110744e3f5d3496">scots::SymbolicModel::verbose_on</a></div><div class="ttdeci">void verbose_on()</div><div class="ttdoc">activate console output </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:208</div></div>
 <div class="ttc" id="_symbolic_set_8hh_html"><div class="ttname"><a href="_symbolic_set_8hh.html">SymbolicSet.hh</a></div></div>
 <div class="ttc" id="classscots_1_1_symbolic_model_html"><div class="ttname"><a href="classscots_1_1_symbolic_model.html">scots::SymbolicModel</a></div><div class="ttdoc">Compute the transition function of a symbolic model as BDD using the growth bound. </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:31</div></div>
-<div class="ttc" id="classscots_1_1_symbolic_model_html_a8bed4c0656c982b0e8d56bb5dcab0848"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">scots::SymbolicModel::set_measurement_error_bound</a></div><div class="ttdeci">void set_measurement_error_bound(const state_type &amp;error_bound)</div><div class="ttdoc">set the measurement error bound </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:196</div></div>
+<div class="ttc" id="classscots_1_1_symbolic_model_html_a8bed4c0656c982b0e8d56bb5dcab0848"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a8bed4c0656c982b0e8d56bb5dcab0848">scots::SymbolicModel::set_measurement_error_bound</a></div><div class="ttdeci">void set_measurement_error_bound(const state_type &amp;error_bound)</div><div class="ttdoc">set the measurement error bound </div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:201</div></div>
 <div class="ttc" id="classscots_1_1_symbolic_model_html_a6fc9353c005c7612cfca3938e6b73d68"><div class="ttname"><a href="classscots_1_1_symbolic_model.html#a6fc9353c005c7612cfca3938e6b73d68">scots::SymbolicModel::SymbolicModel</a></div><div class="ttdeci">SymbolicModel(const SymbolicSet &amp;pre, const SymbolicSet &amp;input, const SymbolicSet &amp;post)</div><div class="ttdoc">Construct SymbolicModel with the SymbolicSet representing the state alphabet (pre and post) and input...</div><div class="ttdef"><b>Definition:</b> SymbolicModel.hh:78</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

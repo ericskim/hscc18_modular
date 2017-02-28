@@ -283,10 +283,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    writer.add_VECTOR(SCOTS_UG_ETA,set.get_eta());</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    writer.add_VECTOR(SCOTS_UG_LOWER_LEFT,set.get_lower_left());</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    writer.add_VECTOR(SCOTS_UG_UPPER_RIGHT,set.get_upper_right());</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keyword">auto</span> intervals = set.get_bdd_intervals();</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;set.get_dim(); i++) {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;          std::string s = SCOTS_SS_BDD_VAR_ID;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            writer.add_VECTOR(s.append(std::to_string(i+1)),intervals[i].get_bdd_var_ids());</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keyword">auto</span> intervals = set.get_bdd_intervals();</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;set.get_dim(); i++) {</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      std::string s = SCOTS_SS_BDD_VAR_ID;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      writer.add_VECTOR(s.append(std::to_string(i+1)),intervals[i].get_bdd_var_ids());</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    writer.close();</div>
@@ -304,7 +304,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">if</span>(!writer.add_BDD(manager, bdd,mode)) {</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  }</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;}</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
@@ -460,10 +460,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  FileReader reader(filename);</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <span class="keywordflow">if</span>(reader.open()) {</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keywordtype">size_t</span> offset = 0;</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;grid.get_dim(); i++) {</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;grid.get_dim(); i++) {</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      std::vector&lt;unsigned int&gt; var_id {};</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;          std::string s = SCOTS_SS_BDD_VAR_ID;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;            offset=reader.get_VECTOR(s.append(std::to_string(i+1)),var_id,offset);</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      std::string s = SCOTS_SS_BDD_VAR_ID;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      offset=reader.get_VECTOR(s.append(std::to_string(i+1)),var_id,offset);</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      <span class="keywordflow">if</span>(!offset) </div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;      bdd_interval.emplace_back(manager,<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{0},grid.get_no_gp_per_dim()[i]-<a class="code" href="namespacescots.html#ada6a0cbabc01e198ebc8e503689de43a">abs_type</a>{1},var_id);</div>
@@ -485,7 +485,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <span class="keywordflow">if</span>(!reader.get_BDD(manager,bdd,mode)) {</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  }</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;}</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
