@@ -163,7 +163,6 @@ int main() {
   /* as long as not converged */
   for(i=1; ZZ != Z; i++) {
     Z=ZZ;
-    ZZ = enf_pre(Z) | S;
     BDD preZ=enf_pre(Z);
     /* init inner fp */
     YY = manager.bddOne();
