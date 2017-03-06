@@ -83,7 +83,6 @@ WinningDomain solve_reachability_game(const TransitionFunction& trans_function,
   std::queue<abs_type> fifo;
   for(abs_type i=0; i<N; i++) {
     if(target(i) && !avoid(i)) {
-      /* states in the target set are defined as loosing state */
       win_domain[i]=loosing;
       /* value is zero */
       value[i]=0;

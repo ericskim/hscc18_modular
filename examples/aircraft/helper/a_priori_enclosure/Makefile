@@ -37,4 +37,4 @@ comp_enclosure:  comp_enclosure.o
 	$(CC) $(LDFLAGS) -o comp_enclosure  comp_enclosure.o $(VNODELPLIB) $(LIBS) 
 
 clean:
-	rm comp_enclosure.o comp_enclosure comp_enclosure_per_input.o comp_enclosure_per_input
+	rm comp_enclosure.o comp_enclosure 

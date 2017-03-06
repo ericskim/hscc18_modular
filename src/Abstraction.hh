@@ -402,7 +402,8 @@ public:
         }
       }
       /* (i,j,q) is a transition */    
-      post.push_back(m_state_alphabet.itox<state_type>(q));
+      m_state_alphabet.itox(q,xx);
+      post.push_back(xx);
     }
     return post;
   }
@@ -419,6 +420,8 @@ public:
                   const state_type& x,
                   const input_type& u) const {
     std::vector<state_type> post = get_post(transition_function, x, u);
+    if(!post.size())
+      std::cout << "\nPost is out of domain\n";
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
       for(int i=0; i<m_state_alphabet.get_dim(); i++) {
@@ -444,6 +447,11 @@ public:
                      const state_type& x,
                      const input_type& u) const {
     std::vector<state_type> post = get_post(system_post,radius_post,x,u);
+    if(!post.size()) {
+      std::cout << "\nPost is out of domain\n";
+      return;
+    }
+
     std::cout << "\nPost states: \n";
     for(abs_type v=0; v<post.size(); v++) {
       for(int i=0; i<m_state_alphabet.get_dim(); i++) {
