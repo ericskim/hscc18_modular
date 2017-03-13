@@ -1,0 +1,23 @@
+
+Controller synthesis for a DC DC boost converter to enforce a recurrence
+specification for two targets
+
+0. to run this example, you need to the Cudd libarary installed. Please see the
+   manual for installation notes.
+
+1. compile the dcdc_bdd_recurrence.cc file
+
+  a) edit the Makefile and adjust the CUDDPATH to the location where the cudd library is installed.
+
+  b) now you should be able to compile the program simply by
+
+    $ make
+
+2. execute 
+
+  $./dcdc_bdd_recurrence     
+  - computes the symbolic model, synthesizes and saves the controllers and simulates them;
+  - the controllers are saved to controller1.scs and controller2.scs
+
+
+
