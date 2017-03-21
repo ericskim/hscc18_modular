@@ -83,7 +83,7 @@ public:
 };
 
 /** @brief: small function to output progess of an iteration to the terminal **/
-void print_progress(int i) {
+inline void print_progress(int i) {
   std::cout << ".";
   std::flush(std::cout);
   if(!(i%40)) {
