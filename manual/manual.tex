@@ -116,7 +116,7 @@ backend=biber]{biblatex}
 \begin{document}
   \maketitle
 
-  \addtocontents{toc}{\setcounter{tocdepth}{1}}
+  \addtocontents{toc}{\setcounter{tocdepth}{2}}
 	\tableofcontents
 	\newpage
 	
@@ -237,7 +237,8 @@ The three most easy-to-compile examples are found in
 ./examples/aircraft   /* landing maneuver of an aircraft (requires 32GB memory) */ 
 \end{lstlisting}
 The examples can be run without any additional software and require only a
-\Cpp compiler with \Cpp{\tt11} support. 
+\Cpp compiler with \Cpp{\tt11} support. See also the case studies in
+PART~\ref{p:casestudies}
 
 \subsection{Customized Synthesis} In the examples in
 \begin{lstlisting}[basicstyle=\small\ttfamily]
@@ -384,6 +385,7 @@ For various reasons, one might consider to use additional software in combinatio
 	
 \newpage
 \part{THEORY BASICS}
+
 
 \section{The Symbolic Approach}
 A detailed description of \emph{the symbolic approach to controller synthesis}
@@ -1592,6 +1594,254 @@ and the companion functions
 %
 
 
+\newpage
+\part{CASE STUDIES}
+\label{p:casestudies}
+
+\section{An Aircraft Landing Maneuver}
+
+We consider an aircraft DC9-30. The dynamics~\eqref{e:sys:ct} according to
+\cite{MitchellBayenTomlin01} are given by
+\begin{align*}
+  \dot \xi_1&=\tfrac{1}{m} ( u_1 \cos u_2 - D(u_2,\xi_1) - m g \sin \xi_2) \\
+  \dot \xi_2&=\tfrac{1}{mx_1} ( u_1 \sin u_2 + L(u_2,\xi_1) - m g \cos \xi_2 ) \\
+  \dot \xi_3&=\xi_1 \sin \xi_2
+\end{align*}
+where $D(u_2,x_1)= (2.7 + 3.08\cdot (1.25 + 4.2\cdot u_2)^2)\cdot x_1^2$, $L(u_2,x_1) = (68.6\cdot (1.25 + 4.2\cdot u_2))\cdot x_1^2$ and $mg = 60 \cdot 10^3 \cdot 9.81$ account for the drag, lift and gravity, respectively \cite{MitchellBayenTomlin01}.
+The state variables $x_1$, $x_2$ and $x_3$ correspond ot the velocity, the
+flight path angle and the altitude of the aircraft. The input alphabet is given by $U =
+\intcc{0,32\cdot 10^3} \times \intcc{0^\circ,8^\circ}$ 
+and represents the thrust of the engines (in Newton) and the angle of attack. 
+Following~\cite{ReissigWeberRungger15}, we consider certain input disturbance,
+which we model in \eqref{e:sys:ct} by $w = (0.108,0.002,0)^\top$ and measurement errors of the form \eqref{e:theory:perturbation}
+with $z=\tfrac{1}{20}(0.25,0.05,1)^\top$. 
+
+The objective is to control the aircraft from a certain hight close to the ground. We
+cast this controller problem as a reachability problem for which the target set
+is given by
+\begin{equation*}
+  Z_1:= (\intcc{63,75} \times \intcc{-3^\circ,0^\circ} \times \intcc{0,2.5}) \cap \{x \in \mathbb{R}^3 \mid x_1 \sin x_2 \geq -0.91 \}.
+\end{equation*}
+
+For the computation of the symbolic model, we fix a sampling time of
+$\tau=0.25\,$ sec and restrict the problem domain to
+$\segcc{a,b}$ with 
+\begin{equation*}
+a=(58,-3^\circ,0)^\top
+\text{ and }
+b=(83,0^\circ,56)^\top
+\end{equation*}
+and set $\eta=(25.0/362,3^\circ/66,56.0/334)^\top$. The real quantizer symbols
+$\bar X_2$ are determined according to~\eqref{e:theory:ss}. The set of inputs is
+given by the grid points $U_2:=\mu \Z^2\cap U$ with $\mu=(32\cdot
+10^3,(8/9)^\circ)^\top$.  The choice of discretization parameter leads to a
+successful solution of the reachability problem. The hight of the controlled
+aircraft over time is illustrated in Fig.~\ref{f:aircraft}.
+\begin{figure}[h]
+\includegraphics[width=8cm]{figures/aircraft}
+\caption{Trajectory of the controlled aircraft landing maneuver.}\label{f:aircraft}
+\end{figure}\\
+The configuration files for the computation in {\tt SCOTS} can be found in {\tt ./examples/aircraft}.
+
+
+
+
+
+\section{A Vehicle in a Maze}
+
+In this case study we consider the vehicle
+illustrated in Fig.~\ref{f:vehicle}.
+\begin{figure}[th]
+\centering
+\begin{tikzpicture}
+\node at (0,0) {\includegraphics[width=.25\textwidth]{figures/vehicle}};
+\node at(0.2,.5) {$u_1$};
+\node at(2.3,.4) {$\delta$};
+\end{tikzpicture}
+\caption{Vehicle illustration taken from~\cite{AstromMurray10}.}
+\label{f:vehicle}
+\end{figure}
+We follow~\cite{AstromMurray10} and use the bicycle dynamics to model the
+vehicle and obtain
+\begin{align*}
+  \dot \xi_1&=u_1\cos(\alpha + \xi_3) \cos(\alpha)^{-1} \\
+  \dot \xi_2&=u_1\sin(\alpha + \xi_3) \cos(\alpha)^{-1} \\
+  \dot \xi_3&=u_1\tan(u_2)
+\end{align*}
+where $\alpha=\arctan(\tan(u_2)/2)$.
+The states $(x_1,x_2)$ and $x_3$ correspond to the
+position, respectively, orientation of the vehicle in the 2-dimensional plane.
+The inputs are given by the velocity $u_1\in \intcc{-1,1}$ and the rate
+$u_2\in\intcc{-1,1}$ of the steering angle $\delta$.
+
+
+The specification is illustrated in Fig.~\ref{f:vehicle_sim}. The goal is to
+synthesize a controller that steers the vehicle through the maze, without
+hitting the blue obstacles until the target set (red box) is reached. The
+synthesis problem is casted as a reach-avoid problem.
+
+\begin{figure}[h]
+\includegraphics[width=10cm]{figures/vehicle_sim}
+\caption{Trajectory of the controlled aircraft landing
+maneuver.}\label{f:vehicle_sim}
+\end{figure}
+
+For the computation of the symbolic model, we fix the sampling time to
+$\tau=0.3\,$sec and limit the problem domain to
+$\segcc{a,b}$ with 
+\begin{equation*}
+a=(0,0,-3.5)^\top
+\text{ and }
+b=(10,10,3.5)^\top
+\end{equation*}
+and set $\eta=(0.2,0.2,0.2)^\top$. The real quantizer symbols
+$\bar X_2$ are determined according to~\eqref{e:theory:ss}. The set of inputs is
+given by the grid points $U_2:=\mu \Z^2\cap U$ with $\mu=(0.3,0.3)^\top$. A
+trajectory of the closed loop resulting from the controller synthesized with
+those choices of parameters is illustrated in Fig.~\ref{f:vehicle_sim}.
+
+The configuration files for the computation in {\tt SCOTS} using the sparse
+matrix implementation and the BDD based implementation can be found in {\tt
+./examples/vehicle} and {\tt ./examples/vehicle\_bdd}, respectively.
+
+
+
+
+
+\section{A DC-DC  Boost Converter}
+
+A DC-DC boost converter (illustrated in Fig.~\ref{f:dcdcboost}) is a step-up converter which is used to
+generate a higher voltage on the load side compared to the source
+voltage. The converter operates in two modes. When the switch is closed, electrical energy is
+stored in terms of a magnetic field in the inductor. When the switch
+is open, the inductor acts as a second source and its voltage adds up
+to the source voltage on the load side. 
+DC-DC boost converters have
+been extensively studied in the literature, often from a hybrid
+control perspective, and also in the context of abstraction-based controller
+design~\cite{GirardPolaTabuada10,Girard12,ReissigRungger13}.
+\begin{figure}[h]
+\includegraphics{figures/dcdcboost}
+\caption{The DC-DC boost converter.}\label{f:dcdcboost}
+\end{figure}
+
+The state of the system is given by $x(t)=\intcc{i_l(t),v_c(t)}^\top$
+where $i_l(t)$ and $v_c(t)$ denote the current through the inductor
+and the voltage across the capacitor at time~$t$,
+respectively. The dynamical behavior is described by the switched linear system
+\begin{equation*}
+  \dot x(t)=A_{g(t)}x(t)+b
+\end{equation*}
+with $A_i\in \R^{2\times 2}$, $i\in\intcc{1;2}$ and $b$ given by
+\begin{align*}
+A_1=
+\begin{bmatrix} 
+-\tfrac{r_l}{x_l} & 0 \\ 
+0 & -\tfrac{1}{x_c}\tfrac{1}{r_0+r_c}
+\end{bmatrix},\,
+A_2
+=
+\begin{bmatrix}
+ -\tfrac{1}{x_l}(r_l+\tfrac{r_c r_0}{r_c+r_0}) 
+ & 
+ -\frac{1}{x_l}\tfrac{ r_0}{r_0+r_c} 
+ \\
+ \frac{1}{x_c}\tfrac{r_0}{r_0+r_c}
+ &
+ -\tfrac{1}{x_c}\tfrac{1}{r_0+r_c}.
+\end{bmatrix},\,
+b=
+\begin{bmatrix}
+\tfrac{v_s}{x_l} \\ 0 
+\end{bmatrix}.
+\end{align*}
+
+First, we synthesize a controller to enforce the safety specification associated with 
+\begin{align*}
+Z_1:= \intcc{1.15,1.55}\times\intcc{5.45,5.85}.
+\end{align*}
+
+In the computation of the abstraction, we fix the sampling time to
+$\tau=0.5\,$sec and pick a grid point distance of $\eta=(
+5\cdot10^{-4},5\cdot10^{-4})^\top$. The winning domain together with a
+trajectory of the closed loop is illustrated in Fig.~\ref{f:dcdc:sim}. The
+implementation  details are provided in {\tt ./examples/dcdc} using the sparse
+matrix representation.
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{figures/dcdc_sim}
+\caption{
+The domain of the invariance controller together with a closed loop trajectory.
+}\label{f:dcdc:sim}
+\end{figure}
+
+
+We continue with a demonstration on how to use the BDD representation together
+with the CUDD Library to operate directly on the
+transition function and atomic propositions in order to create customized
+synthesis algorithms. In particular,
+let us consider the \emph{reach-and-stay} specification $\Sigma_1$ associated with
+with $Z_1\subseteq X_1$ given by
+\begin{IEEEeqnarray*}{c}
+  \Sigma_1:=\big\{(u,x)\in (U_1\times X_1)^\infty
+  \mid  
+    \exists_{t\in\intco{0;\infty}}\;
+    \forall_{t'\in\intco{t;\infty}}: x(t')\in Z_1
+  \big\}.
+\end{IEEEeqnarray*}
+The associated abstract specification $\Sigma_2$ for the symbolic model $S_2$ is given
+by the reach-and-stay specification associated with 
+\begin{IEEEeqnarray*}{c}
+Z_2:=\{x_2\in X_2\mid x_2\subseteq Z_1\}.
+\end{IEEEeqnarray*}
+We can solve the control problem $(S_2,\Sigma_2)$ by the nested fixed point algorithm
+\begin{IEEEeqnarray*}{c}
+	\mu \bar Y.\nu Y. (\pre(Y)\cap Z_2) \cup \pre(\bar Y).
+\end{IEEEeqnarray*}
+We implemented the fixed point computation in {\tt\small
+./examples/bdd/dcdc\_bdd} by using {\tt\small FixedPoint::enf\_pre} according to
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
+  /* set up enf_pre computation */
+  scots::EnfPre enf_pre(manager,TF,sym_model);
+  /* outer fp*/
+  BDD Z=manager.bddOne();
+  BDD ZZ=manager.bddZero();
+  /* inner fp*/
+  BDD Y=manager.bddZero();
+  BDD YY=manager.bddOne();
+  /* the controller */
+  BDD C=manager.bddZero();
+  /* helper */
+  BDD U=ss_input.get_cube(manager);
+  /* as long as not converged */
+  for(size_t i=1; ZZ != Z; i++) {
+    Z=ZZ;
+    BDD preZ=enf_pre(Z);
+    /* init inner fp */
+    YY = manager.bddOne();
+    for(size_t j=1; YY != Y; j++) {
+      Y=YY;
+      YY = ( enf_pre(Y) & S ) | preZ;
+    }
+    ZZ=YY;
+
+    /* only add (state/input) pairs whose state is not already in the * controller */
+    BDD N = ZZ & (!(C.ExistAbstract(U)));
+    C=C | N;
+  }
+  
+\end{lstlisting}
+The resulting controller is stored in the {\tt\small BDD C}. 
+A closed loop trajectory of the system is illustrated in
+Fig.~\ref{f:reachandstay}. The trajectory is obtained by running the MATLAB file
+{\tt\small dcdc.m} in the example directory {\tt\small ./examples/bdd/dcdc\_bdd}.
+\begin{figure}[h]
+	\centering
+  \includegraphics[width=10cm]{figures/dcdcreachandstay}
+\caption{Closed loop trajectory of the DC-DC boost converter satisfying
+the reach-and-stay specification associated with the red
+rectangle.}\label{f:reachandstay}
+\end{figure}
 
 
 \newpage

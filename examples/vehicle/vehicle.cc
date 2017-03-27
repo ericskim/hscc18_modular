@@ -70,13 +70,13 @@ int main() {
 
   /* setup the workspace of the synthesis problem and the uniform grid */
   /* lower bounds of the hyper rectangle */
-  state_type s_lb={{0,0,-M_PI-0.4}};
+  state_type s_lb={{0,0,-3.5}};
   /* upper bounds of the hyper rectangle */
-  state_type s_ub={{10,10,M_PI+0.4}};
+  state_type s_ub={{10,10,3.5}};
   /* grid node distance diameter */
   state_type s_eta={{.2,.2,.2}};
   scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
-  std::cout << "Unfiorm grid details:" << std::endl;
+  std::cout << "Uniform grid details:" << std::endl;
   ss.print_info();
   
   /* construct grid for the input space */

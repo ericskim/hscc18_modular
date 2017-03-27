@@ -78,9 +78,9 @@ int main() {
   if(!scots::read_from_file(mgr,ss_pre,"state_pre") ||
      !scots::read_from_file(mgr,ss_post,"state_post")) {
    /* lower bounds of the hyper rectangle */
-    state_type s_lb={{0,0,-M_PI-0.4}};
+    state_type s_lb={{0,0,-3.5}};
     /* upper bounds of the hyper rectangle */
-    state_type s_ub={{10,10,M_PI+0.4}};
+    state_type s_ub={{10,10,3.5}};
     /* grid node distance diameter */
     state_type s_eta={{.2,.2,.2}};
     /* construct SymbolicSet with the UniformGrid information for the state space

@@ -92,7 +92,7 @@ int main() {
   /* upper bounds of the hyper rectangle */
   state_type s_ub={{83,0,56}}; 
   scots::UniformGrid ss(state_dim,s_lb,s_ub,s_eta);
-  std::cout << "Unfiorm grid details:" << std::endl;
+  std::cout << "Uniform grid details:" << std::endl;
   ss.print_info();
 
   /* construct grid for the input space */
@@ -101,7 +101,7 @@ int main() {
   /* upper bounds of the hyper rectangle */
   input_type i_ub={{32000,8*M_PI/180}};
   /* grid node distance diameter */
-  input_type i_eta={{32000,8.0/9.0*M_PI/180}};
+  input_type i_eta={{32000,9.0/8.0*M_PI/180}};
   scots::UniformGrid is(input_dim,i_lb,i_ub,i_eta);
   is.print_info();
 

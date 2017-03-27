@@ -90,16 +90,16 @@ int main() {
    /* grid node distance diameter */
   state_type eta={{2.0/4e3,2.0/4e3}};
  /* lower bounds of the hyper-rectangle */
-  state_type lb={{1.15-eta[0]/2,5.45-eta[1]/2}};
+  state_type lb={{1.15,5.45}};
   /* upper bounds of the hyper-rectangle */
-  state_type ub={{1.55+eta[0]/2,5.85+eta[1]/2}};
+  state_type ub={{1.55,5.85}};
   scots::UniformGrid ss(state_dim,lb,ub,eta);
-  std::cout << "Unfiorm grid details:\n";
+  std::cout << "Uniform grid details:\n";
   ss.print_info();
 
   /* construct grid for the input alphabet */
   /* hyper-rectangle [1,2] with grid node distance 1 */
-  scots::UniformGrid is(input_dim,input_type{{.99}},input_type{{2.1}},input_type{{1}});
+  scots::UniformGrid is(input_dim,input_type{{1}},input_type{{2}},input_type{{1}});
   is.print_info();
 
   /* compute transition function of symbolic model */
