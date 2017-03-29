@@ -82,6 +82,7 @@ backend=biber]{biblatex}
 }%
 \lstset{emph=[2]{UniformGrid, 
                  Abstraction, 
+                 EnfPre, 
                  SymbolicSet, 
                  SymbolicModel, 
                  WinningDomain, 
@@ -1568,7 +1569,7 @@ propositions.
 
 Useful to 
 \begin{enumerate}
-  \item save memory (needs to be seen);
+  \item save memory;
   \item use {\tt SCOTS} in combination with other tools, such as {\tt slugs} and {\tt SENSE};
   \item compactly save atomic propositions and controllers to a file;
   \item write customized synthesis algorithms;
@@ -1799,7 +1800,8 @@ We can solve the control problem $(S_2,\Sigma_2)$ by the nested fixed point algo
 	\mu \bar Y.\nu Y. (\pre(Y)\cap Z_2) \cup \pre(\bar Y).
 \end{IEEEeqnarray*}
 We implemented the fixed point computation in {\tt\small
-./examples/bdd/dcdc\_bdd} by using {\tt\small FixedPoint::enf\_pre} according to
+./examples/bdd/dcdc\_bdd} by using the enforcible predecessor computed in the
+class {\tt\small scots::Enf\_Pre} according to
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
   /* set up enf_pre computation */
   scots::EnfPre enf_pre(manager,TF,sym_model);
