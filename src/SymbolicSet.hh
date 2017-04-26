@@ -12,6 +12,7 @@
 
 
 #include <vector>
+#include <unordered_set>
 #include <iostream>
 #include <sstream>
 #include <numeric>
@@ -155,6 +156,18 @@ public:
     BDD bdd = m_bdd_interval[0].interval_to_bdd(manager,lb[0],ub[0]);
     for(int i=1; i<m_dim; i++) 
       bdd = bdd & m_bdd_interval[i].interval_to_bdd(manager,lb[i],ub[i]);
+    return bdd;
+  }
+
+  BDD interval_to_bdd(const Cudd& manager,
+                      const abs_type lb,   
+                      const abs_type ub) const {
+    if (m_dim != 1){
+      throw std::runtime_error("\nscots::SymbolicSet function signature requires BDD be one-dimensional");
+    }
+    BDD bdd = m_bdd_interval[0].interval_to_bdd(manager,lb,ub);
+    // for(int i=1; i<m_dim; i++) 
+    //   bdd = bdd & m_bdd_interval[i].interval_to_bdd(manager,lb[i],ub[i]);
     return bdd;
   }
 
@@ -436,6 +449,9 @@ public:
       bdd = bdd & interval.get_all_elements();
     return static_cast<abs_type>(bdd.CountMinterm(get_no_bdd_vars()));
   } 
+
+  /** **/
+
 
   /** @brief get IntegerInterval  **/
   std::vector<IntegerInterval<abs_type>> get_bdd_intervals() const {

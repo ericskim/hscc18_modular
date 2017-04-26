@@ -14,6 +14,7 @@
 
 
 #include "SymbolicSet.hh"
+#include "Dependency.hh"
 
 /** @namespace scots **/ 
 namespace scots {
@@ -106,6 +107,124 @@ public:
    * @result              a BDD encoding the transition function as boolean function over
    *                      the BDD var IDs in m_pre, m_input, m_post
    **/
+  template<class F1, class F2>
+  BDD compute_sparse_gb(const Cudd& manager, 
+                        F1& system_post,
+                        F2& radius_post,
+                        size_t& no_trans,
+                        Dependency& sys_dep){
+
+    /* state space dimension */
+    const int dim=m_pre.get_dim();
+    const int i_dim = m_input.get_dim();
+    int proj_dim, proj_i_dim; 
+
+    abs_type N, M; 
+
+    /* radius of hyper interval containing the attainable set */
+    state_type eta;
+    state_type r;
+    /* state and input variables for ODE solver*/
+    state_type x;
+    input_type u;
+
+    std::vector<double> proj_x; 
+    std::vector<double> proj_u;
+    const std::vector<double> center_x = m_pre.get_center();
+    const std::vector<double> center_u = m_input.get_center();
+
+    /* for out of bounds check */
+    state_type lower_left;
+    state_type upper_right;
+
+    /* variables for managing the low dimensional post */
+    abs_type post_lb, post_ub;
+
+    /* copy data from m_state_alphabet */
+    for(int i=0; i<dim; i++) {
+      eta[i]=m_pre.get_eta()[i];
+      lower_left[i]=m_pre.get_lower_left()[i];
+      upper_right[i]=m_pre.get_upper_right()[i];
+    }
+
+    /* the BDD to encode the transition function */
+    BDD tf = manager.bddZero();
+
+    /* Loop over post state update dimensions */
+    for(abs_type post_dim=0; post_dim<dim; post_dim++){
+
+      /* Get lower dimensional projections */ 
+      SymbolicSet dep_pre = SymbolicSet(m_pre, sys_dep.get_state_dependency(post_dim));
+      SymbolicSet dep_input = SymbolicSet(m_input, sys_dep.get_input_dependency(post_dim));
+      SymbolicSet dep_post = SymbolicSet(m_post, {post_dim});
+
+      proj_dim = dep_pre.get_dim();
+      proj_i_dim = dep_input.get_dim(); 
+      proj_x.resize(proj_dim);
+      proj_u.resize(proj_i_dim); 
+
+      /*Grid sizes among dependent subspaces*/
+      N = dep_pre.size();
+      M = dep_input.size();
+
+      /*Loop over low dimensional pre states*/
+      for(abs_type i=0; i<N; i++) {
+
+        BDD bdd_i = dep_pre.id_to_bdd(i); // current low dim state 
+
+        /* Loop over low dimensional inputs */
+        for(abs_type j=0; j<M; j++) {
+          BDD bdd_j = dep_input.id_to_bdd(j); // current low dim input
+
+          /*Set the center cells for low dimensional x,u*/
+          /*These are stored in proj_x, proj_u*/
+          dep_pre.itox(i,proj_x);
+          dep_input.itox(j,proj_u);
+
+          /*Fill in values to lift proj_x, proj_u to high dimensional version*/
+          for (int k=0; k < dim; k++)
+            x[k] = center_x[k];
+          for (int k=0; k < i_dim; k++)
+            u[k] = center_u[k];
+          for (int k=0; k <proj_dim; k++)
+            x[sys_dep.get_state_dependency(post_dim)[k]] = proj_x[k];
+          for (int k=0; k <proj_i_dim; k++)          
+            u[sys_dep.get_input_dependency(post_dim)[k]] = proj_u[k];
+
+          /*Simulate with growth bound*/
+          for(int k=0; k<dim; k++)
+            r[k]=eta[k]/2.0+m_z[k];
+          radius_post(r,x,u);
+          system_post(x,u);
+
+          /* check for out of bounds in post_dim-th coordinate */
+          double left = x[post_dim]-r[post_dim]-m_z[post_dim];
+          double right = x[post_dim]+r[post_dim]+m_z[post_dim];
+          if(left <= lower_left[post_dim]-eta[post_dim]/2.0  || right >= upper_right[post_dim]+eta[post_dim]/2.0) {
+            continue;
+          }
+          /* integer coordinate of lower left corner of post */
+          post_lb = static_cast<abs_type>((left-lower_left[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
+          /* integer coordinate of upper right corner of post */
+          post_ub = static_cast<abs_type>((right-lower_left[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
+
+          /* Compute BDD of low dimensional post*/
+          BDD bdd_k = dep_post.interval_to_bdd(manager,post_lb,post_ub);
+          /* Add transition to symbolic model*/
+          tf = tf | (bdd_i & bdd_j & bdd_k);
+        }
+      }
+
+    }
+
+    /* count number of transitions */
+    size_t nvars = m_pre.get_no_bdd_vars() +
+                   m_input.get_no_bdd_vars() +
+                   m_post.get_no_bdd_vars();
+    no_trans=tf.CountMinterm(nvars);
+    return tf; 
+  }
+
   template<class F1, class F2, class F3>
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, F3&& avoid, size_t& no_trans) {
     /* number of cells */
@@ -196,7 +315,7 @@ public:
     no_trans=tf.CountMinterm(nvars);
     return tf;
   }
-  
+
   /** @brief set the measurement error bound **/
   void set_measurement_error_bound(const state_type& error_bound) {
     for(int i=0; i<m_pre.get_dim(); i++) {

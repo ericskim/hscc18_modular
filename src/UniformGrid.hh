@@ -340,6 +340,15 @@ public:
     }
     return upper_right;
   }
+
+  std::vector<double> get_center() const{
+    std::vector<double> center, ur = get_upper_right(), ll = get_lower_left(); 
+    for(int i=0; i<m_dim; i++) {
+      center.push_back(ll[i] + (ur[i] - ll[i])/2.);
+    }
+    return center;
+  }
+
   std::vector<abs_type> get_no_gp_per_dim() const {
     std::vector<abs_type> no_grid_points;
     for(int i=0; i<m_dim; i++) {
