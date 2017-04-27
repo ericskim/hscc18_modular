@@ -43,29 +43,41 @@ protected:
 
 public:
   Dependency(): state_dim(0), input_dim (0){}
-  Dependency(int s_dim, int i_dim): state_dim(s_dim), input_dim(i_dim), state_rhs(s_dim, {}), state_dep(s_dim, {}), input_rhs(i_dim, {}), input_dep(i_dim, {}){
-  }
-  ~Dependency();
+  Dependency(int s_dim, int i_dim): state_dim(s_dim), 
+                                    input_dim(i_dim), 
+                                    state_rhs(s_dim, std::vector<int>()), 
+                                    state_dep(s_dim, std::vector<int>()), 
+                                    input_rhs(s_dim, std::vector<int>()), 
+                                    input_dep(s_dim, std::vector<int>()){}
 
-  /** @brief Set right hand side of equations **/
+  ~Dependency() {};
+
+  /** @brief Set right hand side of post state update equations **/
   void set_rhs(std::vector<std::vector<int> > & s_rhs, std::vector<std::vector<int> > & i_rhs){
-    /** Set state dependencies **/
+
+    /** Check right hand side sizes **/
     if (s_rhs.size() != (size_t) state_dim)
-      throw std::runtime_error("\nscots::Dependency RHS vector size does not match state dimension");
+      throw std::runtime_error("\nscots::Dependency state dependency vector size must be same as state dimension");
+    if (i_rhs.size() !=  (size_t) state_dim)
+      throw std::runtime_error("\nscots::Dependency input dependency vector size must be same as state dimension");
+
+    /** Set state dependencies **/    
     for (size_t i= 0; i < s_rhs.size(); i++){
+      if (s_rhs[i].size() == 0)
+        continue;
       if ( *std::min_element(s_rhs[i].begin(), s_rhs[i].end()) < 0 || 
                  *std::max_element(s_rhs[i].begin(), s_rhs[i].end()) >= state_dim)
-        throw std::runtime_error("\nscots::Dependency index is out of bounds");
+        throw std::runtime_error("\nscots::Dependency state index is out of bounds");
       state_rhs[i] = s_rhs[i];
     }
 
     /** Set input dependencies **/
-    if (i_rhs.size() !=  (size_t) input_dim)
-      throw std::runtime_error("\nscots::Dependency RHS vector size does not match input dimension");
     for (size_t i= 0; i < i_rhs.size(); i++){
+      if (i_rhs[i].size() == 0)
+        continue;
       if ( *std::min_element(i_rhs[i].begin(), i_rhs[i].end()) < 0 || 
-                 *std::max_element(i_rhs[i].begin(), i_rhs[i].end()) >= state_dim)
-        throw std::runtime_error("\nscots::Dependency index is out of bounds");
+                 *std::max_element(i_rhs[i].begin(), i_rhs[i].end()) >= input_dim)
+        throw std::runtime_error("\nscots::Dependency input index is out of bounds");
       input_rhs[i] = i_rhs[i];
     }
 
@@ -84,6 +96,24 @@ public:
     return input_dep[i];
   }
 
+  /** @brief Print out state and input dependencies **/
+  friend std::ostream &operator<< (std::ostream &os, const Dependency & dep){
+    for(int i = 0; i < dep.state_dim; i++){
+      os << "\nPost State " << i << " Dependencies";
+      os << "\nStates:";
+      for (auto &j: dep.state_dep[i]){
+        os << "  " << j;
+      }
+      os << "\nInputs:";
+      for (auto &j: dep.input_dep[i]){
+        os << "  " << j;
+      }
+    }
+    os << "\n";
+
+    return os;
+  } 
+
   virtual void set_state_dependency() = 0; 
   virtual void set_input_dependency() = 0; 
 
@@ -97,18 +127,25 @@ public:
  **/
 class DT_Dependency: public Dependency{
 
+public:
   DT_Dependency(int s_dim, int i_dim): Dependency(s_dim, i_dim){}
-  void set_state_dependency(){
-    for (int i = 0; i < state_dim; i++){
-      state_dep[i] = state_rhs[i];
-    }
-  } 
+
+  /** @brief Set DT state dependency to be same as the input right hand side**/
   void set_input_dependency(){
     for (int i = 0; i < state_dim; i++){
       input_dep[i] = input_rhs[i];
     }
   }
-  public:
+
+  /** @brief Set DT state dependency to be same as the state right hand side**/
+  void set_state_dependency(){
+    for (int i = 0; i < state_dim; i++){
+      state_dep[i] = state_rhs[i];
+    }
+  } 
+
+  ~DT_Dependency() {};
+
 };
 
 /**

@@ -166,8 +166,6 @@ public:
       throw std::runtime_error("\nscots::SymbolicSet function signature requires BDD be one-dimensional");
     }
     BDD bdd = m_bdd_interval[0].interval_to_bdd(manager,lb,ub);
-    // for(int i=1; i<m_dim; i++) 
-    //   bdd = bdd & m_bdd_interval[i].interval_to_bdd(manager,lb[i],ub[i]);
     return bdd;
   }
 

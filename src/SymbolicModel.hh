@@ -91,8 +91,9 @@ public:
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, size_t& no_trans) {
     return compute_gb(manager, system_post, radius_post, [](const abs_type&) noexcept {return false;}, no_trans);
   }
+
   /** 
-   * @brief computes the transition function
+   * @brief computes the transition function with sparsity-aware algorithm
    *
    * @param [in]  manager     - Cudd manager
    *              
@@ -102,24 +103,26 @@ public:
    *              
    * @param [in]  avoid       - lambda expression as defined in  Abstraction::compute_gb
    *              
+   * @param [in]  sys_dep     - Dependency information as defined in 
+   *
    * @param [out] no_trans    - number of transitions 
    *
    * @result              a BDD encoding the transition function as boolean function over
    *                      the BDD var IDs in m_pre, m_input, m_post
    **/
+
   template<class F1, class F2>
   BDD compute_sparse_gb(const Cudd& manager, 
                         F1& system_post,
                         F2& radius_post,
-                        size_t& no_trans,
-                        Dependency& sys_dep){
+                        Dependency& sys_dep,
+                        size_t& no_trans
+                        ){
 
     /* state space dimension */
     const int dim=m_pre.get_dim();
     const int i_dim = m_input.get_dim();
     int proj_dim, proj_i_dim; 
-
-    abs_type N, M; 
 
     /* radius of hyper interval containing the attainable set */
     state_type eta;
@@ -148,12 +151,12 @@ public:
     }
 
     /* the BDD to encode the transition function */
-    BDD tf = manager.bddZero();
+    BDD tf = manager.bddOne();
 
     /* Loop over post state update dimensions */
-    for(abs_type post_dim=0; post_dim<dim; post_dim++){
+    for(int post_dim=0; post_dim<dim; post_dim++){
 
-      /* Get lower dimensional projections */ 
+      /* Get lower dimensional dependent subspaces */ 
       SymbolicSet dep_pre = SymbolicSet(m_pre, sys_dep.get_state_dependency(post_dim));
       SymbolicSet dep_input = SymbolicSet(m_input, sys_dep.get_input_dependency(post_dim));
       SymbolicSet dep_post = SymbolicSet(m_post, {post_dim});
@@ -164,8 +167,11 @@ public:
       proj_u.resize(proj_i_dim); 
 
       /*Grid sizes among dependent subspaces*/
-      N = dep_pre.size();
-      M = dep_input.size();
+      abs_type N = dep_pre.size();
+      abs_type M = dep_input.size();
+
+      /**/
+      BDD coordinate_tf = manager.bddZero();
 
       /*Loop over low dimensional pre states*/
       for(abs_type i=0; i<N; i++) {
@@ -208,14 +214,17 @@ public:
           /* integer coordinate of upper right corner of post */
           post_ub = static_cast<abs_type>((right-lower_left[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
 
-          /* Compute BDD of low dimensional post*/
+          /* Compute BDD of low dimensional post */
           BDD bdd_k = dep_post.interval_to_bdd(manager,post_lb,post_ub);
-          /* Add transition to symbolic model*/
-          tf = tf | (bdd_i & bdd_j & bdd_k);
-        }
-      }
+          /* Add transition to current post coordinate */
+          coordinate_tf = coordinate_tf | (bdd_i & bdd_j & bdd_k);
+        } // end input loop
+      } // end pre state loop
 
-    }
+      /* Impose coordinate constraint on post_dim*/ 
+      tf = tf & coordinate_tf;
+
+    } // end post state loop 
 
     /* count number of transitions */
     size_t nvars = m_pre.get_no_bdd_vars() +
@@ -225,6 +234,22 @@ public:
     return tf; 
   }
 
+  /** 
+   * @brief computes the transition function
+   *
+   * @param [in]  manager     - Cudd manager
+   *              
+   * @param [in]  system_post - lambda expression as defined in  Abstraction::compute_gb
+   *              
+   * @param [in]  radius_post - lambda expression as defined in  Abstraction::compute_gb
+   *              
+   * @param [in]  avoid       - lambda expression as defined in  Abstraction::compute_gb
+   *              
+   * @param [out] no_trans    - number of transitions 
+   *
+   * @result              a BDD encoding the transition function as boolean function over
+   *                      the BDD var IDs in m_pre, m_input, m_post
+   **/
   template<class F1, class F2, class F3>
   BDD compute_gb(const Cudd& manager, F1& system_post, F2& radius_post, F3&& avoid, size_t& no_trans) {
     /* number of cells */
