@@ -151,7 +151,7 @@ int main() {
     std::cout << "Number of transitions: " << no_trans << std::endl;
     if(!getrusage(RUSAGE_SELF, &usage))
       std::cout << "Memory per transition: " << usage.ru_maxrss/(double)no_trans << std::endl;
-    
+
     scots::write_to_file(mgr,set,TF,"vehicle_tf");
   }
 

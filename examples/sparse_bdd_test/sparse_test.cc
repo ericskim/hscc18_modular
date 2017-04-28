@@ -104,10 +104,10 @@ int main() {
   scots::DT_Dependency dep(state_dim,input_dim);
   std::vector<std::vector<int>> state_rhs(state_dim, std::vector<int>()), input_rhs(state_dim, std::vector<int>());
   state_rhs[0].push_back({0});
-  input_rhs[0].push_back({0});
+  // input_rhs[0].push_back({0});
 
   state_rhs[1].push_back({1});
-  input_rhs[1].push_back({0});
+  // input_rhs[1].push_back({0});
   dep.set_rhs(state_rhs, input_rhs);
   std::cout << dep;
 

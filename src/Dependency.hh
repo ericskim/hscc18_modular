@@ -88,12 +88,12 @@ public:
   set_input_dependency();
   }
 
-  /** @brief Get set of state dimensions for which dimension i's post depends**/
+  /** @brief Get vector of state dimensions for which dimension i's post depends**/
   std::vector<int> get_state_dependency(int i){
     return state_dep[i];
   }
 
-  /** @brief Get set of input dimensions for which dimension i's post depends**/
+  /** @brief Get vector of input dimensions for which dimension i's post depends**/
   std::vector<int> get_input_dependency(int i){
     return input_dep[i];
   }
@@ -129,9 +129,7 @@ public:
  **/
 class DT_Dependency: public Dependency{
 
-public:
-  DT_Dependency(int s_dim, int i_dim): Dependency(s_dim, i_dim){}
-
+protected:
   /** @brief Set DT state dependency to be same as the input right hand side**/
   void set_input_dependency(){
     for (int i = 0; i < state_dim; i++){
@@ -144,7 +142,12 @@ public:
     for (int i = 0; i < state_dim; i++){
       state_dep[i] = state_rhs[i];
     }
-  } 
+  }
+
+public:
+  DT_Dependency(int s_dim, int i_dim): Dependency(s_dim, i_dim){}
+
+
 
   ~DT_Dependency() {};
 
@@ -154,8 +157,13 @@ public:
  * @class CT_Dependency 
  *
  * @brief Encodes dependencies with continuous time system dynamics
+ * @todo Need to implement
  **/
 class CT_Dependency: public Dependency{
+protected:
+  void set_input_dependency(){}
+  void set_state_dependency(){}
+
 public: 
 
 };

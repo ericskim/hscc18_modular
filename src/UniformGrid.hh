@@ -383,6 +383,9 @@ protected:
 private:
   /** @brief helper function to calculate the overall number of grid points **/
   abs_type total_no_grid_points() const {
+    if (m_dim == 0){
+      return 0;
+    }
     abs_type total=1;
     for(int i=0; i<m_dim; i++) {
       total *= m_no_grid_points[i];

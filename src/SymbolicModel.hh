@@ -59,6 +59,35 @@ private:
       std::cout << "100\n";
   }
 
+  /**
+  @brief Helper function to find integer coordinates of a post
+  **/
+  int post_interval_bounds(int post_dim, state_type x, state_type r, state_type eta, state_type ll, state_type ur, abs_type &post_lb, abs_type &post_ub){
+    double left = x[post_dim]-r[post_dim]-m_z[post_dim];
+    double right = x[post_dim]+r[post_dim]+m_z[post_dim];
+    if(left <= ll[post_dim]-eta[post_dim]/2.0  || right >= ur[post_dim]+eta[post_dim]/2.0) {
+      return 0; 
+    }
+    /* integer coordinate of lower left corner of post */
+    post_lb = static_cast<abs_type>((left-ll[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
+    /* integer coordinate of upper right corner of post */
+    post_ub = static_cast<abs_type>((right-ll[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
+    return 1;
+  }
+
+  template <class T>
+  inline T lifted_input(abs_type i, const SymbolicSet & full, const SymbolicSet & small, std::vector<int> dep){
+    T x;
+    static std::vector<double> proj_x;
+    proj_x.resize(small.get_dim());
+    small.itox(i,proj_x);
+    for (int k=0; k < full.get_dim(); k++)
+      x[k] = (full.get_center())[k];
+    for (int k=0; k < small.get_dim(); k++)
+      x[dep[k]] = proj_x[k];
+    return x;
+  }
+
 public:
   /* @cond  EXCLUDE from doxygen*/
   /* destructor */
@@ -109,6 +138,7 @@ public:
    *
    * @result              a BDD encoding the transition function as boolean function over
    *                      the BDD var IDs in m_pre, m_input, m_post
+   * 
    **/
   template<class F1, class F2>
   BDD compute_sparse_gb(const Cudd& manager, 
@@ -120,24 +150,21 @@ public:
 
     /* state space dimension */
     const int dim=m_pre.get_dim();
-    const int i_dim = m_input.get_dim();
     int proj_dim, proj_i_dim; 
 
     /* radius of hyper interval containing the attainable set */
-    state_type eta;
-    state_type r;
+    state_type eta, r;
+
     /* state and input variables for ODE solver*/
     state_type x;
     input_type u;
 
-    std::vector<double> proj_x; 
-    std::vector<double> proj_u;
+    /* Used as default value for system/radius post when iterating over lower dimensions*/
     const std::vector<double> center_x = m_pre.get_center();
     const std::vector<double> center_u = m_input.get_center();
 
     /* for out of bounds check */
-    state_type lower_left;
-    state_type upper_right;
+    state_type lower_left, upper_right;
 
     /* variables for managing the low dimensional post */
     abs_type post_lb, post_ub;
@@ -152,6 +179,10 @@ public:
     /* the BDD to encode the transition function */
     BDD tf = manager.bddOne();
 
+    /* State and input space BDDs */
+    BDD input_grid = m_input.get_grid_bdd(manager);
+    BDD pre_grid = m_pre.get_grid_bdd(manager);
+
     /* Loop over post state update dimensions */
     for(int post_dim=0; post_dim<dim; post_dim++){
 
@@ -162,63 +193,88 @@ public:
 
       proj_dim = dep_pre.get_dim();
       proj_i_dim = dep_input.get_dim(); 
-      proj_x.resize(proj_dim);
-      proj_u.resize(proj_i_dim); 
 
       /*Grid sizes among dependent subspaces*/
       abs_type N = dep_pre.size();
       abs_type M = dep_input.size();
 
-      /**/
+      /*BDD to encode post_dim's coordinate update*/
       BDD coordinate_tf = manager.bddZero();
 
-      /*Loop over low dimensional pre states*/
-      for(abs_type i=0; i<N; i++) {
+      /* Different for loops depending on state and input dependencies*/
+      if (proj_dim > 0 && proj_i_dim > 0){ // state and input dependence
 
-        BDD bdd_i = dep_pre.id_to_bdd(i); // current low dim state 
+        for(abs_type i=0; i<N; i++) {  /*Loop over low dimensional pre states*/
+          BDD bdd_i = dep_pre.id_to_bdd(i); // current low dim state 
 
-        /* Loop over low dimensional inputs */
-        for(abs_type j=0; j<M; j++) {
+          for(abs_type j=0; j<M; j++) {  /* Loop over low dimensional inputs */
+            BDD bdd_j = dep_input.id_to_bdd(j); // current low dim input
+            x = lifted_input<state_type>(i, m_pre, dep_pre, sys_dep.get_state_dependency(post_dim));
+            u = lifted_input<input_type>(j, m_input, dep_input, sys_dep.get_input_dependency(post_dim));
+
+            /*Simulate with growth bound*/
+            for(int k=0; k<dim; k++)
+              r[k]=eta[k]/2.0+m_z[k];
+            radius_post(r,x,u);
+            system_post(x,u);
+            /* Get bounds in post_dim-th coordinate and check for violation */
+            if(!post_interval_bounds(post_dim, x, r,  eta, lower_left,  upper_right, post_lb, post_ub))
+              continue;
+            /* Compute BDD of low dimensional post */
+            BDD bdd_k = dep_post.interval_to_bdd(manager,post_lb,post_ub);
+
+            /* Add transition to current post coordinate */
+            coordinate_tf = coordinate_tf | (bdd_i & bdd_j & bdd_k);
+
+          }
+        }
+      }
+      else if (proj_dim == 0 && proj_i_dim > 0){ // no state dependence
+        for(abs_type j=0; j<M; j++) {  /* Loop over low dimensional inputs */
           BDD bdd_j = dep_input.id_to_bdd(j); // current low dim input
-
-          /*Set the center cells for low dimensional x,u*/
-          /*These are stored in proj_x, proj_u*/
-          dep_pre.itox(i,proj_x);
-          dep_input.itox(j,proj_u);
-
-          /*Fill in values to lift proj_x, proj_u to high dimensional version*/
-          for (int k=0; k < dim; k++)
-            x[k] = center_x[k];
-          for (int k=0; k < i_dim; k++)
-            u[k] = center_u[k];
-          for (int k=0; k <proj_dim; k++)
-            x[sys_dep.get_state_dependency(post_dim)[k]] = proj_x[k];
-          for (int k=0; k <proj_i_dim; k++)          
-            u[sys_dep.get_input_dependency(post_dim)[k]] = proj_u[k];
+          std::copy(center_x.begin(), center_x.end(), x.begin());
+          u = lifted_input<input_type>(j, m_input, dep_input, sys_dep.get_input_dependency(post_dim));
 
           /*Simulate with growth bound*/
           for(int k=0; k<dim; k++)
             r[k]=eta[k]/2.0+m_z[k];
           radius_post(r,x,u);
           system_post(x,u);
-
-          /* check for out of bounds in post_dim-th coordinate */
-          double left = x[post_dim]-r[post_dim]-m_z[post_dim];
-          double right = x[post_dim]+r[post_dim]+m_z[post_dim];
-          if(left <= lower_left[post_dim]-eta[post_dim]/2.0  || right >= upper_right[post_dim]+eta[post_dim]/2.0) {
+          /* Get bounds in post_dim-th coordinate and check for violation */
+          if(!post_interval_bounds(post_dim, x, r,  eta, lower_left,  upper_right, post_lb, post_ub))
             continue;
-          }
-          /* integer coordinate of lower left corner of post */
-          post_lb = static_cast<abs_type>((left-lower_left[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
-          /* integer coordinate of upper right corner of post */
-          post_ub = static_cast<abs_type>((right-lower_left[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
-
           /* Compute BDD of low dimensional post */
           BDD bdd_k = dep_post.interval_to_bdd(manager,post_lb,post_ub);
-          /* Add transition to current post coordinate */
-          coordinate_tf = coordinate_tf | (bdd_i & bdd_j & bdd_k);
-        } // end input loop
-      } // end pre state loop
+
+          /* Add transition to current post coordinate */ 
+          coordinate_tf = coordinate_tf | (bdd_j & pre_grid & bdd_k);
+        }
+      }
+      else if (proj_dim > 0 && proj_i_dim == 0){ // no input dependence
+        /*Loop over low dimensional pre states*/
+        for(abs_type i=0; i<N; i++) {
+          BDD bdd_i = dep_pre.id_to_bdd(i); // current low dim state 
+          std::copy(center_u.begin(), center_u.end(), u.begin());
+          x = lifted_input<state_type>(i, m_pre, dep_pre, sys_dep.get_state_dependency(post_dim));
+
+          /*Simulate with growth bound*/
+          for(int k=0; k<dim; k++)
+            r[k]=eta[k]/2.0+m_z[k];
+          radius_post(r,x,u);
+          system_post(x,u);
+          /* Get bounds post_lb, post_ub in post_dim-th coordinate and check for violation */
+          if(!post_interval_bounds(post_dim, x, r,  eta, lower_left,  upper_right, post_lb, post_ub))
+            continue;
+          /* Compute BDD of low dimensional post */
+          BDD bdd_k = dep_post.interval_to_bdd(manager,post_lb,post_ub);
+
+          /* Add transition to current post coordinate */ 
+          coordinate_tf = coordinate_tf | (bdd_i & input_grid & bdd_k);
+        }
+      }
+      else{
+        throw std::runtime_error("scots::SymbolicModel A post state update does not depend on any pre state or input");
+      }
 
       /* Impose coordinate constraint on post_dim*/ 
       tf = tf & coordinate_tf;

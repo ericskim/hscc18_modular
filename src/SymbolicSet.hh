@@ -448,8 +448,17 @@ public:
     return static_cast<abs_type>(bdd.CountMinterm(get_no_bdd_vars()));
   } 
 
-  /** **/
-
+  /** @brief constructs a BDD of the BDD variables in the Symbolic set. 
+  *
+  *   get_grid_bdd() is different than get_cube() when an interval's length is not a power of two.
+  *
+  **/
+  BDD get_grid_bdd(const Cudd &manager) const {
+    BDD bdd = manager.bddOne();
+    for(const auto& interval : m_bdd_interval) 
+      bdd = bdd & interval.get_all_elements();
+    return bdd;
+  }
 
   /** @brief get IntegerInterval  **/
   std::vector<IntegerInterval<abs_type>> get_bdd_intervals() const {
