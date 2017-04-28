@@ -17,9 +17,9 @@ CUDDINC 		= -I$(CUDDPATH)/include
 CUDD		    =  $(CUDDINC) -L$(CUDDPATH)/lib -lcudd
 
 
-.PHONY: sparse_test simulate
+.PHONY: sparse_test sparse_vehicle
 
-TARGET = sparse_test 
+TARGET = sparse_test sparse_vehicle
 #simulate
 
 all: $(TARGET)
@@ -27,8 +27,8 @@ all: $(TARGET)
 sparse_test: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) sparse_test.cc -o sparse_test
 
-#simulate: 
-#	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) simulate.cc -o simulate
+sparse_vehicle: 
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) sparse_vehicle.cc -o sparse_vehicle
 
 clean:
-	rm sparse_test simulate
+	rm sparse_test sparse_vehicle

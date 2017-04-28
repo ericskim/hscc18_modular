@@ -103,14 +103,13 @@ public:
    *              
    * @param [in]  avoid       - lambda expression as defined in  Abstraction::compute_gb
    *              
-   * @param [in]  sys_dep     - Dependency information as defined in 
+   * @param [in]  sys_dep     - Dependency information 
    *
    * @param [out] no_trans    - number of transitions 
    *
    * @result              a BDD encoding the transition function as boolean function over
    *                      the BDD var IDs in m_pre, m_input, m_post
    **/
-
   template<class F1, class F2>
   BDD compute_sparse_gb(const Cudd& manager, 
                         F1& system_post,

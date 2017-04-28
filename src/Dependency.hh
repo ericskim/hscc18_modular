@@ -6,6 +6,8 @@
  */
 
 /** @file **/
+#ifndef DEPENDENCY_HH_
+#define DEPENDENCY_HH_
 
 #include <iostream>
 #include <vector>
@@ -14,7 +16,7 @@
 
 #include "SymbolicSet.hh"
 
-
+/** @namespace scots **/ 
 namespace scots {
 
 /**
@@ -149,7 +151,7 @@ public:
 };
 
 /**
- * @class DT_Dependency 
+ * @class CT_Dependency 
  *
  * @brief Encodes dependencies with continuous time system dynamics
  **/
@@ -158,4 +160,6 @@ public:
 
 };
 
-}
+} /*end namespace*/
+
+#endif /* DEPENDENCY_HH_ */
