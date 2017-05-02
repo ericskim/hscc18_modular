@@ -161,8 +161,12 @@ public:
  **/
 class CT_Dependency: public Dependency{
 protected:
-  void set_input_dependency(){}
-  void set_state_dependency(){}
+  void set_input_dependency(){
+    
+  }
+  void set_state_dependency(){
+    
+  }
 
 public: 
 

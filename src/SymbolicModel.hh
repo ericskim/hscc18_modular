@@ -3,6 +3,7 @@
  *
  *  created: Jan 2017
  *   author: Matthias Rungger
+ *           Eric S. Kim
  */
 
 /** @file **/
@@ -60,21 +61,27 @@ private:
   }
 
   /**
-  @brief Helper function to find integer coordinates of a post
+  *  @brief Helper function to find integer coordinates along the post_dim-th coordinate
+  * @param[out] post_lb
+  * @param[out] post_ub
+  * @return  false if out of bounds, true otherwise
   **/
-  int post_interval_bounds(int post_dim, state_type x, state_type r, state_type eta, state_type ll, state_type ur, abs_type &post_lb, abs_type &post_ub){
+  bool post_interval_bounds(int post_dim, state_type x, state_type r, state_type eta, state_type ll, state_type ur, abs_type &post_lb, abs_type &post_ub){
     double left = x[post_dim]-r[post_dim]-m_z[post_dim];
     double right = x[post_dim]+r[post_dim]+m_z[post_dim];
     if(left <= ll[post_dim]-eta[post_dim]/2.0  || right >= ur[post_dim]+eta[post_dim]/2.0) {
-      return 0; 
+      return false; 
     }
     /* integer coordinate of lower left corner of post */
     post_lb = static_cast<abs_type>((left-ll[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
     /* integer coordinate of upper right corner of post */
     post_ub = static_cast<abs_type>((right-ll[post_dim]+eta[post_dim]/2.0)/eta[post_dim]);
-    return 1;
+    return true;
   }
 
+  /**
+  *  @brief Projects the i-th gridpoint in lower dimension space "small" to a full dimensional gridpoint
+  **/
   template <class T>
   inline T lifted_input(abs_type i, const SymbolicSet & full, const SymbolicSet & small, std::vector<int> dep){
     T x;
@@ -190,7 +197,6 @@ public:
       SymbolicSet dep_pre = SymbolicSet(m_pre, sys_dep.get_state_dependency(post_dim));
       SymbolicSet dep_input = SymbolicSet(m_input, sys_dep.get_input_dependency(post_dim));
       SymbolicSet dep_post = SymbolicSet(m_post, {post_dim});
-
       proj_dim = dep_pre.get_dim();
       proj_i_dim = dep_input.get_dim(); 
 
@@ -203,10 +209,8 @@ public:
 
       /* Different for loops depending on state and input dependencies*/
       if (proj_dim > 0 && proj_i_dim > 0){ // state and input dependence
-
         for(abs_type i=0; i<N; i++) {  /*Loop over low dimensional pre states*/
-          BDD bdd_i = dep_pre.id_to_bdd(i); // current low dim state 
-
+          BDD bdd_i = dep_pre.id_to_bdd(i); // current low dim state
           for(abs_type j=0; j<M; j++) {  /* Loop over low dimensional inputs */
             BDD bdd_j = dep_input.id_to_bdd(j); // current low dim input
             x = lifted_input<state_type>(i, m_pre, dep_pre, sys_dep.get_state_dependency(post_dim));
@@ -217,7 +221,7 @@ public:
               r[k]=eta[k]/2.0+m_z[k];
             radius_post(r,x,u);
             system_post(x,u);
-            /* Get bounds in post_dim-th coordinate and check for violation */
+            /* Get bounds in post_dim-th coordinate and skip if violation occurs */
             if(!post_interval_bounds(post_dim, x, r,  eta, lower_left,  upper_right, post_lb, post_ub))
               continue;
             /* Compute BDD of low dimensional post */
@@ -225,7 +229,6 @@ public:
 
             /* Add transition to current post coordinate */
             coordinate_tf = coordinate_tf | (bdd_i & bdd_j & bdd_k);
-
           }
         }
       }
@@ -240,7 +243,7 @@ public:
             r[k]=eta[k]/2.0+m_z[k];
           radius_post(r,x,u);
           system_post(x,u);
-          /* Get bounds in post_dim-th coordinate and check for violation */
+          /* Get bounds in post_dim-th coordinate and skip if violation occurs */
           if(!post_interval_bounds(post_dim, x, r,  eta, lower_left,  upper_right, post_lb, post_ub))
             continue;
           /* Compute BDD of low dimensional post */
@@ -262,7 +265,7 @@ public:
             r[k]=eta[k]/2.0+m_z[k];
           radius_post(r,x,u);
           system_post(x,u);
-          /* Get bounds post_lb, post_ub in post_dim-th coordinate and check for violation */
+          /* Get bounds in post_dim-th coordinate and skip if violation occurs */
           if(!post_interval_bounds(post_dim, x, r,  eta, lower_left,  upper_right, post_lb, post_ub))
             continue;
           /* Compute BDD of low dimensional post */
