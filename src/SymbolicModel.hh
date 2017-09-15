@@ -34,11 +34,11 @@ class SymbolicModel {
 private:
   /* print progress to the console (default m_verbose=true) */
   bool m_verbose=true;
-  /* SymbolicSet conaining the BDD vars of the pre  */
+  /* SymbolicSet containing the BDD vars of the pre  */
   const SymbolicSet m_pre;
-  /* SymbolicSet conaining the BDD vars of the inputs  */
+  /* SymbolicSet containing the BDD vars of the inputs  */
   const SymbolicSet m_input;
-  /* SymbolicSet conaining the BDD vars of the post  */
+  /* SymbolicSet containing the BDD vars of the post  */
   const SymbolicSet m_post;
   /* measurement error bound */
   std::unique_ptr<double[]> m_z;
@@ -226,7 +226,7 @@ public:
               continue;
             /* Compute BDD of low dimensional post */
             BDD bdd_k = dep_post.interval_to_bdd(manager,post_lb,post_ub);
-
+            
             /* Add transition to current post coordinate */
             coordinate_tf = coordinate_tf | (bdd_i & bdd_j & bdd_k);
           }

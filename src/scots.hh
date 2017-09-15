@@ -26,6 +26,7 @@
 /* scots classes with bdd support */
 #include "SymbolicSet.hh"
 #include "SymbolicModel.hh"
+#include "FunctionAbstraction.hh"
 #include "EnfPre.hh"
 #endif
 

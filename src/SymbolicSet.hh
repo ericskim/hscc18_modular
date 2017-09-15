@@ -33,6 +33,7 @@ namespace scots {
  *
  **/
 class SymbolicSet : public UniformGrid {
+
 private:
   /* a vector of IntegerIntervals - one for each dimension */
   std::vector<IntegerInterval<abs_type>> m_bdd_interval;
@@ -460,14 +461,52 @@ public:
     return bdd;
   }
 
-  /** @brief get IntegerInterval  **/
+  /** @brief get vector of IntegerIntervals  **/
   std::vector<IntegerInterval<abs_type>> get_bdd_intervals() const {
     return m_bdd_interval;
   }
+
+
+  /** @brief get IntegerInterval  **/
+  IntegerInterval<abs_type> get_bdd_interval(int i) const {
+    return m_bdd_interval[i];
+  }
+
+  /** @brief access IntegerInterval slice **/
+  IntegerInterval<abs_type> &operator[](int i){
+    return m_bdd_interval[i];
+  }
+
   /** @brief get cube BDD with the BDD variables of the SymbolicSet **/
   BDD get_cube(const Cudd& manager) const {
     return manager.computeCube(get_bdd_vars());
   }
+
+  bool operator!= (const SymbolicSet& other) const{
+    return !(*(this) == other);
+  }
+
+  bool operator== (const SymbolicSet& other) const{
+    if (m_bdd_interval.size() != other.m_bdd_interval.size()) {
+      return false;
+    }
+    for (size_t i = 0; i < other.m_bdd_interval.size(); i++){
+      if (m_bdd_interval[i] != other.m_bdd_interval[i]){
+        return false;
+      }
+    }
+    return true; 
+  }
+
 }; /* close class def */
+
+SymbolicSet product(const std::vector<SymbolicSet> sets){
+  SymbolicSet p = sets[0];
+  for (size_t i = 1; i < sets.size(); i++){
+      p = SymbolicSet(p, sets[i]);
+  }
+  return p;
+}
+
 } /* close namespace */
 #endif /* SYMBOLICSET_HH_ */

@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <memory>
 
 /* cudd library */
@@ -20,8 +21,10 @@
 
 namespace scots {
 
+//enum IntervalType = {state, control, exogenous, output, unknown};
+
 /** @class IntegerInterval 
- *
+ * 
  *  @brief A class to represent the integers in a closed integer interval [lb; ub] as BDDs
  **/
 template<class int_type >
@@ -148,6 +151,39 @@ public:
     for(const auto& bdd : m_int_to_bdd)
       elements = elements | bdd;
     return elements;
+  }
+
+  bool operator!= (const IntegerInterval<int_type>& other) const{
+    return !(*(this) == other);
+  }
+
+  /** @brief Checks equality domain then subinterval **/
+  bool operator== (const IntegerInterval<int_type>& other) const{
+    if (this->m_bdd_var_id != other.m_bdd_var_id){
+      return false;
+    }else if (this->m_lb != other.m_lb){
+      return false;
+    }else if (this->m_ub != other.m_ub){
+      return false;
+    }else if (this->m_size != other.m_size){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
+  bool operator< (const IntegerInterval<int_type> rhs) const{
+    if (*this == rhs)
+      return false;
+
+    if (m_bdd_var_id.size() < rhs.m_bdd_var_id.size())
+      return true;
+    for(int i = 0; i < m_bdd_var_id.size(); i++){
+      if (m_bdd_var_id[i] < rhs.m_bdd_var_id[i]){
+        return true; 
+      }
+    }
+    return false; 
   }
 
 }; /* close class def */
