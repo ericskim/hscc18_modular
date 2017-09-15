@@ -263,6 +263,22 @@ public:
     x[0]=m_first[0]+num*m_eta[0];
   }
 
+  /*@brief computes upper right grid point associated with an index*/
+  void i_to_ur(abs_type id, std::vector<double>& x) const{
+    itox(id, x);
+    for (int k = 0; k < m_dim; k++){
+      x[k] += m_eta[k]/2.0;
+    }
+  }
+
+  /*@brief computes lower left grid point associated with an index*/
+  void i_to_ll(abs_type id, std::vector<double>& x) const{
+    itox(id, x);
+    for (int k = 0; k < m_dim; k++){
+      x[k] -= m_eta[k]/2.0;
+    }
+  }
+
   /** @brief do a index to state conversion for vectors **/
   template<class grid_point_t>
   std::vector<grid_point_t> ItoX(std::vector<abs_type>& Ivector) const{

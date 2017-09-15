@@ -29,7 +29,9 @@ const int state_dim=2;
 /* input space dim */
 const int control_dim=1;
 /* exog space dim*/
-const int exog_dim =1;
+const int exog_dim = 1;
+/* input space is a cartesian product*/
+const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
 const int N = 8;
 
@@ -40,6 +42,7 @@ const int N = 8;
 using state_type = std::array<double,state_dim>;
 using control_type = std::array<double,control_dim>;
 using exog_type  = std::array<double,exog_dim>;
+using input_type  = std::array<double,input_dim>;
 
 /* abbrev of the type for abstract states and inputs */
 using abs_type = scots::abs_type;
@@ -55,21 +58,7 @@ inline double saturate(double x, double lb, double ub){
   }
 }
 
-/* Function */ 
-auto dynamics = [](state_type &x, const control_type &u, const exog_type &w) {
-  x[0] = saturate(x[0] + x[1], 0.0, 40.0);
-  x[1] = saturate(x[1] + u[1] + w[0], -1.0, 1.0);
-};
 
-/* we integrate the growth bound by 0.3 sec (the result is stored in r)  */
-auto growth = [](state_type &r, const state_type &, const control_type &) {
-  r[0] = .2;
-  r[1] = .11;
-};
-
-auto overapprox = [&dynamics, &growth](){
-  
-}
 
 int main() {
   /* to measure time */
@@ -78,6 +67,21 @@ int main() {
   Cudd mgr;
   mgr.AutodynEnable();
   //mgr.AutodynDisable();
+
+  /* Function */ 
+  auto dynamics = [](state_type x, const control_type &u, const exog_type &w) -> state_type {
+    state_type post;
+    post[0] = saturate(x[0] + x[1], 0.0, 40.0);
+    post[1] = saturate(x[1] + u[1] + w[0], -1.0, 1.0);
+    return post;
+  };
+
+  /* Takes an input box and computes an overapproximating box. Both are represented with their 
+  */
+  auto sys_overapprox = [dynamics](const input_type &i_ll, const input_type &i_ur, state_type& o_ll, state_type& o_ur){
+    o_ll = dynamics({{i_ll[0], i_ll[1]}}, {{i_ll[2]}}, {{i_ll[3]}});
+    o_ur = dynamics({{i_ur[0], i_ur[1]}}, {{i_ur[2]}}, {{i_ur[3]}});
+  };
 
   /* State spaces */
   std::vector<scots::SymbolicSet> ss_pre; ss_pre.resize(N);
@@ -91,6 +95,15 @@ int main() {
     ss_pre[i] = scots::SymbolicSet(mgr, state_dim,s_lb,s_ub,s_eta);
     ss_post[i] = scots::SymbolicSet(mgr, state_dim,s_lb,s_ub,s_eta);
   }
+  ss_pre[0].print_info(1);
+
+  std::vector<double> x; 
+  ss_pre[0].itox(0, x);
+  std::cout << x[0] << " " << x[1] << "\n";
+  ss_pre[0].itox(200, x);
+  std::cout << x[0] << " " << x[1] << "\n";
+  ss_pre[0].itox(201, x);
+  std::cout << x[0] << " " << x[1] << "\n";
 
   /*Input spaces*/
   std::vector<scots::SymbolicSet> ss_control; ss_control.resize(N);
@@ -103,6 +116,7 @@ int main() {
   for(int i = 0; i < N; i++){
     ss_control[i] = scots::SymbolicSet(mgr, control_dim,i_lb,i_ub,i_eta);
   }
+
 
   /* Exogenous space */
   std::vector<scots::SymbolicSet> ss_exog; ss_exog.resize(N);
@@ -121,9 +135,10 @@ int main() {
     sysdeps[i].set_dependency(ss_post[i][1], {ss_pre[i][1],ss_control[i][0],ss_exog[i][0]});
   }
 
-  /*Compute system abstractions using dependencies*/ 
+  std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
+  /*Compute system abstractions using dependencies*/
   for (int i = 0; i < N; i++){
-    scots::FunctionAbstraction(sysdeps[i], overapprox);
+    abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
   }
 
   // std::vector<std::vector<int>> state_rhs(state_dim, std::vector<int>()), control_rhs(state_dim, std::vector<int>());
