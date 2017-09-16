@@ -136,9 +136,11 @@ int main() {
   }
 
   std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
+  std::vector<BDD> abs_systems(N, mgr.bddOne());
   /*Compute system abstractions using dependencies*/
   for (int i = 0; i < N; i++){
     abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
+    abs_systems[i] = abs_comp[i].compute_abstraction(mgr);
   }
 
   // std::vector<std::vector<int>> state_rhs(state_dim, std::vector<int>()), control_rhs(state_dim, std::vector<int>());

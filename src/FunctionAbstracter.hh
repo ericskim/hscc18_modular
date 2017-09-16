@@ -207,6 +207,27 @@ private:
     return x;
   }
 
+  /**
+  *  @brief Helper function to find integer coordinates along the post_dim-th coordinate
+  * @param[out] post_lb
+  * @param[out] post_ub
+  * @return  false if out of bounds, true otherwise
+  **/
+  bool post_interval_bounds(int odim, 
+                            concreteOutput ll, concreteOutput ur, 
+                            concreteOutput ll_bound, concreteOutput ur_bound, 
+                            abs_type &post_lb, abs_type &post_ub){
+    std::vector<double> eta = m_outSpace.get_eta();
+    if(ll[odim] <= ll_bound[odim]-eta[odim]/2.0  || ur[odim] >= ur_bound[odim]+eta[odim]/2.0) {
+      return false;
+    }
+    /* integer coordinate of lower left corner of output dimension odim */
+    post_lb = static_cast<abs_type>((ll[odim]-ll_bound[odim]+eta[odim]/2.0)/eta[odim]);
+    /* integer coordinate of upper right corner of output dimension odim */
+    post_ub = static_cast<abs_type>((ll[odim]-ur_bound[odim]+eta[odim]/2.0)/eta[odim]);
+    return true;
+  }
+
 public:
   ~FunctionAbstracter() {};
   // /* deactivate standard constructor */
@@ -224,56 +245,82 @@ public:
       overApprox = oa;
   }
 
-  BDD computeAbstraction(const Cudd& mgr){
-    const int odim = m_outSpace.get_dim();
-    const int idim = m_inSpace.get_dim();
+  BDD compute_abstraction(const Cudd& mgr){
+    const int odims = m_outSpace.get_dim();
+    const int idims = m_inSpace.get_dim();
     
+    /* variables for managing the low dimensional output */
+    abs_type post_lb, post_ub;
+
+    concreteInput input_ll, input_ur;
+
     /* for out of bounds check on output */
-    concreteOutput lower_left, upper_right;
+    concreteOutput set_ll, set_ur;
     concreteOutput overapprox_ll, overapprox_ur;
     /* copy data from m_state_alphabet */
-    for(int i=0; i<idim; i++) {
+    for(int i=0; i<idims; i++) {
       //eta[i]=m_inSpace.get_eta()[i];
-      lower_left[i]=m_inSpace.get_lower_left()[i];
-      upper_right[i]=m_inSpace.get_upper_right()[i];
+      set_ll[i]=m_inSpace.get_lower_left()[i];
+      set_ur[i]=m_inSpace.get_upper_right()[i];
     }
 
     /* the BDD to encode the approximation*/
     BDD approx = mgr.bddOne();
-    concreteInput input_ll, input_ur;
+    
 
-    if (odim <= 0){
+    if (odims <= 0){
       throw std::runtime_error("scots::computeAbstraction Output space is zero dimensional");
     }
 
-    for(int post_dim=0; post_dim<odim; post_dim++){
+    std::cout << "Abstraction Setup Complete" << std::endl;
+
+    for(int post_dim=0; post_dim<odims; post_dim++){
       BDD coord_approx = mgr.bddZero();
       /*Iterate over input space and compute overapproximations to output*/
       SymbolicSet bdd_dep = SymbolicSet(m_inSpace, dep.get_dependency(post_dim));
       SymbolicSet bdd_post_dim  = SymbolicSet(m_outSpace, {post_dim});
 
       abs_type N = bdd_dep.size();
+      std::cout << dep << " " << post_dim << " " << N << std::endl;
       for(abs_type i=0; i<N; i++) {
         BDD bdd_i = bdd_dep.id_to_bdd(i);
         input_ll = lifted_input<concreteInput>(i, m_inSpace, bdd_dep, dep.get_dependency(post_dim), "ll");
         input_ur = lifted_input<concreteInput>(i, m_inSpace, bdd_dep, dep.get_dependency(post_dim), "ur");
 
+        std::cout << i << std::endl;
+        std::cout << "In LL: " << input_ll[0] << " " << input_ll[1] << " " << input_ll[2] << " " << input_ll[3] << std::endl; 
+        std::cout << "In UR: " << input_ur[0] << " " << input_ur[1] << " " << input_ur[2] << " " << input_ur[3] << std::endl;
+
         /* Compute concrete values for post_lower and post_upper */
+        //std::cout << "Computing Corners of Concrete Box" << std::endl;
         overApprox(input_ll, input_ur, overapprox_ll, overapprox_ur);
 
+        std::cout << "Out LL: " << overapprox_ll[0] << " " << overapprox_ll[1] << std::endl; 
+        std::cout << "Out UR: " << overapprox_ur[0] << " " << overapprox_ur[1] << std::endl;
+
         /* Check for out of bounds errors along post_dim*/
+        //std::cout << "Out of bounds" << std::endl;
+        std::cout << "Post index" << std::endl;
+        if (!post_interval_bounds(post_dim, overapprox_ll, overapprox_ur, set_ll, set_ur, post_lb, post_ub))
+            continue;
+
 
         /* Compute BDD of the post_dim component of the function output */
-        BDD bdd_post_component = bdd_post_dim.interval_to_bdd(mgr,overapprox_ur,overapprox_ur);
+        std::cout << "Compute BDD index of post_dim" << std::endl;
+        BDD bdd_post_component = bdd_post_dim.interval_to_bdd(mgr,post_lb,post_ub);
+
+
         /* Add transition to current post coordinate */
+        std::cout << "Adding transition" << std::endl;
         coord_approx = coord_approx | (bdd_i & bdd_post_component);
       }
-
+      std::cout << "Computed Output component " << post_dim << std::endl;
       /* Impose coordinate constraint on post_dim*/
       approx &= coord_approx;
 
     } // end for along output coordinates
 
+    std::cout << "Returning" << std::endl;
     return approx;
   }
 
