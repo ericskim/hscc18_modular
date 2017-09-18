@@ -35,7 +35,7 @@ private:
   /* stores the permutation array used to swap pre with post variables */
   std::unique_ptr<int[]> m_permute;
   /* transition relation */
-  BDD m_tr;  
+  BDD m_tr;
   /* transition relation with m_cube_post abstracted */
   BDD m_tr_nopost;  
   /* BDD cubes with input and post variables */
@@ -49,23 +49,24 @@ public:
    *                              computed with SymbolicModel::compute_gb
    * @param  model - SymbolicModel containing the SymbolicSet for the state and input alphabet 
    **/
-  template<class state_type, class input_type>
   EnfPre(const Cudd& manager, 
          const BDD& transition_relation,
-         const SymbolicModel<state_type,input_type>& model) : m_tr(transition_relation) {
+         const SymbolicSet pre_set,
+         const SymbolicSet control_set,
+         const SymbolicSet post_set) : m_tr(transition_relation) {
     /* the permutation array */
     size_t size = manager.ReadSize();
     m_permute = std::unique_ptr<int[]>(new int[size]);
     std::iota(m_permute.get(),m_permute.get()+size,0);
-    auto pre_ids = model.get_sym_set_pre().get_bdd_var_ids();
-    auto post_ids = model.get_sym_set_post().get_bdd_var_ids();
+    auto pre_ids = pre_set.get_bdd_var_ids();
+    auto post_ids = post_set.get_bdd_var_ids();
     for(size_t i=0; i<pre_ids.size(); i++)
       m_permute[pre_ids[i]]=post_ids[i];
     /* create a cube with the input bdd vars */
-    m_cube_input = model.get_sym_set_input().get_cube(manager);
+    m_cube_input = control_set.get_cube(manager);
     /* create a cube with the post bdd vars */
-    m_cube_post = model.get_sym_set_post().get_cube(manager);
-    /* copy the transition relation */
+    m_cube_post = post_set.get_cube(manager);
+    /* non blocking states */
     m_tr_nopost=m_tr.ExistAbstract(m_cube_post);
   }
   /** @brief computes the enforcable predecessor of the BDD Z **/
@@ -91,7 +92,7 @@ inline void print_progress(int i) {
     std::cout << "                                        ";
     std::cout << "\r";
   }
-}
+} // close EnfPre 
 
 //inline 
 //BDD solve_invariance_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& S, bool verbose=true)  {
