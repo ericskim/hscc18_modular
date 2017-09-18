@@ -77,7 +77,7 @@ int main() {
   auto dynamics = [](const state_type x, const control_type u, const exog_type w) -> state_type {
     state_type post;
     post[0] = saturate(x[0] + x[1], 0.0, 40.0);
-    post[1] = saturate(x[1] + u[0] + .02*w[0], -1.0, 1.0);
+    post[1] = saturate(x[1] + u[0] + .05*w[0], -1.0, 1.0);
     return post;
   };
 
@@ -105,6 +105,7 @@ int main() {
     pre_product = scots::SymbolicSet(pre_product, ss_pre[i]);
     post_product = scots::SymbolicSet(post_product, ss_post[i]);
   }
+  ss_pre[0].print_info(1);
   
   /*Input spaces*/
   std::vector<scots::SymbolicSet> ss_control; ss_control.resize(N);
@@ -177,7 +178,7 @@ int main() {
   std::cout << "Abstracting out internal variables" << std::endl;
   interconnected_sys = interconnected_sys.ExistAbstract(exog_product.get_cube(mgr));
 
-  /** Construct Invariant Set **/
+  /** Construct Invariant Set on monlithic space **/
   std::cout << "Constructing Invariant Set" << std::endl;
   BDD inv = mgr.bddZero();
   for (int t = 0; t < 40 ; t++){
@@ -186,7 +187,7 @@ int main() {
       state_type x;
       ss_pre[0].itox(idx,x);
       /* function returns true if cell associated with x is in invariant set  */
-      if ( x[0] <= t + 5.0 && x[0] >= t - 5.0)
+      if ( x[0] <= t + 4.0 && x[0] >= t - 4.0)
         return true;
       return false;
     };
@@ -209,7 +210,7 @@ int main() {
   BDD C = mgr.bddZero();
   // /* BDD cube for existential abstract inputs */
   const BDD U = control_product.get_cube(mgr);
-  std::cout << "State Space Size: " << pre_product.get_size(mgr,XX) << std::endl;
+  std::cout << "\nState Space Size: " << pre_product.get_size(mgr,XX) << std::endl;
   std::cout << "Invariant size: " << pre_product.get_size(mgr,inv) << std::endl << std::endl;
   for(int i=1; XX != X; i++) { 
     X = XX;
@@ -219,6 +220,10 @@ int main() {
     XX = (XX & (inv));// | forcedout; // 
     std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,XX) << std::endl;
   }
-
+  
+  scots::SymbolicSet controller(pre_product,control_product);
+  std::cout << "\nWrite controller to controller.scs \n";
+  if(write_to_file(mgr, controller, C,"controller"))
+    std::cout << "Done. \n";
 }
 

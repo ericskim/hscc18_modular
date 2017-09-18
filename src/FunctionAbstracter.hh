@@ -253,7 +253,7 @@ public:
 
   BDD compute_abstraction(const Cudd& mgr){
     const int odims = m_outSpace.get_dim();
-    const int idims = m_inSpace.get_dim();
+    // const int idims = m_inSpace.get_dim();
     
     /* variables for managing the low dimensional output */
     abs_type post_lb, post_ub;
@@ -292,7 +292,6 @@ public:
         /* Compute concrete values for post_lower and post_upper */
         overApprox(input_ll, input_ur, overapprox_ll, overapprox_ur);
 
-        bool verbose = true;
         /* Check for out of bounds errors along post_dim*/
         if (!post_interval_bounds(post_dim, overapprox_ll, overapprox_ur, set_ll, set_ur, post_lb, post_ub)){
           std::cout << "Postdim: "<< post_dim << "  Dependency Index: " << i << std::endl;
@@ -304,7 +303,7 @@ public:
           std::cout << "Symbolic Indices: " << post_dim << " " << post_lb << " " << post_ub << std::endl << std::endl; 
           continue;
         }
-
+        
         /* Compute BDD of the post_dim component of the function output */
         BDD bdd_post_component = post_dim_slice.interval_to_bdd(mgr,post_lb,post_ub);
 
