@@ -31,11 +31,11 @@ namespace scots {
  *
  **/
 class EnfPre {
-private:
+protected:
   /* stores the permutation array used to swap pre with post variables */
   std::unique_ptr<int[]> m_permute;
   /* transition relation */
-  BDD m_tr;
+  const BDD m_tr;
   /* transition relation with m_cube_post abstracted */
   BDD m_tr_nopost;  
   /* BDD cubes with input and post variables */
@@ -51,9 +51,9 @@ public:
    **/
   EnfPre(const Cudd& manager, 
          const BDD& transition_relation,
-         const SymbolicSet pre_set,
-         const SymbolicSet control_set,
-         const SymbolicSet post_set) : m_tr(transition_relation) {
+         const SymbolicSet& pre_set,
+         const SymbolicSet& control_set,
+         const SymbolicSet& post_set) : m_tr(transition_relation){
     /* the permutation array */
     size_t size = manager.ReadSize();
     m_permute = std::unique_ptr<int[]>(new int[size]);
@@ -66,7 +66,7 @@ public:
     m_cube_input = control_set.get_cube(manager);
     /* create a cube with the post bdd vars */
     m_cube_post = post_set.get_cube(manager);
-    /* non blocking states */
+    /* non blocking states-input pairs */
     m_tr_nopost=m_tr.ExistAbstract(m_cube_post);
   }
   /** @brief computes the enforcable predecessor of the BDD Z **/
@@ -81,18 +81,68 @@ public:
     BDD preZ= m_tr_nopost & (!F);
     return preZ;
   }
-};
 
-/** @brief: small function to output progess of an iteration to the terminal **/
-inline void print_progress(int i) {
-  std::cout << ".";
-  std::flush(std::cout);
-  if(!(i%40)) {
-    std::cout << "\r";
-    std::cout << "                                        ";
-    std::cout << "\r";
+  /** @brief: small function to output progess of an iteration to the terminal **/
+  inline void print_progress(int i) {
+    std::cout << ".";
+    std::flush(std::cout);
+    if(!(i%40)) {
+      std::cout << "\r";
+      std::cout << "                                        ";
+      std::cout << "\r";
+    }
   }
-} // close EnfPre 
+
+}; // close EnfPre 
+
+
+
+class InterconnectedEnfPre: public EnfPre {
+private:
+  BDD inter;
+  std::vector<BDD> systems;
+  BDD m_cube_exog; 
+public:
+  /** @brief initialize the enforcabel predecessor
+   *  
+   * @param manager - the Cudd manager
+   * @param transition_relation - the BDD encoding the transition function of the SymbolicModel\n 
+   *                              computed with SymbolicModel::compute_gb
+   * @param  model - SymbolicModel containing the SymbolicSet for the state and input alphabet 
+   **/
+  InterconnectedEnfPre(const Cudd& manager, 
+         const BDD& transition_relation,
+         const SymbolicSet& pre_set,
+         const SymbolicSet& control_set,
+         const SymbolicSet& post_set,
+         const SymbolicSet& exog_set,
+         const BDD interconnection,
+         const std::vector<BDD>& sys_vec) : EnfPre(manager, transition_relation, pre_set, control_set, post_set), 
+                                       inter(interconnection),
+                                       systems(sys_vec){
+    m_cube_exog = exog_set.get_cube(manager);
+    m_tr_nopost = m_tr_nopost.ExistAbstract(m_cube_exog); 
+  }
+
+  /** @brief computes the enforcable predecessor of the BDD Z **/
+  BDD operator()(BDD Z) const {
+    /* project onto pre state alphabet */
+    Z=Z.ExistAbstract(m_cube_post*m_cube_input*m_cube_exog);
+    /* swap pre variables to post. Z is now in post domain */
+    Z=Z.Permute(m_permute.get());
+    /* find the set of (state, exog, inputs) tuples F with a post outside the safe set */
+    BDD F = m_tr.AndAbstract(!Z,m_cube_post);
+    /* find unsafe subset which is consistent with the interconnection relation */
+    // for (size_t i = 0; i < inter.size(); i++){
+    //   F &= inter[i];
+    // }
+    F &= inter; 
+    F = F.ExistAbstract(m_cube_exog*m_cube_post);
+    /* the remaining (state, input) pairs make up the pre */
+    BDD preZ= m_tr_nopost & (!F);
+    return preZ;
+  }
+}; // close InterconnectedEnfPre 
 
 //inline 
 //BDD solve_invariance_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& S, bool verbose=true)  {

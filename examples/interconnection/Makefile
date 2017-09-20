@@ -17,17 +17,20 @@ CUDDINC 		= -I$(CUDDPATH)/include
 CUDD		    =  $(CUDDINC) -L$(CUDDPATH)/lib -lcudd
 
 
-.PHONY: interconnection simulation
+.PHONY: interconnection simulation interconnection_2
 
-TARGET = interconnection simulation
+TARGET = interconnection simulation interconnection_2
 
 all: $(TARGET)
 
 interconnection: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) interconnection.cc -o interconnection.o
 
+interconnection_2: 
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) interconnection_2.cc -o interconnection_2.o
+
 simulation:
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) simulation.cc -o simulation.o
 
 clean:
-	rm interconnection simulation
+	rm interconnection simulation interconnection_2

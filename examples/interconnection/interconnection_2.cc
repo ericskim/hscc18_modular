@@ -33,7 +33,7 @@ const int exog_dim = 1;
 /* input space is a cartesian product*/
 const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
-const int N = 3;
+const int N = 2;
 
 /*
  * data types for the state space elements and input space
@@ -165,9 +165,9 @@ int main() {
 
   /* Declare and abstract interconnection. */
   std::cout << "Constructing Interconnection Abstraction" << std::endl;
-  scots::FunctionDependency inter_dep({ss_pre[0], ss_pre[1], ss_pre[2]},{ss_exog[0], ss_exog[1], ss_exog[2]});
+  scots::FunctionDependency inter_dep({ss_pre[0], ss_pre[1]},{ss_exog[0], ss_exog[1]});
   for(int i = 0; i < N; i++){
-    inter_dep.set_dependency(ss_exog[i][0], {ss_pre[0][0], ss_pre[1][0], ss_pre[2][0]});
+    inter_dep.set_dependency(ss_exog[i][0], {ss_pre[0][0], ss_pre[1][0]});
   }
   auto inter_overapprox = [ss_pre](const prod_state_type &ll, const prod_state_type& ur, prod_exog_type &o_ll, prod_exog_type &o_ur){
       std::vector<double> eta = ss_pre[0].get_eta();

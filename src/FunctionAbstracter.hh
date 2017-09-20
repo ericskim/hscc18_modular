@@ -146,6 +146,14 @@ public:
     return i_product;
   }
 
+  int get_idim(){
+    return i_dim;
+  }
+
+  int get_odim(){
+    return o_dim;
+  }
+
   /** @brief Print out dependencies for the product set **/
   friend std::ostream &operator<< (std::ostream &os, const FunctionDependency & dep){
     for(int i = 0; i < dep.o_dim; i++){
@@ -214,7 +222,7 @@ private:
   * @return  false if out of bounds, true otherwise
   **/
   bool post_interval_bounds(int odim, 
-                            concreteOutput ll, concreteOutput ur, 
+                            concreteOutput ll, concreteOutput ur,
                             concreteOutput ll_bound, concreteOutput ur_bound, 
                             abs_type &post_lb, abs_type &post_ub){
     std::vector<double> eta = m_outSpace.get_eta();
@@ -250,25 +258,86 @@ public:
       m_inSpace = dep.get_input_product();
       overApprox = oa;
   }
-
-  BDD compute_abstraction(const Cudd& mgr){
+  
+  /**
+  @brief Computes the symbolic approximation of the function along output dimension post_dim
+  **/
+  BDD compute_abstraction(const Cudd& mgr, int post_dim){
     const int odims = m_outSpace.get_dim();
-    // const int idims = m_inSpace.get_dim();
-    
+    if (post_dim >= odims){
+      throw std::runtime_error("scots::FunctionAbstracter post_dim exceeds permitted dimension");
+    }
     /* variables for managing the low dimensional output */
-    abs_type post_lb, post_ub;
-
     concreteInput input_ll, input_ur;
 
     /* for out of bounds check on output */
     concreteOutput set_ll, set_ur;
-    concreteOutput overapprox_ll, overapprox_ur;
-    /* copy data from m_state_alphabet */
     for(int i=0; i<odims; i++) {
-      //eta[i]=m_inSpace.get_eta()[i];
       set_ll[i]=m_outSpace.get_lower_left()[i];
       set_ur[i]=m_outSpace.get_upper_right()[i];
     }
+
+    concreteOutput overapprox_ll, overapprox_ur;
+    abs_type post_lb, post_ub;
+    BDD coord_approx = mgr.bddZero();
+
+    /*Iterate over input space and compute overapproximations to output*/
+    SymbolicSet dep_set = SymbolicSet(m_inSpace, dep.get_dependency(post_dim));
+    SymbolicSet post_dim_slice  = SymbolicSet(m_outSpace, {post_dim});
+
+    abs_type N = dep_set.size();
+    for(abs_type i=0; i<N; i++) {
+      BDD bdd_i = dep_set.id_to_bdd(i);
+      input_ll = lifted_input<concreteInput>(i, m_inSpace, dep_set, dep.get_dependency(post_dim), "ll");
+      input_ur = lifted_input<concreteInput>(i, m_inSpace, dep_set, dep.get_dependency(post_dim), "ur");
+
+      /* Compute concrete values for post_lower and post_upper */
+      overApprox(input_ll, input_ur, overapprox_ll, overapprox_ur);
+
+      /* Check for out of bounds errors along post_dim and skip if necessary */
+      if (!post_interval_bounds(post_dim, overapprox_ll, overapprox_ur, set_ll, set_ur, post_lb, post_ub)){
+        std::cout << "Postdim: "<< post_dim << "  Dependency Index: " << i << std::endl;
+        std::cout << "In LL: " << input_ll[0] << " " << input_ll[1] << " " << input_ll[2] << " " << input_ll[3] << std::endl; 
+        std::cout << "In UR: " << input_ur[0] << " " << input_ur[1] << " " << input_ur[2] << " " << input_ur[3] << std::endl;
+        std::cout << "Out LL: " << overapprox_ll[0] << " " << overapprox_ll[1] << std::endl; 
+        std::cout << "Out UR: " << overapprox_ur[0] << " " << overapprox_ur[1] << std::endl;
+        std::cout << "OUT OF REGION\n";
+        std::cout << "Symbolic Indices: " << post_dim << " " << post_lb << " " << post_ub << std::endl << std::endl;
+        continue;
+      }
+
+      /* Compute BDD of the post_dim component of the function output */
+      BDD bdd_post_component = post_dim_slice.interval_to_bdd(mgr,post_lb,post_ub);
+
+      /* Add transition to current post coordinate */
+      coord_approx = coord_approx | (bdd_i & bdd_post_component);
+    }
+    
+    /* Impose coordinate constraint on post_dim*/
+    return coord_approx;
+  }
+
+  /**
+  @brief Compute BDDs abstraction of function along each output dimension and returns a vector
+  **/
+  std::vector<BDD> compute_vector_abstraction(const Cudd& mgr){
+    const int odims = m_outSpace.get_dim();
+    std::vector<BDD> abs_components(odims, mgr.bddOne());
+
+    if (odims <= 0){
+      throw std::runtime_error("scots::FunctionAbstracter Output space should not be zero dimensional");
+    }
+    for(int post_dim=0; post_dim<odims; post_dim++){
+      abs_components[post_dim] = compute_abstraction(mgr, post_dim);
+    }
+    return abs_components;
+  }
+
+  /**
+  @brief Compute BDDs abstraction of function along each output dimension and returns the conjunction
+  **/
+  BDD compute_abstraction(const Cudd& mgr){
+    const int odims = m_outSpace.get_dim();
 
     /* the BDD to encode the approximation*/
     BDD approx = mgr.bddOne();
@@ -278,45 +347,8 @@ public:
     }
 
     for(int post_dim=0; post_dim<odims; post_dim++){
-      BDD coord_approx = mgr.bddZero();
-      /*Iterate over input space and compute overapproximations to output*/
-      SymbolicSet dep_set = SymbolicSet(m_inSpace, dep.get_dependency(post_dim));
-      SymbolicSet post_dim_slice  = SymbolicSet(m_outSpace, {post_dim});
-
-      abs_type N = dep_set.size();
-      for(abs_type i=0; i<N; i++) {
-        BDD bdd_i = dep_set.id_to_bdd(i);
-        input_ll = lifted_input<concreteInput>(i, m_inSpace, dep_set, dep.get_dependency(post_dim), "ll");
-        input_ur = lifted_input<concreteInput>(i, m_inSpace, dep_set, dep.get_dependency(post_dim), "ur");
-
-        /* Compute concrete values for post_lower and post_upper */
-        overApprox(input_ll, input_ur, overapprox_ll, overapprox_ur);
-
-        /* Check for out of bounds errors along post_dim*/
-        if (!post_interval_bounds(post_dim, overapprox_ll, overapprox_ur, set_ll, set_ur, post_lb, post_ub)){
-          std::cout << "Postdim: "<< post_dim << "  Dependency Index: " << i << std::endl;
-          std::cout << "In LL: " << input_ll[0] << " " << input_ll[1] << " " << input_ll[2] << " " << input_ll[3] << std::endl; 
-          std::cout << "In UR: " << input_ur[0] << " " << input_ur[1] << " " << input_ur[2] << " " << input_ur[3] << std::endl;
-          std::cout << "Out LL: " << overapprox_ll[0] << " " << overapprox_ll[1] << std::endl; 
-          std::cout << "Out UR: " << overapprox_ur[0] << " " << overapprox_ur[1] << std::endl;
-          std::cout << "OUT OF REGION\n";
-          std::cout << "Symbolic Indices: " << post_dim << " " << post_lb << " " << post_ub << std::endl << std::endl; 
-          continue;
-        }
-        
-        /* Compute BDD of the post_dim component of the function output */
-        BDD bdd_post_component = post_dim_slice.interval_to_bdd(mgr,post_lb,post_ub);
-
-
-        /* Add transition to current post coordinate */
-        coord_approx = coord_approx | (bdd_i & bdd_post_component);
-      }
-      
-      /* Impose coordinate constraint on post_dim*/
-      approx &= coord_approx;
-
-    } // end for along output coordinates
-
+      approx &= compute_abstraction(mgr, post_dim);
+    }
     return approx;
   }
 
