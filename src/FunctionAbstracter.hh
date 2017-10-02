@@ -107,6 +107,7 @@ public:
 
   }
 
+
   ~FunctionDependency(){};
 
  /** @brief Set function dependency
@@ -183,7 +184,7 @@ private:
   /* Explicit dependency graph*/
   FunctionDependency dep;
   /* Overapproximates concrete function */
-  std::function<void(const concreteInput&, const concreteInput&, concreteOutput &, concreteOutput &)> overApprox;
+  std::function<void(const concreteInput, const concreteInput, concreteOutput &, concreteOutput &)> overApprox;
   
   /**
   *  @brief Lifts the i-th gridpoint in lower dimension space "small" to a full dimensional gridpoint
@@ -222,12 +223,17 @@ private:
   * @return  false if out of bounds, true otherwise
   **/
   bool post_interval_bounds(int odim, 
-                            concreteOutput ll, concreteOutput ur,
+                            const concreteOutput ll, const concreteOutput ur,
                             concreteOutput ll_bound, concreteOutput ur_bound, 
                             abs_type &post_lb, abs_type &post_ub){
     std::vector<double> eta = m_outSpace.get_eta();
-    if(ll[odim] <= (ll_bound[odim]-eta[odim]/2.0)  || ur[odim] >= (ur_bound[odim]+eta[odim]/2.0)){
-      std::cout << "Post dim " << odim << std::endl;
+    if(ll[odim] < (ll_bound[odim]-eta[odim]/2.0)  || ur[odim] > (ur_bound[odim]+eta[odim]/2.0)){
+      std::cout << "Eta: ";
+      for (size_t i = 0; i < eta.size(); i++){
+        std::cout << eta[i] << " ";
+      }
+      std::cout << std::endl;
+      std::cout << "post_interval_bound post dim " << odim << std::endl;
       std::cout << "LL " << ll[odim] << " " << (ll_bound[odim]-eta[odim]/2.0) << std::endl;
       std::cout << "UR " << ur[odim] << " " << (ur_bound[odim]+eta[odim]/2.0) << std::endl;
       return false;
@@ -237,6 +243,13 @@ private:
     /* integer coordinate of upper right corner of output dimension odim */
     post_ub = static_cast<abs_type>((ur[odim]-ll_bound[odim]+eta[odim]/2.0)/eta[odim]);
     if (post_ub < post_lb){
+      std::cout << "Output Dimension: " << odim << std::endl; 
+      for (size_t i = 0; i < ll.size(); i++){
+        std::cout << ll[i] << " ";
+      }
+      std::cout << std::endl;
+      std::cout << "Concrete Values: " << ll[odim] << " " << ur[odim] << std::endl;
+      std::cout << "Discrete Indices" << post_lb << " " << post_ub << std::endl;
       throw std::runtime_error("scots::FunctionAbstracter Unexpected interval index");
     }
     return true;
@@ -297,10 +310,10 @@ public:
       /* Check for out of bounds errors along post_dim and skip if necessary */
       if (!post_interval_bounds(post_dim, overapprox_ll, overapprox_ur, set_ll, set_ur, post_lb, post_ub)){
         std::cout << "Postdim: "<< post_dim << "  Dependency Index: " << i << std::endl;
-        std::cout << "In LL: " << input_ll[0] << " " << input_ll[1] << " " << input_ll[2] << " " << input_ll[3] << std::endl; 
-        std::cout << "In UR: " << input_ur[0] << " " << input_ur[1] << " " << input_ur[2] << " " << input_ur[3] << std::endl;
-        std::cout << "Out LL: " << overapprox_ll[0] << " " << overapprox_ll[1] << std::endl; 
-        std::cout << "Out UR: " << overapprox_ur[0] << " " << overapprox_ur[1] << std::endl;
+        std::cout << "In LL: " << input_ll[0] << " " << input_ll[1] << " " << input_ll[2] << " " << input_ll[3]<< " " << input_ll[4] << " " << input_ll[5]<< " " << input_ll[6] << " " << input_ll[7] << std::endl; 
+        std::cout << "In UR: " << input_ur[0] << " " << input_ur[1] << " " << input_ur[2] << " " << input_ur[3]<< " " << input_ur[4] << " " << input_ur[5]<< " " << input_ur[6] << " " << input_ur[7] << std::endl;
+        std::cout << "Out LL: " << overapprox_ll[0] << " " << overapprox_ll[1]<< " " << overapprox_ll[2]<< " " << overapprox_ll[3]<< " " << overapprox_ll[4]<< " " << overapprox_ll[5] << std::endl; 
+        std::cout << "Out UR: " << overapprox_ur[0] << " " << overapprox_ur[1] << " " << overapprox_ur[2]<< " " << overapprox_ur[3]<< " " << overapprox_ur[4]<< " " << overapprox_ur[5]<< std::endl;
         std::cout << "OUT OF REGION\n";
         std::cout << "Symbolic Indices: " << post_dim << " " << post_lb << " " << post_ub << std::endl << std::endl;
         continue;
@@ -347,6 +360,7 @@ public:
     }
 
     for(int post_dim=0; post_dim<odims; post_dim++){
+      std::cout << post_dim << std::endl;
       approx &= compute_abstraction(mgr, post_dim);
     }
     return approx;

@@ -390,7 +390,8 @@ protected:
       m_NN[i] = total;
       /* check overflow */
       if(total > (max/m_no_grid_points[i])) {
-        throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in UniformGrid.hh).");
+
+        // throw std::runtime_error("\nscots::UniformGrid: number of grid points exceeds maximum value of abs_type (defined in UniformGrid.hh).");
       }
       total *= m_no_grid_points[i];
     }

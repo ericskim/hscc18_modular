@@ -41,6 +41,7 @@ protected:
   /* BDD cubes with input and post variables */
   BDD m_cube_post;
   BDD m_cube_input;
+  Cudd mgr;
 public:
   /** @brief initialize the enforcabel predecessor
    *  
@@ -54,6 +55,7 @@ public:
          const SymbolicSet& pre_set,
          const SymbolicSet& control_set,
          const SymbolicSet& post_set) : m_tr(transition_relation){
+    mgr = manager; 
     /* the permutation array */
     size_t size = manager.ReadSize();
     m_permute = std::unique_ptr<int[]>(new int[size]);
@@ -132,11 +134,9 @@ public:
     Z=Z.Permute(m_permute.get());
     /* find the set of (state, exog, inputs) tuples F with a post outside the safe set */
     BDD F = m_tr.AndAbstract(!Z,m_cube_post);
-    /* find unsafe subset which is consistent with the interconnection relation */
-    // for (size_t i = 0; i < inter.size(); i++){
-    //   F &= inter[i];
-    // }
-    F &= inter; 
+    /* get rid of transitions that are inconsistent with the interconnection relation */
+    // for (size_t i = 0; i < inter.size(); i++){F &= inter[i];}
+    F &= inter;
     F = F.ExistAbstract(m_cube_exog*m_cube_post);
     /* the remaining (state, input) pairs make up the pre */
     BDD preZ= m_tr_nopost & (!F);
