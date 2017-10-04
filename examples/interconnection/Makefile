@@ -17,9 +17,9 @@ CUDDINC 		= -I$(CUDDPATH)/include
 CUDD		    =  $(CUDDINC) -L$(CUDDPATH)/lib -lcudd
 
 
-.PHONY: interconnection simulation interconnection_2 consensus consensus_simulation max_connection
+.PHONY: interconnection simulation interconnection_2 consensus consensus_simulation max_connection runningmax
 
-TARGET = interconnection simulation interconnection_2 consensus consensus_simulation max_connection
+TARGET = interconnection simulation interconnection_2 consensus consensus_simulation max_connection runningmax
 
 all: $(TARGET)
 
@@ -34,6 +34,9 @@ consensus:
 
 consensus_simulation: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) consensus_simulation.cc -o consensus_simulation.o
+
+runningmax: 
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) runningmax.cc -o runningmax.o
 
 simulation:
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) simulation.cc -o simulation.o

@@ -108,8 +108,9 @@ void max128(std::array<double,128> ll, std::array<double, 128> ur, std::array<do
   for (int i = 0; i < n/2; i++){o_ll[i] = std::max(ll[2*i], ll[2*i+1]); o_ur[i] = std::max(ur[2*i], ur[2*i+1]);}
 }
 
-/* Computes AND of BDDs which are a vector of identical BDDs*/
-BDD pow2vectorAND(std::vector<BDD>& bdds){
+/* Computes AND of BDDs which are a vector of N identical BDDs. Assumes N is a power of 2.*/
+// TODO optimize so that the vector is passed by reference
+BDD pow2vectorAND(std::vector<BDD> bdds){
   int N = bdds.size(); 
   std::cout << N << std::endl;
   for(int stride = 2; stride <= N; stride *= 2){
@@ -128,7 +129,7 @@ int main() {
   /* cudd manager */
   Cudd mgr;
   mgr.AutodynEnable(CUDD_REORDER_SIFT_CONVERGE);
-  //mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
+  // mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
   //mgr.SetMaxGrowth(2.5);
   mgr.EnableReorderingReporting();
   //mgr.AutodynDisable();
@@ -203,13 +204,13 @@ int main() {
   std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
   std::vector<BDD> abs_systems(N, mgr.bddOne());
   BDD composed_systems = mgr.bddOne();
+  tt.tic();
   for (int i = 0; i < N; i++){
-    abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
-    tt.tic();
-    std::cout << "System " << i << " abstraction ";
-    composed_systems &= abs_comp[i].compute_abstraction(mgr);
-    //abs_systems[i] = abs_comp[i].compute_abstraction(mgr);
-    tt.toc();
+    // abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
+    // std::cout << "System " << i << " abstraction ";
+    // composed_systems &= abs_comp[i].compute_abstraction(mgr);
+    // //abs_systems[i] = abs_comp[i].compute_abstraction(mgr);
+    // tt.toc();
   }
   tt.toc();
 
@@ -218,15 +219,6 @@ int main() {
   // tt.tic();
   // interconnected_sys = pow2vectorAND(abs_systems);
   // tt.toc();
-
-  // Merging while also destroying the BDDs
-  // while(abs_systems.size() != 1){
-  //   std::cout << "Systems Remaining " << abs_systems.size() << std::endl;
-  //   for (size_t i = 0; i < abs_systems.size()/2;i++){
-  //     abs_systems[i] = abs_systems[2*i] & abs_systems[2*i+1];
-  //   }
-  //   abs_systems.resize(abs_systems.size()/2);
-  // }
 
   tt.tic();
 
@@ -267,7 +259,7 @@ int main() {
       for(int j = 0; j < vars_in_layer;j++){
         inter_deps[i].set_dependency(ss_inter[i][j], {ss_inter[i-1][2*j], ss_inter[i-1][2*j+1]});
       }
-    }
+    } 
     //std::cout << inter_deps[i] << std::endl << std::endl;
     vars_in_layer = vars_in_layer / 2;
   }
@@ -276,16 +268,20 @@ int main() {
   /* Abstracter Declarations. This is required b/c templates are all at compile time */
   std::vector<std::vector<BDD> > interconnection_BDDs; interconnection_BDDs.resize(layers);
   std::vector<BDD> layer_BDDs; layer_BDDs.resize(layers);
+  BDD interconnection = mgr.bddOne();
   std::cout << "Abstracting Interconnection Layers" << std::endl;
   tt.tic();
-  for(int i = 0; i < layers; i++){
+  for(int i = layers-1; i >= 0; i--) {
     switch(i){
       case 0:{
         std::cout << "Abstracting " << i << " layers deep" << std::endl;
         scots::FunctionAbstracter<std::array<double, 2>, std::array<double, 1> > layer1(inter_deps[layers-1],max2);
         tt.tic();
         // interconnection_BDDs[0] = layer1.compute_vector_abstraction(mgr);
-        layer_BDDs[i] = pow2vectorAND(layer1.compute_vector_abstraction(mgr));
+        // layer_BDDs[i] = pow2vectorAND(layer1.compute_vector_abstraction(mgr));
+        interconnection &= pow2vectorAND(layer1.compute_vector_abstraction(mgr));
+        // for (int j = 0; j < 1; j++)
+          // interconnection &= layer1.compute_abstraction(mgr, j);
         tt.toc();
         break;
       }
@@ -293,7 +289,10 @@ int main() {
         std::cout << "Abstracting " << i << " layers deep" << std::endl;
         scots::FunctionAbstracter<std::array<double, 4>, std::array<double, 2> > layer2(inter_deps[layers-2],max4);
         // interconnection_BDDs[i] = layer2.compute_vector_abstraction(mgr);
-        layer_BDDs[i] = pow2vectorAND(layer2.compute_vector_abstraction(mgr));        
+        // layer_BDDs[i] = pow2vectorAND(layer2.compute_vector_abstraction(mgr));
+        interconnection &= pow2vectorAND(layer2.compute_vector_abstraction(mgr));
+        // for (int j = 0; j < 2; j++)
+        //   interconnection &= layer2.compute_abstraction(mgr, j);
         tt.toc();
         break;
       }
@@ -301,15 +300,21 @@ int main() {
         std::cout << "Abstracting " << i << " layers deep" << std::endl;
         scots::FunctionAbstracter<std::array<double, 8>, std::array<double, 4> > layer3(inter_deps[layers-3],max8);
         // interconnection_BDDs[i] = layer3.compute_vector_abstraction(mgr);
-        layer_BDDs[i] = pow2vectorAND(layer3.compute_vector_abstraction(mgr));
+        // layer_BDDs[i] = pow2vectorAND(layer3.compute_vector_abstraction(mgr));
+        interconnection &= pow2vectorAND(layer3.compute_vector_abstraction(mgr));
+        // for (int j = 0; j < 4; j++)
+        //   interconnection &= layer3.compute_abstraction(mgr, j);
         tt.toc();
         break;
       }
-      case 3:{
+      case 3:{ 
         std::cout << "Abstracting " << i << " layers deep" << std::endl;
         scots::FunctionAbstracter<std::array<double, 16>, std::array<double, 8> > layer4(inter_deps[layers-4],max16);
         // interconnection_BDDs[i] = layer4.compute_vector_abstraction(mgr);
-        layer_BDDs[i] = pow2vectorAND(layer4.compute_vector_abstraction(mgr));        
+        // layer_BDDs[i] = pow2vectorAND(layer4.compute_vector_abstraction(mgr));
+        interconnection &= pow2vectorAND(layer4.compute_vector_abstraction(mgr));
+        // for (int j = 0; j < 8; j++) 
+        //   interconnection &= layer4.compute_abstraction(mgr, j);
         tt.toc();
         break;
       }
@@ -317,7 +322,10 @@ int main() {
         std::cout << "Abstracting " << i << " layers deep" << std::endl;
         scots::FunctionAbstracter<std::array<double, 32>, std::array<double, 16> > layer5(inter_deps[layers-5],max32);
         // interconnection_BDDs[i] = layer5.compute_vector_abstraction(mgr);
-        layer_BDDs[i] = pow2vectorAND(layer5.compute_vector_abstraction(mgr));
+        // layer_BDDs[i] = pow2vectorAND(layer5.compute_vector_abstraction(mgr));
+        interconnection &= pow2vectorAND(layer5.compute_vector_abstraction(mgr));
+        // for (int j = 0; j < 16; j++)
+        //   interconnection &= layer5.compute_abstraction(mgr, j);
         tt.toc();
         break;
       }
@@ -325,7 +333,10 @@ int main() {
         std::cout << "Abstracting " << i << " layers deep" << std::endl;
         scots::FunctionAbstracter<std::array<double, 64>, std::array<double, 32> > layer6(inter_deps[layers-6],max64);
 //        interconnection_BDDs[i] = layer6.compute_vector_abstraction(mgr);
-        layer_BDDs[i] = pow2vectorAND(layer6.compute_vector_abstraction(mgr));
+        // layer_BDDs[i] = pow2vectorAND(layer6.compute_vector_abstraction(mgr));
+        interconnection &= pow2vectorAND(layer6.compute_vector_abstraction(mgr));
+        // for (int j = 0; j < 32; j++)
+        //   interconnection &= layer6.compute_abstraction(mgr, j);
         tt.toc();
         break;
       }

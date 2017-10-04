@@ -70,6 +70,7 @@ auto dynamics = [](state_type &x, control_type u) {
     avg += x[i];
   }
   avg = avg / state_dim;
+  std::cout << "Average w: " << avg << std::endl;
   for (int i = 0; i < state_dim; i++){
     w = x[i] - avg;
     x[i] = logistic_curve(x[i] + u[i] + .1*w, 0, 31);
@@ -112,12 +113,15 @@ int main() {
 
 
   //2 12 8 14 8 10
-  state_type x={15.5, 15.8, 15, 16, 24, 16};
+  state_type x={15.4, 15.3, 15, 16, 22, 17};
+  // state_type x = {15,15,15,16,24,16};
+  //14.6 15.4 15 16.2 17.1 24.1 
   int u_index;
   std::cout << "\nSimulation:\n " << std::endl;
 
-      // std::cout << "Enter an initial 6D state" << std::endl;
-      // std::cin >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5];
+    while(true){
+      std::cout << "Enter an initial 6D state" << std::endl;
+      std::cin >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5];
 
       for(int i=0; i<50; i++) {
       //   // returns a std vector with the valid control inputs     
@@ -130,12 +134,12 @@ int main() {
         if (active_control){
           std::cout << "Getting Control Input" << std::endl;
           auto u = con.restriction<state_type>(manager,C,x);
-          u_index = u.size() - (rand() % (u.size()/control_dim))*control_dim;//rand() % (u.size()/control_dim);
-          std::cout << u.size() << std::endl;
           if (u.size() == 0){
             std::cout << "No valid control" << std::endl;
             break;
           }
+          u_index = u.size() - (rand() % (u.size()/control_dim))*control_dim;//rand() % (u.size()/control_dim);
+          std::cout << u.size() << std::endl;
           std::cout << "Input Index: " << u_index << std::endl;
           std::cout << "Input: ";
           for(int j = 0; j < control_dim; j++){
@@ -149,7 +153,7 @@ int main() {
           dynamics(x, {0,0,0,0,0,0});
         }
       }
-    
+    }
   
 
 

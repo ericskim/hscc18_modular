@@ -125,7 +125,6 @@ public:
       p_index = get_index(i_interval_to_index, pre_deps[i]);
       depends[o_index].push_back(p_index);
     }
-
   }
 
   std::vector<std::vector<int> > get_dependency() const{
@@ -360,7 +359,7 @@ public:
     }
 
     for(int post_dim=0; post_dim<odims; post_dim++){
-      std::cout << post_dim << std::endl;
+      // std::cout << post_dim << std::endl;
       approx &= compute_abstraction(mgr, post_dim);
     }
     return approx;
