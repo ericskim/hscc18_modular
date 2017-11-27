@@ -111,6 +111,8 @@ public:
   ~FunctionDependency(){};
 
  /** @brief Set function dependency
+  @param [in] oslice - Output interval. A "slice" of the output set
+  @param [in] pre_deps - Vector of dependencies for the pre interval. 
   If a dependency has already been set for the specific output then it will be cleared if written.
  **/
   void set_dependency(IntegerInterval<abs_type>& oslice, 
@@ -189,7 +191,7 @@ private:
   *  @brief Lifts the i-th gridpoint in lower dimension space "small" to a full dimensional gridpoint
   **/
   template <class T>
-  inline T lifted_input(abs_type i, 
+  T lifted_input(abs_type i, 
                         const SymbolicSet & full, 
                         const SymbolicSet & small, 
                         std::vector<int> dep,
@@ -254,16 +256,19 @@ private:
     return true;
   }
 
+  template <class A>
+  void print_vector (std::string description, A &vec){
+    std::cout << description;
+    for (size_t j = 0; j < vec.size(); j++){
+      std::cout << vec[j] << " "; 
+    }
+    std::cout << std::endl; 
+  }
+
 public:
   ~FunctionAbstracter() {};
-  // /* deactivate standard constructor */
   FunctionAbstracter() {};
-  // /* cannot be copied or moved */
-  // FunctionAbstracter(FunctionAbstracter&&) = delete;
-  // FunctionAbstracter(const FunctionAbstracter&) = delete;
-  // FunctionAbstracter& operator=(FunctionAbstracter&&)=delete;
-  // FunctionAbstracter& operator=(const FunctionAbstracter&)=delete;
-
+  /**@brief Constructor that remembers function dependencies **/
   FunctionAbstracter(const FunctionDependency d,
                       const std::function<void(const concreteInput&, const concreteInput&, concreteOutput &, concreteOutput &)> oa): dep(d) {
       m_outSpace = dep.get_output_product();
@@ -273,6 +278,7 @@ public:
   
   /**
   @brief Computes the symbolic approximation of the function along output dimension post_dim
+
   **/
   BDD compute_abstraction(const Cudd& mgr, int post_dim){
     const int odims = m_outSpace.get_dim();
@@ -297,8 +303,9 @@ public:
     SymbolicSet dep_set = SymbolicSet(m_inSpace, dep.get_dependency(post_dim));
     SymbolicSet post_dim_slice  = SymbolicSet(m_outSpace, {post_dim});
 
-    abs_type N = dep_set.size();
-    for(abs_type i=0; i<N; i++) {
+    abs_type N_grid_points = dep_set.size();
+    /* Iterates over an exponential grid of dep_set. N_grid_points may be huge!*/
+    for(abs_type i=0; i<N_grid_points; i++) {
       BDD bdd_i = dep_set.id_to_bdd(i);
       input_ll = lifted_input<concreteInput>(i, m_inSpace, dep_set, dep.get_dependency(post_dim), "ll");
       input_ur = lifted_input<concreteInput>(i, m_inSpace, dep_set, dep.get_dependency(post_dim), "ur");
@@ -309,10 +316,12 @@ public:
       /* Check for out of bounds errors along post_dim and skip if necessary */
       if (!post_interval_bounds(post_dim, overapprox_ll, overapprox_ur, set_ll, set_ur, post_lb, post_ub)){
         std::cout << "Postdim: "<< post_dim << "  Dependency Index: " << i << std::endl;
-        std::cout << "In LL: " << input_ll[0] << " " << input_ll[1] << " " << input_ll[2] << " " << input_ll[3]<< " " << input_ll[4] << " " << input_ll[5]<< " " << input_ll[6] << " " << input_ll[7] << std::endl; 
-        std::cout << "In UR: " << input_ur[0] << " " << input_ur[1] << " " << input_ur[2] << " " << input_ur[3]<< " " << input_ur[4] << " " << input_ur[5]<< " " << input_ur[6] << " " << input_ur[7] << std::endl;
-        std::cout << "Out LL: " << overapprox_ll[0] << " " << overapprox_ll[1]<< " " << overapprox_ll[2]<< " " << overapprox_ll[3]<< " " << overapprox_ll[4]<< " " << overapprox_ll[5] << std::endl; 
-        std::cout << "Out UR: " << overapprox_ur[0] << " " << overapprox_ur[1] << " " << overapprox_ur[2]<< " " << overapprox_ur[3]<< " " << overapprox_ur[4]<< " " << overapprox_ur[5]<< std::endl;
+        
+        print_vector("In LL: ", input_ll);
+        print_vector("In UR: ", input_ur);
+        print_vector("Out LL: ", overapprox_ll);
+        print_vector("Out UR: ", overapprox_ur);
+
         std::cout << "OUT OF REGION\n";
         std::cout << "Symbolic Indices: " << post_dim << " " << post_lb << " " << post_ub << std::endl << std::endl;
         continue;
@@ -330,7 +339,7 @@ public:
   }
 
   /**
-  @brief Compute BDDs abstraction of function along each output dimension and returns a vector
+  @brief Compute BDDs abstraction of function along each output dimension and returns a vector of BDDs
   **/
   std::vector<BDD> compute_vector_abstraction(const Cudd& mgr){
     const int odims = m_outSpace.get_dim();
@@ -347,11 +356,14 @@ public:
 
   /**
   @brief Compute BDDs abstraction of function along each output dimension and returns the conjunction
+
+  This method is more efficient than calling compute_vector_abstraction and then taking a conjunction because
+  CUDD can destroy the BDDs once they are no longer used.
   **/
-  BDD compute_abstraction(const Cudd& mgr){
+  BDD compute_abstraction(const Cudd& mgr, bool verbose = false){
     const int odims = m_outSpace.get_dim();
 
-    /* the BDD to encode the approximation*/
+    /* the BDD to encode the abstract function approximation */
     BDD approx = mgr.bddOne();
     
     if (odims <= 0){
@@ -359,7 +371,9 @@ public:
     }
 
     for(int post_dim=0; post_dim<odims; post_dim++){
-      // std::cout << post_dim << std::endl;
+      if (verbose){
+        std::cout << "Abstracting Output Dimension: " << post_dim << std::endl;
+      }
       approx &= compute_abstraction(mgr, post_dim);
     }
     return approx;

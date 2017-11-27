@@ -1,14 +1,17 @@
 /*
- * vehicle.cc
+ * runningmax.cc
  *
  *  created: Sep 2017
  *   author: Eric Kim
  */
 
 /*
- * information about this example is given ll
- * http://arxiv.org/abs/1313.03715
- * doi: 10.1109/TAC.2016.2593947
+* Computes a max of N numbers through a running maximum, similar to the for loop below by in a declarative setting
+* z = x[0]; 
+* for(i = 1; i< N; i++) 
+*   z = max(z, x[i]);
+*
+*
  */
 
 #include <iostream>
@@ -35,7 +38,7 @@ const int exog_dim = 1;
 /* input space of system is a cartesian product*/
 const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
-const int N = 20;
+const int N = 22;
 
 const int inter_dim = N - 2; 
 
@@ -78,7 +81,6 @@ void print_support(const Cudd& mgr, const BDD& x){
 }
 
 /* Generate max functions */
-/* THIS IS STUPID, BUT I NEED TO DO THIS BECAUSE OF FUNCTIONABSTRACTER'S TEMPLATE ARGUMENTS*/
 void max2(std::array<double,2> ll, std::array<double, 2> ur, std::array<double, 1> &o_ll, std::array<double,1> &o_ur){
   o_ll[0] = std::max(ll[0], ll[1]); 
   o_ur[0] = std::max(ur[0], ur[1]);
@@ -113,7 +115,7 @@ int main() {
   /* Dynamics for individual subsystem */ 
   auto dynamics = [](const state_type x, const control_type u, const exog_type w) -> state_type {
     state_type post;
-    post[0] = std::min(x[0] + u[0], w[0] + 1);
+    post[0] = std::min(.75*(x[0] + u[0]), w[0] + 1);
     post[0] = saturate(post[0], 0, 31.0);
     return post;
   };
@@ -235,7 +237,7 @@ int main() {
     tt.toc();
   }
   tt.toc();
-
+  // mgr.AutodynDisable();
   std::cout << "Composing Systems" << std::endl;
   tt.tic();
   BDD monolithic = composed_systems & interconnection;

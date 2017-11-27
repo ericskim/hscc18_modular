@@ -17,20 +17,26 @@ CUDDINC 		= -I$(CUDDPATH)/include
 CUDD		    =  $(CUDDINC) -L$(CUDDPATH)/lib -lcudd
 
 
-.PHONY: interconnection simulation interconnection_2 consensus consensus_simulation max_connection runningmax
+.PHONY: interconnection simulation consensus consensus_simulation max_connection runningmax better_consensus iter_consensus monotone_consensus
 
-TARGET = interconnection simulation interconnection_2 consensus consensus_simulation max_connection runningmax
+TARGET = interconnection simulation consensus consensus_simulation max_connection runningmax better_consensus iter_consensus monotone_consensus
 
 all: $(TARGET)
 
 interconnection: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) interconnection.cc -o interconnection.o
 
-interconnection_2: 
-	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) interconnection_2.cc -o interconnection_2.o
+monotone_consensus:
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) monotone_consensus.cc -o monotone_consensus.o
 
 consensus: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) consensus.cc -o consensus.o
+
+better_consensus:
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) better_consensus.cc -o better_consensus.o
+
+iter_consensus:
+	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) iter_consensus.cc -o iter_consensus.o
 
 consensus_simulation: 
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) consensus_simulation.cc -o consensus_simulation.o

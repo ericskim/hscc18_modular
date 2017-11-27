@@ -83,7 +83,7 @@ public:
     BDD preZ= m_tr_nopost & (!F);
     return preZ;
   }
-
+  
   /** @brief: small function to output progess of an iteration to the terminal **/
   inline void print_progress(int i) {
     std::cout << ".";
@@ -128,19 +128,18 @@ public:
 
   /** @brief computes the enforcable predecessor of the BDD Z **/
   BDD operator()(BDD Z) const {
+    // TODO there might be a bug where it's permissible to go outside the interconnection's domain
     /* project onto pre state alphabet */
     Z=Z.ExistAbstract(m_cube_post*m_cube_input*m_cube_exog);
     /* swap pre variables to post. Z is now in post domain */
     Z=Z.Permute(m_permute.get());
-    /* find the set of (state, exog, inputs) tuples F with a post outside the safe set */
+    /* find the set of (state, exog, inputs) tuples F with a post intersecting the unsafe set */
     BDD F = m_tr.AndAbstract(!Z,m_cube_post);
     /* get rid of transitions that are inconsistent with the interconnection relation */
-    // for (size_t i = 0; i < inter.size(); i++){F &= inter[i];}
     F &= inter;
     F = F.ExistAbstract(m_cube_exog*m_cube_post);
     /* the remaining (state, input) pairs make up the pre */
-    BDD preZ= m_tr_nopost & (!F);
-    return preZ;
+    return  m_tr_nopost & (!F);
   }
 }; // close InterconnectedEnfPre 
 

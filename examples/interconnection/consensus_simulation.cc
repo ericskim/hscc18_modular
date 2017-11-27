@@ -85,8 +85,8 @@ int main() {
   /* read controller from file */
   BDD C;
   scots::SymbolicSet con, ss_pre, ss_control;
-  bool active_control = false;
-  if(active_control && !read_from_file(manager,con,C,"consensus_controller")) {
+  bool active_control = true;
+  if(active_control && !read_from_file(manager,con,C,"better_consensus_controller")) {
     std::cout << "Could not read controller from consensus_controller.scs\n";
     return 0;
   }
