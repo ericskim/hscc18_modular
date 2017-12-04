@@ -218,7 +218,7 @@ private:
   }
 
   /**
-  *  @brief Helper function to find integer coordinates along the post_dim-th coordinate
+  * @brief Helper function to find integer coordinates along the post_dim-th coordinate
   * @param[out] post_lb
   * @param[out] post_ub
   * @return  false if out of bounds, true otherwise
@@ -304,6 +304,7 @@ public:
     SymbolicSet post_dim_slice  = SymbolicSet(m_outSpace, {post_dim});
 
     abs_type N_grid_points = dep_set.size();
+    std::cout << N_grid_points << std::endl;
     /* Iterates over an exponential grid of dep_set. N_grid_points may be huge!*/
     for(abs_type i=0; i<N_grid_points; i++) {
       BDD bdd_i = dep_set.id_to_bdd(i);
