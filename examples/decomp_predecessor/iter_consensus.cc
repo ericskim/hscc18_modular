@@ -12,8 +12,6 @@
 #include <array>
 #include <cmath>
 
-#include <algorithm>
-
 /* SCOTS header */
 #include "scots.hh"
 
@@ -35,9 +33,7 @@ const int input_dim = state_dim + control_dim + exog_dim;
 /* Create N identical systems */
 const int N = 3;
 
-const int inter_dim = N-2; 
-
-bool verbose = false; 
+const int inter_dim = N - 2; 
 
 /*
  * data types for the state space elements and input space
@@ -85,13 +81,6 @@ void print_support(const Cudd& mgr, const BDD& x){
   std::cout << std::endl;
 }
 
-/** @brief Variables IDs that the BDD x depends on **/
-std::vector< unsigned int > get_support(const Cudd& mgr, const BDD& x){
-  return mgr.SupportIndices({x});
-}
-
-
-
 int main() {
   /* to measure time */
   TicToc tt;
@@ -100,7 +89,7 @@ int main() {
   mgr.AutodynEnable(CUDD_REORDER_SIFT_CONVERGE);
   // mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
   //mgr.SetMaxGrowth(2.5);
-  //mgr.EnableReorderingReporting();
+  mgr.EnableReorderingReporting();
   //mgr.AutodynDisable();
 
   /* Dynamics for individual subsystem */ 
@@ -116,7 +105,7 @@ int main() {
   auto sys_overapprox = [dynamics](const input_type i_ll, const input_type i_ur, state_type& o_ll, state_type& o_ur){
     o_ll = dynamics({i_ll[0]}, {i_ll[1]}, {i_ll[2]});
     o_ur = dynamics({i_ur[0]}, {i_ur[1]}, {i_ur[2]});
-  }; 
+  };
 
   /* State spaces */
   std::vector<scots::SymbolicSet> ss_pre; ss_pre.resize(N);
@@ -160,8 +149,6 @@ int main() {
   exog_type e_ub = {{31}};
   exog_type e_eta = {{1}};
   ss_exog = scots::SymbolicSet(mgr, exog_dim,e_lb,e_ub,e_eta);
-  std::cout << "Exogenous Information" << std::endl;
-  ss_exog.print_info(1);
 
   /* Declare dependencies for individual systems */
   std::vector<scots::FunctionDependency> sysdeps(N, scots::FunctionDependency());
@@ -169,32 +156,17 @@ int main() {
     sysdeps[i] = scots::FunctionDependency({ss_pre[i], ss_control[i], ss_exog},{ss_post[i]});
     sysdeps[i].set_dependency(ss_post[i][0], {ss_pre[i][0], ss_control[i][0], ss_exog[0]});
   }
-  /* Compute sub-system abstractions using dependencies */
-  std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
-  std::vector<BDD> abs_systems(N, mgr.bddOne());
-  std::vector<BDD> BDD_components; 
-  BDD systems = mgr.bddOne(); 
-  BDD interconnected_sys = mgr.bddOne();
-  for (int i = 0; i < N; i++){
-    abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
-    tt.tic();
-    std::cout << "System " << i << " abstraction ";
-    //abs_systems[i] = abs_comp[i].compute_abstraction(mgr);
-    BDD_components.push_back(abs_comp[i].compute_abstraction(mgr));
-    tt.toc();
-  }
 
 
   /* 
-  Declare dependencies and abstract interconnection. 
+  Declare and abstract interconnection. 
   */
   std::vector<scots::SymbolicSet> ss_intermed; // intermediate layers ll tree
   ss_intermed.resize(N-2);
 
-  std::vector<scots::FunctionDependency>inter_deps; inter_deps.resize(N-1);
+  std::vector<scots::FunctionDependency>inter_deps; inter_deps.resize(N-1); 
   scots::SymbolicSet intermed_product = scots::SymbolicSet();
   BDD abs_inter = mgr.bddOne();
-  std::vector<BDD> BDD_recursive_avg(N-1, mgr.bddOne());
   tt.tic();
   for (int i = 0; i < N-1; i++){
     std::cout << i << std::endl;
@@ -215,7 +187,7 @@ int main() {
         o_ll[0] = .5*(ll[0] + ll[1]); 
         o_ur[0] = .5*(ur[0] + ur[1]); 
       }
-      else{ // left hand side is always the current average of previous i+2 numbers
+      else{ // left hand side is always the current average of previous i+1 numbers
         o_ll[0] = ((i+1.0)*(ll[0]) + ll[1])/(i+2.0);
         o_ur[0] = ((i+1.0)*(ur[0]) + ur[1])/(i+2.0);
       }
@@ -235,13 +207,40 @@ int main() {
     }
 
     scots::FunctionAbstracter<std::array<double, 2>, std::array<double, 1> > layer(inter_deps[i], recursive_avg);
-//    BDD_recursive_avg[i] = layer.compute_abstraction(mgr);
-    BDD_components.push_back(layer.compute_abstraction(mgr));
+    abs_inter &= layer.compute_abstraction(mgr);
 
   }
   tt.toc();
-  std::cout << "Intermediate Product Information" << std::endl; 
-  intermed_product.print_info(1);
+
+  /** Construct abstraction of interconnected system.
+  First construct system that's a subset of X x W x U x X'
+  Then use this system to get a monolithic system X x U x X'
+  with nondeterminism from W, which is constrained by values in X
+   **/
+  /*Compute system abstractions using dependencies*/
+  std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
+  std::vector<BDD> abs_systems(N, mgr.bddOne());
+  BDD systems = mgr.bddOne(); 
+  BDD interconnected_sys = mgr.bddOne();
+  for (int i = 0; i < N; i++){
+    abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
+    tt.tic();
+    std::cout << "System " << i << " abstraction ";
+    interconnected_sys &= abs_comp[i].compute_abstraction(mgr);
+    tt.toc();
+  }
+  // std::cout << "Composing smaller systems " << std::endl;
+
+  tt.tic();
+  // std::cout << "Applying interconnection relation" << std::endl;
+  interconnected_sys &= abs_inter;
+  tt.toc(); 
+
+  tt.tic();
+  std::cout << "Abstracting out internal variabless!" << std::endl;
+  interconnected_sys = interconnected_sys.ExistAbstract(ss_exog.get_cube(mgr));
+  interconnected_sys = interconnected_sys.ExistAbstract(intermed_product.get_cube(mgr));
+  tt.toc();
 
   /** Construct Invariant Set on monlithic space **/
   std::cout << "Constructing Target Set" << std::endl;
@@ -251,7 +250,7 @@ int main() {
     auto inv_predicate = [t, &ss_pre](const abs_type& idx){
       state_type x;
       ss_pre[0].itox(idx,x);
-      /* function returns true if cell associated with x is in invariant set */
+      /* function returns true if cell associated with x is in invariant set  */
       if ( x[0] <= t + 3.0 && x[0] >= t - 3.0)
         return true;
       return false;
@@ -264,140 +263,122 @@ int main() {
     }
     /* Union over all t's*/
     target |= allin;
-  } 
+  }
 
-  // /* Handle different types of latent variables */
-  BDD X , XX, C = mgr.bddZero(); 
-  scots::SymbolicSet latent_product = scots::SymbolicSet(ss_exog, intermed_product); // exogenous and intermediate variables
+  /* Controller synthesis over monolithic system */
+  scots::SymbolicSet aux_product = scots::SymbolicSet(ss_exog, intermed_product); // exogenous and intermediate variables
+//  scots::InterconnectedEnfPre enf_pre(mgr,interconnected_sys, pre_product, control_product, post_product, aux_product, abs_inter, abs_systems);
+  scots::EnfPre enf_pre(mgr, interconnected_sys, pre_product, control_product, post_product); 
   scots::SymbolicSet controller(pre_product,control_product);
+  // /* the controller */
+  BDD X , XX, C = mgr.bddZero(), newbasin;
+  // /* BDD cube for existential abstract inputs */
   const BDD U = control_product.get_cube(mgr);
-  const BDD E = latent_product.get_cube(mgr); // all latent variables, exog + intermediate ones
-  std::vector<scots::SymbolicSet> ss_latent(ss_intermed);
-  ss_latent.emplace(ss_latent.begin(), ss_exog);
-
-  /* Decomposition Predecessor Setup */
-  std::cout << "Decomposed Predecessor Setup" << std::endl;
-  scots::DecomposedPredecessor decomp_pre(mgr, BDD_components, ss_pre, ss_control, ss_post, ss_latent);
-  std::cout << "Decomposed Computing Nonblocking" << std::endl;
-  BDD nonblocking = decomp_pre.nonblocking();
-  if (verbose) {
-    std::cout << "nonblocking state-input: " << (nonblocking) << std::endl;
-    print_support(mgr, nonblocking);
-    std::cout << "nonblocking states: " << (nonblocking.ExistAbstract(U)) << std::endl;
-    print_support(mgr, (nonblocking).ExistAbstract(U));
-  }
-  // /**
-  // Test of is_dependent function. 
-  // **/
-  // for (size_t i = 0; i<BDD_components.size(); i++){
-  //   for (size_t j = 0; j < ss_latent.size(); j++){
-  //     std::cout << "Component " << i << " depends on " << j << " " << scots::is_dependent(mgr, BDD_components[i], ss_latent[j].get_cube(mgr)) << std::endl;
-  //   }
-  // }
-
-  /* Monolithic Predecessor Setup */
-  // std::cout << "Monolithic Predecessor Setup" << std::endl;
-  // scots::InterconnectedEnfPre enf_pre(mgr,interconnected_sys, pre_product, control_product, post_product, latent_product, abs_inter, abs_systems);
-  
-  std::cout << std::endl << "State Space Size: " << pre_product.get_size(mgr,mgr.bddOne()) << std::endl;
-  std::cout << "Nonblocking Space Size: " << pre_product.get_size(mgr,nonblocking.ExistAbstract(U)) << std::endl;
-  std::cout << "Target size: " << pre_product.get_size(mgr,target) << std::endl;
-  std::cout << "Nonblocking Pairs: " << controller.get_size(mgr, nonblocking) << std::endl;
-  std::cout << "Nonblocking Controls: " << control_product.get_size(mgr, nonblocking) << std::endl  << std::endl;
-
-  /* Controller synthesis over decomposed system */
-  BDD dX, dXX, dC = mgr.bddZero();
+  const BDD E = aux_product.get_cube(mgr); // all auxiliary variables, exog + intermediate ones
+  std::cout << "\nState Space Size: " << pre_product.get_size(mgr,mgr.bddOne()) << std::endl;
+  std::cout << "Target size: " << pre_product.get_size(mgr,target) << std::endl << std::endl;
   tt.tic();
-  dX = mgr.bddZero(); dXX = mgr.bddOne();
-  for (int i = 0; dXX != dX; i++){
-    dX = dXX;
-    BDD enf = decomp_pre(dX);
-    if (verbose){
-      print_support(mgr, U);
-      //std::cout << "enf: " << enf << std::endl;
-      print_support(mgr, enf);
-      //std::cout << "exists U . enf: " << enf.ExistAbstract(U) << std::endl;
-      print_support(mgr, enf.ExistAbstract(U));
-      //std::cout << "enf && nonblocking: " << (enf & nonblocking) << std::endl;
-      print_support(mgr, (enf & nonblocking));
-    }
-
-    //std::cout << pre_product.get_size(mgr, enf.ExistAbstract(U)) << std::endl;
-    //std::cout << controller.get_size(mgr, enf) << std::endl;
-    dXX = (enf & nonblocking).ExistAbstract(U) & target; // state input pairs
-    std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,dXX) << std::endl << std::endl;
+  /*Safety objective*/
+  std::cout<< "Invariance Controller Synthesis" << std::endl;
+  X = mgr.bddZero(); XX = mgr.bddOne();
+  for(int i=1; XX != X; i++) { 
+    X = XX;
+    C = enf_pre(X); // (state, input) controlled pre pairs
+    XX = C.ExistAbstract(U*E);
+    XX = (C & target);
+    std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,XX) << std::endl;
   }
-  tt.toc(); 
-
-  // /* Controller synthesis over monolithic system */
-  // tt.tic();
-  // /*Safety objective*/
-  // std::cout<< "Invariance Controller Synthesis" << std::endl;
-  // X = mgr.bddZero(); XX = mgr.bddOne();
-  // for(int i=1; XX != X; i++) {
-  //   X = XX;
-  //   C = enf_pre(X); // (state, input) controlled pre pairs
-  //   XX = C.ExistAbstract(U*E);
-  //   XX = (C & target);
-  //   std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,XX) << std::endl;
-  // }
-
   
-  // if(write_to_file(mgr, controller, C.ExistAbstract(E),"consensus_inv_controller"))
-  //   std::cout << "Done. \n";
+  if(write_to_file(mgr, controller, C.ExistAbstract(E),"consensus_inv_controller"))
+    std::cout << "Done. \n";
 
-  // auto prod_dynamics = [](prod_state_type &x,  prod_control_type u) {
-  //   double avg = 0, w;
-  //   for (int i = 0; i < N; i++){
-  //     avg += x[i];
-  //   }
-  //   avg = avg / N;
-  //   std::cout << "Average w: " << avg << std::endl;
-  //   for (int i = 0; i < N; i++){
-  //     w = x[i] - avg;
-  //     x[i] = logistic_curve(x[i] + u[i] + .1*w, 0, 31);
-  //   }
-  // };
+  BDD inv = XX;
 
-  // prod_state_type x={15.4, 15.3, 15, 16, 22, 17};
-  // //14.6 15.4 15 16.2 17.1 24.1 
-  // int u_index;
-  // bool active_control = true;
-  // while(true){
-  //   std::cout << "Enter an initial 6D state" << std::endl;
-  //   std::cin >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5];
+  /*Reach objective*/
+  std::cout<< "Reachability Controller Synthesis" << std::endl;
+  X = mgr.bddOne(); XX = mgr.bddZero();
+  for(int i = 1; XX != X; i++){
+    std::cout << i << "-th reach basin size: " << pre_product.get_size(mgr,XX) << std::endl;
+    X = XX;
+    XX = enf_pre(X) | inv;
+    newbasin = XX & (!(C.ExistAbstract(U*E)));
+    XX = XX.ExistAbstract(U*E);
+    C = C | newbasin;
+  }
+  tt.toc();
 
-  //   for(int i=0; i<30; i++) {
-  //   //   // returns a std vector with the valid control inputs     
-  //     std::cout << "State: ";
-  //     for(int j = 0; j < N; j++){
-  //       std::cout << x[j] << " ";
-  //     }
-  //     std::cout<< std::endl;
+  /* Print final reach set */
+  if (false){
+    std::ofstream file;
+    file.open("better_consensus_reachable.txt");
+    auto a = pre_product.bdd_to_grid_points(mgr, XX);
+    for(size_t j = 0; j < a.size(); j++){
+      // if (j % (state_dim *N) == 0){
+      //   file << i << " ";
+      // }
+      file << a[j] << " ";
+      if (j % (state_dim *N) == (state_dim *N)-1)
+        file << "\n";
+    }
+    file.close();
+  }
 
-  //     if (active_control){
-  //       std::cout << "Getting Control Input" << std::endl;
-  //       auto u = controller.restriction<prod_state_type>(mgr,C,x);
-  //       if (u.size() == 0){
-  //         std::cout << "No valid control" << std::endl;
-  //         break;
-  //       }
-  //       u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
-  //       std::cout << u.size() << std::endl;
-  //       std::cout << "Input Index: " << u_index << std::endl;
-  //       std::cout << "Input: ";
-  //       for(int j = 0; j < N; j++){
-  //         std::cout << u[u_index+j] << " ";
-  //       }
+  std::cout << "\nWrite controller to better_consensus_controller.scs \n";
+  if(write_to_file(mgr, controller, C.ExistAbstract(E),"better_consensus_controller"))
+    std::cout << "Done. \n";
+
+  auto prod_dynamics = [](prod_state_type &x,  prod_control_type u) {
+    double avg = 0, w;
+    for (int i = 0; i < N; i++){
+      avg += x[i];
+    }
+    avg = avg / N;
+    std::cout << "Average w: " << avg << std::endl;
+    for (int i = 0; i < N; i++){
+      w = x[i] - avg;
+      x[i] = logistic_curve(x[i] + u[i] + .1*w, 0, 31);
+    }
+  };
+
+  prod_state_type x={15.4, 15.3, 15};//, 16, 22, 17};
+  //14.6 15.4 15 16.2 17.1 24.1 
+  int u_index;
+  bool active_control = true;
+  while(true){
+    std::cout << "Enter an initial "<< N << "D state" << std::endl;
+    std::cin >> x[0] >> x[1] >> x[2];// >> x[3];// >> x[4] >> x[5];
+
+    for(int i=0; i<30; i++) {
+    //   // returns a std vector with the valid control inputs     
+      std::cout << "State: ";
+      for(int j = 0; j < N; j++){
+        std::cout << x[j] << " ";
+      }
+      std::cout<< std::endl;
+
+      if (active_control){
+        std::cout << "Getting Control Input" << std::endl;
+        auto u = controller.restriction<prod_state_type>(mgr,C,x);
+        if (u.size() == 0){
+          std::cout << "No valid control" << std::endl;
+          break;
+        }
+        u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
+        std::cout << u.size() << std::endl;
+        std::cout << "Input Index: " << u_index << std::endl;
+        std::cout << "Input: ";
+        for(int j = 0; j < N; j++){
+          std::cout << u[u_index+j] << " ";
+        }
         
-  //       prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2],u[u_index+3],u[u_index+4],u[u_index+5]});
-  //       std::cout<< std::endl << std::endl;
-  //     }
-  //     else{
-  //       prod_dynamics(x, {0,0,0,0,0,0});
-  //     }
-  //   }
-  // }
+        prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2]});//,u[u_index+3],u[u_index+4],u[u_index+5]});
+        std::cout<< std::endl << std::endl;
+      }
+      else{
+        prod_dynamics(x, {0,0,0});
+      }
+    }
+  }
 
 }
 

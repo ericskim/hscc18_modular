@@ -12,6 +12,8 @@
 
 #include <iostream>
 #include <memory>
+#include <algorithm>
+ #include <list>
 
 #include "SymbolicSet.hh"
 #include "SymbolicModel.hh"
@@ -63,19 +65,21 @@ bool is_dependent(const Cudd& mgr, const BDD& formula, const BDD& vars){
 @param elim_vars [in] -  variables to eliminate
 @param remaining_formulas [in] - copy of  initial formulas in the conjunction
 **/
-BDD exists_over_conjunction(const Cudd& mgr, std::list<BDD> elim_vars, std::vector<BDD> remaining_formulas) {
+BDD exists_over_conjunction(const Cudd& mgr, std::list<BDD> elim_vars, std::vector<BDD> remaining_formulas, bool verbose = false) {
   /* TODO  */
   BDD prev = mgr.bddOne();
   std::cout << "No cost function is currently used for variable ordering" << std::endl;
-  std::cout << "Formulas in conjunction: " << remaining_formulas.size() << std::endl;
   while(elim_vars.size() > 0){
     /** Identify which variable to eliminate **/
-    std::cout << "Remaining Variables: " << elim_vars.size() << std::endl;
-    print_support(mgr, prev);
     BDD to_elim = elim_vars.front();
     elim_vars.pop_front();
-    // std::cout << "Abstracting out: " << std::endl;
-    // print_support(mgr, to_elim);
+    if (verbose){
+      std::cout << "Formulas in conjunction: " << remaining_formulas.size() << std::endl;
+      std::cout << "Remaining Variables: " << elim_vars.size() << std::endl;
+      print_support(mgr, prev);
+      std::cout << "Abstracting out: " << std::endl;
+      print_support(mgr, to_elim);
+    }
 
     /** Identify which formulas are independent **/
 
@@ -93,8 +97,11 @@ BDD exists_over_conjunction(const Cudd& mgr, std::list<BDD> elim_vars, std::vect
     remaining_formulas.resize(bound - remaining_formulas.begin());
 
   }
-  std::cout << "No remaining variables" << std::endl;
-  print_support(mgr, prev);
+  if (verbose){
+    std::cout << "No remaining variables" << std::endl;
+    print_support(mgr, prev);    
+  }
+
   return prev;
 }
 
