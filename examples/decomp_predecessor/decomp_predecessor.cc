@@ -7,7 +7,6 @@
  *   author: Eric Kim
  */
 
-
 #include <iostream>
 #include <array>
 #include <cmath>
@@ -33,7 +32,7 @@ const int exog_dim = 1;
 /* input space of system is a cartesian product*/
 const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
-const int N = 3;
+const int N = 5;
 
 const int inter_dim = N-2; 
 
@@ -77,6 +76,7 @@ inline double logistic_curve(double x, double lb, double ub, double B = .2){
   return lb + num/denom; 
 }
 
+/** @brief Print variable IDs from BDD x's support **/
 void print_support(const Cudd& mgr, const BDD& x){
   std::vector< unsigned int >  indices = mgr.SupportIndices({x});
   for (size_t i = 0; i < indices.size(); i++){
@@ -91,7 +91,6 @@ std::vector< unsigned int > get_support(const Cudd& mgr, const BDD& x){
 }
 
 
-
 int main() {
   /* to measure time */
   TicToc tt;
@@ -100,7 +99,7 @@ int main() {
   mgr.AutodynEnable(CUDD_REORDER_SIFT_CONVERGE);
   // mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
   //mgr.SetMaxGrowth(2.5);
-  //mgr.EnableReorderingReporting();
+  // mgr.EnableReorderingReporting();
   //mgr.AutodynDisable();
 
   /* Dynamics for individual subsystem */ 
@@ -169,6 +168,7 @@ int main() {
     sysdeps[i] = scots::FunctionDependency({ss_pre[i], ss_control[i], ss_exog},{ss_post[i]});
     sysdeps[i].set_dependency(ss_post[i][0], {ss_pre[i][0], ss_control[i][0], ss_exog[0]});
   }
+  
   /* Compute sub-system abstractions using dependencies */
   std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
   std::vector<BDD> abs_systems(N, mgr.bddOne());
@@ -237,8 +237,8 @@ int main() {
     scots::FunctionAbstracter<std::array<double, 2>, std::array<double, 1> > layer(inter_deps[i], recursive_avg);
 //    BDD_recursive_avg[i] = layer.compute_abstraction(mgr);
     BDD_components.push_back(layer.compute_abstraction(mgr));
-
   }
+  std::cout << "Intermediate Abstraction Time" << std::endl;
   tt.toc();
   std::cout << "Intermediate Product Information" << std::endl; 
   intermed_product.print_info(1);
@@ -255,8 +255,8 @@ int main() {
       if ( x[0] <= t + 3.0 && x[0] >= t - 3.0)
         return true;
       return false;
-    };
-
+    }; 
+    
     /* All systems must have x[0] state close to t */
     BDD allin = mgr.bddOne();
     for (int i = 0; i < N; i++){
@@ -285,7 +285,7 @@ int main() {
     print_support(mgr, nonblocking);
     std::cout << "nonblocking states: " << (nonblocking.ExistAbstract(U)) << std::endl;
     print_support(mgr, (nonblocking).ExistAbstract(U));
-  }
+  } 
   // /**
   // Test of is_dependent function. 
   // **/
@@ -306,28 +306,17 @@ int main() {
   std::cout << "Nonblocking Controls: " << control_product.get_size(mgr, nonblocking) << std::endl  << std::endl;
 
   /* Controller synthesis over decomposed system */
-  BDD dX, dXX, dC = mgr.bddZero();
+  BDD dX, dXX;
   tt.tic();
   dX = mgr.bddZero(); dXX = mgr.bddOne();
   for (int i = 0; dXX != dX; i++){
     dX = dXX;
-    BDD enf = decomp_pre(dX);
-    if (verbose){
-      print_support(mgr, U);
-      //std::cout << "enf: " << enf << std::endl;
-      print_support(mgr, enf);
-      //std::cout << "exists U . enf: " << enf.ExistAbstract(U) << std::endl;
-      print_support(mgr, enf.ExistAbstract(U));
-      //std::cout << "enf && nonblocking: " << (enf & nonblocking) << std::endl;
-      print_support(mgr, (enf & nonblocking));
-    }
-
-    //std::cout << pre_product.get_size(mgr, enf.ExistAbstract(U)) << std::endl;
-    //std::cout << controller.get_size(mgr, enf) << std::endl;
-    dXX = (enf & nonblocking).ExistAbstract(U) & target; // state input pairs
-    std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,dXX) << std::endl << std::endl;
+    dXX = (decomp_pre(dX) & nonblocking).ExistAbstract(U) & target; // state input pairs
+    std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,dXX) << std::endl;
+    tt.toc();
+    std::cout << std::endl;
   }
-  tt.toc(); 
+  
 
   // /* Controller synthesis over monolithic system */
   // tt.tic();

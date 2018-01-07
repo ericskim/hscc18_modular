@@ -60,10 +60,11 @@ bool is_dependent(const Cudd& mgr, const BDD& formula, const BDD& vars){
 }
 
 /**
-@brief Applies an existential quantification over a conjunction of BDD formulas. Takes into account variable dependencies. 
+@brief Applies an existential quantification over a conjunction of BDD formulas while accounting for variable dependencies. 
 
-@param elim_vars [in] -  variables to eliminate
-@param remaining_formulas [in] - copy of  initial formulas in the conjunction
+@param elim_vars [in] - binary cubes of variables to eliminate
+@param remaining_formulas [in] - copy of initial formulas in the conjunction
+@param verbose[in] - print out intermediate results of taking conjunction and quantification
 **/
 BDD exists_over_conjunction(const Cudd& mgr, std::list<BDD> elim_vars, std::vector<BDD> remaining_formulas, bool verbose = false) {
   /* TODO  */
@@ -82,7 +83,6 @@ BDD exists_over_conjunction(const Cudd& mgr, std::list<BDD> elim_vars, std::vect
     }
 
     /** Identify which formulas are independent **/
-
     auto is_dependent_on_to_elim = std::bind(is_dependent, mgr, std::placeholders::_1, to_elim); // create predicate
     std::vector<BDD>::iterator bound = std::partition(remaining_formulas.begin(), remaining_formulas.end(), is_dependent_on_to_elim); 
 
@@ -99,7 +99,7 @@ BDD exists_over_conjunction(const Cudd& mgr, std::list<BDD> elim_vars, std::vect
   }
   if (verbose){
     std::cout << "No remaining variables" << std::endl;
-    print_support(mgr, prev);    
+    print_support(mgr, prev);
   }
 
   return prev;
@@ -193,8 +193,8 @@ private:
 public:
   /** @brief initialize the enforcable predecessor
    *  
-   * @param manager - the Cudd manager
-   * @param transition_relation - the BDD encoding the transition function of the SymbolicModel\n 
+   * @param manager[in] - the Cudd manager
+   * @param transition_relation[in] - the BDD encoding the transition function of the SymbolicModel\n 
    *                              computed with SymbolicModel::compute_gb
    * @param  model - SymbolicModel containing the SymbolicSet for the state and input alphabet 
    **/
@@ -227,17 +227,17 @@ public:
     /* the remaining (state, input) pairs make up the pre */
     return  m_tr_nopost & (!F);
   }
-}; // close InterconnectedEnfPre 
+}; // close InterconnectedEnfPre
 
 /**
 @brief Predecessor operation that attempts to minimize the size of the intermediate BDD.
 
 Unlike EnfPre, it takes all of the sets and the system transition relation as decomposed sets. 
+
 **/
 class DecomposedPredecessor{
 private:
 
- 
 
 protected: 
   /* stores the permutation array used to swap pre with post variables */
@@ -249,7 +249,14 @@ protected:
   std::vector<BDD> m_cubes_post;
   std::list<BDD> pre_elim_vars; 
   Cudd mgr;
-public: 
+public:
+  /**
+* @brief Decomposed predecessor constructor 
+* @param pre_sets[in] -  predecessor state sets
+* @param control_sets[in] - controllable input sets
+* @param post_sets[in] - post state sets
+* @param latent_sets[in] - latent variable for sparsity or 
+**/
   DecomposedPredecessor(const Cudd& manager,
                         const std::vector<BDD>& relations,
                         const std::vector<SymbolicSet>& pre_sets,

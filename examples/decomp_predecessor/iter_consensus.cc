@@ -31,7 +31,7 @@ const int exog_dim = 1;
 /* input space of system is a cartesian product*/
 const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
-const int N = 3;
+const int N = 4;
 
 const int inter_dim = N - 2; 
 
@@ -167,6 +167,7 @@ int main() {
   std::vector<scots::FunctionDependency>inter_deps; inter_deps.resize(N-1); 
   scots::SymbolicSet intermed_product = scots::SymbolicSet();
   BDD abs_inter = mgr.bddOne();
+  BDD interconnected_sys = mgr.bddOne();
   tt.tic();
   for (int i = 0; i < N-1; i++){
     std::cout << i << std::endl;
@@ -207,7 +208,7 @@ int main() {
     }
 
     scots::FunctionAbstracter<std::array<double, 2>, std::array<double, 1> > layer(inter_deps[i], recursive_avg);
-    abs_inter &= layer.compute_abstraction(mgr);
+    interconnected_sys &= layer.compute_abstraction(mgr);
 
   }
   tt.toc();
@@ -221,7 +222,7 @@ int main() {
   std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
   std::vector<BDD> abs_systems(N, mgr.bddOne());
   BDD systems = mgr.bddOne(); 
-  BDD interconnected_sys = mgr.bddOne();
+
   for (int i = 0; i < N; i++){
     abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
     tt.tic();
@@ -231,10 +232,10 @@ int main() {
   }
   // std::cout << "Composing smaller systems " << std::endl;
 
-  tt.tic();
-  // std::cout << "Applying interconnection relation" << std::endl;
-  interconnected_sys &= abs_inter;
-  tt.toc(); 
+  // tt.tic();
+  // std::cout << "Composing systems with interconnection" << std::endl;
+  // interconnected_sys &= interconnected_sys;
+  // tt.toc(); 
 
   tt.tic();
   std::cout << "Abstracting out internal variabless!" << std::endl;
@@ -281,104 +282,109 @@ int main() {
   /*Safety objective*/
   std::cout<< "Invariance Controller Synthesis" << std::endl;
   X = mgr.bddZero(); XX = mgr.bddOne();
+  tt.tic();
   for(int i=1; XX != X; i++) { 
     X = XX;
     C = enf_pre(X); // (state, input) controlled pre pairs
     XX = C.ExistAbstract(U*E);
     XX = (C & target);
     std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,XX) << std::endl;
+    tt.toc();
   }
   
-  if(write_to_file(mgr, controller, C.ExistAbstract(E),"consensus_inv_controller"))
-    std::cout << "Done. \n";
 
-  BDD inv = XX;
+  return 0; 
 
-  /*Reach objective*/
-  std::cout<< "Reachability Controller Synthesis" << std::endl;
-  X = mgr.bddOne(); XX = mgr.bddZero();
-  for(int i = 1; XX != X; i++){
-    std::cout << i << "-th reach basin size: " << pre_product.get_size(mgr,XX) << std::endl;
-    X = XX;
-    XX = enf_pre(X) | inv;
-    newbasin = XX & (!(C.ExistAbstract(U*E)));
-    XX = XX.ExistAbstract(U*E);
-    C = C | newbasin;
-  }
-  tt.toc();
+  // if(write_to_file(mgr, controller, C.ExistAbstract(E),"consensus_inv_controller"))
+  //   std::cout << "Done. \n";
 
-  /* Print final reach set */
-  if (false){
-    std::ofstream file;
-    file.open("better_consensus_reachable.txt");
-    auto a = pre_product.bdd_to_grid_points(mgr, XX);
-    for(size_t j = 0; j < a.size(); j++){
-      // if (j % (state_dim *N) == 0){
-      //   file << i << " ";
-      // }
-      file << a[j] << " ";
-      if (j % (state_dim *N) == (state_dim *N)-1)
-        file << "\n";
-    }
-    file.close();
-  }
+  // BDD inv = XX;
 
-  std::cout << "\nWrite controller to better_consensus_controller.scs \n";
-  if(write_to_file(mgr, controller, C.ExistAbstract(E),"better_consensus_controller"))
-    std::cout << "Done. \n";
+  // /*Reach objective*/
+  // std::cout<< "Reachability Controller Synthesis" << std::endl;
+  // X = mgr.bddOne(); XX = mgr.bddZero();
+  // for(int i = 1; XX != X; i++){
+  //   std::cout << i << "-th reach basin size: " << pre_product.get_size(mgr,XX) << std::endl;
+  //   X = XX;
+  //   XX = enf_pre(X) | inv;
+  //   newbasin = XX & (!(C.ExistAbstract(U*E)));
+  //   XX = XX.ExistAbstract(U*E);
+  //   C = C | newbasin;
+  // }
+  // tt.toc();
 
-  auto prod_dynamics = [](prod_state_type &x,  prod_control_type u) {
-    double avg = 0, w;
-    for (int i = 0; i < N; i++){
-      avg += x[i];
-    }
-    avg = avg / N;
-    std::cout << "Average w: " << avg << std::endl;
-    for (int i = 0; i < N; i++){
-      w = x[i] - avg;
-      x[i] = logistic_curve(x[i] + u[i] + .1*w, 0, 31);
-    }
-  };
+  // /* Print final reach set */
+  // if (false){
+  //   std::ofstream file;
+  //   file.open("better_consensus_reachable.txt");
+  //   auto a = pre_product.bdd_to_grid_points(mgr, XX);
+  //   for(size_t j = 0; j < a.size(); j++){
+  //     // if (j % (state_dim *N) == 0){
+  //     //   file << i << " ";
+  //     // }
+  //     file << a[j] << " ";
+  //     if (j % (state_dim *N) == (state_dim *N)-1)
+  //       file << "\n";
+  //   }
+  //   file.close();
+  // }
 
-  prod_state_type x={15.4, 15.3, 15};//, 16, 22, 17};
-  //14.6 15.4 15 16.2 17.1 24.1 
-  int u_index;
-  bool active_control = true;
-  while(true){
-    std::cout << "Enter an initial "<< N << "D state" << std::endl;
-    std::cin >> x[0] >> x[1] >> x[2];// >> x[3];// >> x[4] >> x[5];
+  // std::cout << "\nWrite controller to better_consensus_controller.scs \n";
+  // if(write_to_file(mgr, controller, C.ExistAbstract(E),"better_consensus_controller"))
+  //   std::cout << "Done. \n";
 
-    for(int i=0; i<30; i++) {
-    //   // returns a std vector with the valid control inputs     
-      std::cout << "State: ";
-      for(int j = 0; j < N; j++){
-        std::cout << x[j] << " ";
-      }
-      std::cout<< std::endl;
+  // auto prod_dynamics = [](prod_state_type &x,  prod_control_type u) {
+  //   double avg = 0, w;
+  //   for (int i = 0; i < N; i++){
+  //     avg += x[i];
+  //   }
+  //   avg = avg / N;
+  //   std::cout << "Average w: " << avg << std::endl;
+  //   for (int i = 0; i < N; i++){
+  //     w = x[i] - avg;
+  //     x[i] = logistic_curve(x[i] + u[i] + .1*w, 0, 31);
+  //   }
+  // };
 
-      if (active_control){
-        std::cout << "Getting Control Input" << std::endl;
-        auto u = controller.restriction<prod_state_type>(mgr,C,x);
-        if (u.size() == 0){
-          std::cout << "No valid control" << std::endl;
-          break;
-        }
-        u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
-        std::cout << u.size() << std::endl;
-        std::cout << "Input Index: " << u_index << std::endl;
-        std::cout << "Input: ";
-        for(int j = 0; j < N; j++){
-          std::cout << u[u_index+j] << " ";
-        }
+  // prod_state_type x={15.4, 15.3, 15};//, 16, 22, 17};
+  // //14.6 15.4 15 16.2 17.1 24.1 
+  // int u_index;
+  // bool active_control = true;
+  // while(true){
+  //   std::cout << "Enter an initial "<< N << "D state" << std::endl;
+  //   std::cin >> x[0] >> x[1] >> x[2];// >> x[3];// >> x[4] >> x[5];
+
+  //   for(int i=0; i<30; i++) {
+  //   //   // returns a std vector with the valid control inputs     
+  //     std::cout << "State: ";
+  //     for(int j = 0; j < N; j++){
+  //       std::cout << x[j] << " ";
+  //     }
+  //     std::cout<< std::endl;
+
+  //     if (active_control){
+  //       std::cout << "Getting Control Input" << std::endl;
+  //       auto u = controller.restriction<prod_state_type>(mgr,C,x);
+  //       if (u.size() == 0){
+  //         std::cout << "No valid control" << std::endl;
+  //         break;
+  //       }
+  //       u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
+  //       std::cout << u.size() << std::endl;
+  //       std::cout << "Input Index: " << u_index << std::endl;
+  //       std::cout << "Input: ";
+  //       for(int j = 0; j < N; j++){
+  //         std::cout << u[u_index+j] << " ";
+  //       }
         
-        prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2]});//,u[u_index+3],u[u_index+4],u[u_index+5]});
-        std::cout<< std::endl << std::endl;
-      }
-      else{
-        prod_dynamics(x, {0,0,0});
-      }
-    }
-  }
+  //       prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2]});//,u[u_index+3],u[u_index+4],u[u_index+5]});
+  //       std::cout<< std::endl << std::endl;
+  //     }
+  //     else{
+  //       prod_dynamics(x, {0,0,0});
+  //     }
+  //   }
+  // }
 
 }
 

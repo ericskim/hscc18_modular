@@ -120,7 +120,7 @@ public:
     // TODO Error handling 
     int o_index = get_index(o_interval_to_index, oslice);
     depends[o_index].clear();
-
+    
     int p_index;
     scots::SymbolicSet iset; 
     for (size_t i = 0; i < pre_deps.size(); i++){
@@ -278,7 +278,6 @@ public:
   
   /**
   @brief Computes the symbolic approximation of the function along output dimension post_dim
-
   **/
   BDD compute_abstraction(const Cudd& mgr, int post_dim){
     const int odims = m_outSpace.get_dim();
