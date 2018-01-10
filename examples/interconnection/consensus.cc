@@ -1,12 +1,17 @@
 /*
  * consensus.cc
+ * 
+ * Abstract N bimodal, scalar systems and apply an interconnection where each system 
+ * has access to the average state. 
  *
+ * Synthesize for a consensus objective. 
+ * 
  *  created: Sep 2017
- *   author: Eric Kim
+ *  author: Eric Kim
  */
 
-
 #include <iostream>
+#include <algorithm>
 #include <array>
 #include <cmath>
 
@@ -45,8 +50,9 @@ using inter_type = std::array<double, inter_dim>;
 
 /* Data types for the interconnection relation */
 using prod_state_type = std::array<double, state_dim * N>;
+using prod_control_type = std::array<double, control_dim * N>;
 using prod_exog_type = std::array<double, exog_dim * N>;
-using prod_intermed_type_lvl2 = std::array<double, N + inter_dim>;
+using prod_intermed_type_lvl2 = std::array<double, inter_dim>;
 
 /* abbrev of the type for abstract states and inputs */
 using abs_type = scots::abs_type;
@@ -81,18 +87,17 @@ void print_support(const Cudd& mgr, const BDD& x){
 int main() {
   /* to measure time */
   TicToc tt;
-  /* cudd manager */
+  /* cudd manager and BDD reordering options */
   Cudd mgr;
   mgr.AutodynEnable(CUDD_REORDER_SIFT_CONVERGE);
-  mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
-  //mgr.SetMaxGrowth(2.5);
-  mgr.EnableReorderingReporting();
-  //mgr.AutodynDisable();
+  // mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
+  mgr.EnableReorderingReporting(); 
 
+  double K = .1;
   /* Dynamics for individual subsystem */ 
-  auto dynamics = [](const state_type x, const control_type u, const exog_type w) -> state_type {
+  auto dynamics = [K](const state_type x, const control_type u, const exog_type w) -> state_type {
     state_type post;
-    post[0] = logistic_curve(x[0] + u[0] + .1*w[0], 0, 31);
+    post[0] = logistic_curve(x[0] + u[0] + K*w[0], 0, 31);
     return post;
   };
 
@@ -141,28 +146,23 @@ int main() {
   control_product.print_info(1);
 
   /* Exogenous spaces */
-  std::vector<scots::SymbolicSet> ss_exog; ss_exog.resize(N);
-  scots::SymbolicSet exog_product = scots::SymbolicSet();
-  exog_type e_lb = {{-31}};
+  scots::SymbolicSet ss_exog;
+  exog_type e_lb = {{0}};
   exog_type e_ub = {{31}};
-  exog_type e_eta = {{4.4285714286}};
-  for (int i = 0; i < N; i++){
-    ss_exog[i] = scots::SymbolicSet(mgr, exog_dim,e_lb,e_ub,e_eta);
-    exog_product = scots::SymbolicSet(exog_product, ss_exog[i]);
-  }
-  std::cout << "Exogenous Product Information" << std::endl;
-  exog_product.print_info(1);
+  exog_type e_eta = {{2}};
+  ss_exog = scots::SymbolicSet(mgr, exog_dim,e_lb,e_ub,e_eta);
 
   /* Declare dependencies for individual systems */
   std::vector<scots::FunctionDependency> sysdeps(N, scots::FunctionDependency());
   for (int i = 0; i < N; i++){
-    sysdeps[i] = scots::FunctionDependency({ss_pre[i], ss_control[i], ss_exog[i]},{ss_post[i]});
-    sysdeps[i].set_dependency(ss_post[i][0], {ss_pre[i][0], ss_control[i][0], ss_exog[i][0]});
+    sysdeps[i] = scots::FunctionDependency({ss_pre[i], ss_control[i], ss_exog},{ss_post[i]});
+    sysdeps[i].set_dependency(ss_post[i][0], {ss_pre[i][0], ss_control[i][0], ss_exog[0]});
   }
 
   /*Compute system abstractions using dependencies*/
   std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
   std::vector<BDD> abs_systems(N, mgr.bddOne());
+  BDD systems = mgr.bddOne(); 
   for (int i = 0; i < N; i++){
     abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
     tt.tic();
@@ -172,18 +172,18 @@ int main() {
   }
 
 
-
   /* 
   Intermediate Variables representing sums of small sets of variables
   */
   std::cout << "\nIntermediate Variables" << std::endl;
   inter_type inter_lb = {{0,0}};
   inter_type inter_ub = {{31,31}};
-  inter_type inter_eta = {{4.4285714286, 4.4285714286}};
+  inter_type inter_eta = {{2, 2}};
   scots::SymbolicSet ss_inter = scots::SymbolicSet(mgr, inter_dim, inter_lb,inter_ub,inter_eta);
   ss_inter.print_info(1);
+  tt.tic();
 
-  /*Interconnection Level 1 */
+  /*Interconnection Level 1. Calculate two averages of three variables each. */
   std::cout << "Level 1" << std::endl;
   scots::FunctionDependency intermed_dep_1({pre_product}, {ss_inter});
   intermed_dep_1.set_dependency(ss_inter[0], {ss_pre[0][0], ss_pre[1][0], ss_pre[2][0]});
@@ -196,40 +196,37 @@ int main() {
     for (int i = 0; i < N; i++){
       center[i]   = (ll[i] + ur[i])/2.0;
     }
-    o_ll[0] = (1.0/3)*(center[0] + center[1] + center[2] - 1.5*eta[0]);
-    o_ur[0] = (1.0/3)*(center[0] + center[1] + center[2] + 1.5*eta[0]);
-    o_ll[1] = (1.0/3)*(center[3] + center[4] + center[5] - 1.5*eta[0]); 
-    o_ur[1] = (1.0/3)*(center[3] + center[4] + center[5] + 1.5*eta[0]); 
+    o_ll[0] = std::max((1.0/3)*(center[0] + center[1] + center[2] - 1.5*eta[0]),0.0);
+    o_ur[0] = std::min((1.0/3)*(center[0] + center[1] + center[2] + 1.5*eta[0]),31.0);
+    o_ll[1] = std::max((1.0/3)*(center[3] + center[4] + center[5] - 1.5*eta[0]),0.0); 
+    o_ur[1] = std::min((1.0/3)*(center[3] + center[4] + center[5] + 1.5*eta[0]),31.0);
   };
   scots::FunctionAbstracter<prod_state_type, inter_type> inter_abs_1(intermed_dep_1 , inter_overapprox_1);
-  BDD abs_inter_1 = inter_abs_1.compute_abstraction(mgr); 
+  BDD abs_inter_1 = inter_abs_1.compute_abstraction(mgr);
 
-  /*Interconnection Level 2 */
-    std::cout << "\nLevel 2" << std::endl;
-  scots::FunctionDependency intermed_dep_2({pre_product, ss_inter},{exog_product});
-  for (int i = 0; i < N; i++){
-    intermed_dep_2.set_dependency(ss_exog[i][0], {ss_pre[i][0], ss_inter[0], ss_inter[1]});
-  }
+  /*Interconnection Level 2. Average of the two averages from Level 1.*/
+  std::cout << "\nLevel 2" << std::endl;
+  scots::FunctionDependency intermed_dep_2({ss_inter},{ss_exog});
+  intermed_dep_2.set_dependency(ss_exog[0], {ss_inter[0], ss_inter[1]});
   std::cout << intermed_dep_2 << std::endl;
-  auto inter_overapprox_2 = [pre_product](const prod_intermed_type_lvl2 ll, const prod_intermed_type_lvl2 ur, prod_exog_type &o_ll, prod_exog_type &o_ur){
+  auto inter_overapprox_2 = [pre_product, ss_inter](const prod_intermed_type_lvl2 ll, const prod_intermed_type_lvl2 ur, exog_type &o_ll, exog_type &o_ur){
     std::vector<double> eta = pre_product.get_eta();
-    prod_exog_type center;
-    for (int i = 0; i < 8; i++){
+    std::vector<double> mu = ss_inter.get_eta();
+    exog_type center;
+    for (int i = 0; i < 2; i++){
       center[i]  = (ll[i] + ur[i])/2.0;
     }
-    for (int i = 0; i < N; i++){
-      o_ll[i] = center[i] -0.5*(center[6] + center[7]) - .5*eta[i]; 
-      o_ur[i] = center[i] -0.5*(center[6] + center[7]) + .5*eta[i];
-    }
+    o_ll[0] = std::max(0.5*(center[0] + center[1]) - .5*eta[0], 0.0); 
+    o_ur[0] = std::min(0.5*(center[0] + center[1]) + .5*eta[0], 31.0);
   };
-  scots::FunctionAbstracter<prod_intermed_type_lvl2, prod_exog_type> inter_abs_2(intermed_dep_2 , inter_overapprox_2);
+  scots::FunctionAbstracter<prod_intermed_type_lvl2, exog_type> inter_abs_2(intermed_dep_2 , inter_overapprox_2);
   BDD abs_inter_2 = inter_abs_2.compute_abstraction(mgr); 
 
 
   /* 
   Declare and abstract interconnection. 
   */
-  tt.tic();
+
   BDD abs_inter = abs_inter_1 & abs_inter_2;
   print_support(mgr, abs_inter);
   std::cout << (int)(abs_inter == mgr.bddZero()) << std::endl;
@@ -247,15 +244,6 @@ int main() {
     std::cout << i << std::endl;
     interconnected_sys = interconnected_sys & abs_systems[i];
   }
-  tt.toc(); tt.tic();
-  std::cout << "Applying interconnection relation" << std::endl;
-  // for (int i = 0; i < abs_inter.size(); i++){
-  //   std::cout << i << std::endl;
-  //   interconnected_sys = interconnected_sys & abs_inter[i];
-  // }
-  tt.toc(); tt.tic();
-  std::cout << "Abstracting out internal variables" << std::endl;
-  //interconnected_sys = interconnected_sys.ExistAbstract(exog_product.get_cube(mgr));
   tt.toc();
 
   /** Construct Invariant Set on monlithic space **/
@@ -282,11 +270,11 @@ int main() {
   }
 
   /* Controller synthesis over monolithic system */
-  scots::SymbolicSet aux_product = scots::SymbolicSet(exog_product, ss_inter);
+  scots::SymbolicSet aux_product = scots::SymbolicSet(ss_exog, ss_inter); // exogenous and intermediate variables
   scots::InterconnectedEnfPre enf_pre(mgr,interconnected_sys, pre_product, control_product, post_product, aux_product, abs_inter, abs_systems);
   scots::SymbolicSet controller(pre_product,control_product);
   // /* the controller */
-  BDD X , XX, C = mgr.bddZero(), N;
+  BDD X , XX, C = mgr.bddZero(), newbasin;
   // /* BDD cube for existential abstract inputs */
   const BDD U = control_product.get_cube(mgr);
   const BDD E = aux_product.get_cube(mgr); // all auxiliary variables, exog + intermediate ones
@@ -300,14 +288,22 @@ int main() {
     X = XX;
     C = enf_pre(X); // (state, input) controlled pre pairs
     XX = C.ExistAbstract(U*E);
-    XX = (C & target);
+    XX = (X & XX & target) & abs_inter.ExistAbstract(E);
     std::cout << i << "-th winning domain size: " << pre_product.get_size(mgr,XX) << std::endl;
   }
   
   if(write_to_file(mgr, controller, C.ExistAbstract(E),"consensus_inv_controller"))
-    std::cout << "Done. \n";
+    std::cout << "Done writing controller to file. \n";
 
   BDD inv = XX;
+  std::cout << "Invariant Set BDD Var ID Support" <<std::endl;
+  print_support(mgr,inv.ExistAbstract(U*E));
+  std::cout << "Target Set BDD Var ID Support" <<std::endl;
+  print_support(mgr,target);
+  std::cout << "Controller BDD Var ID Support" << std::endl;
+  print_support(mgr,C);
+  std::cout << "Inter BDD Var ID Support" << std::endl;
+  print_support(mgr, abs_inter); 
 
   /*Reach objective*/
   std::cout<< "Reachability Controller Synthesis" << std::endl;
@@ -315,17 +311,19 @@ int main() {
   for(int i = 1; XX != X; i++){
     std::cout << i << "-th reach basin size: " << pre_product.get_size(mgr,XX) << std::endl;
     X = XX;
-    XX = enf_pre(X) | inv;
-    N = XX & (!(C.ExistAbstract(U*E)));
+    XX = (enf_pre(X) | inv) & abs_inter.ExistAbstract(E);
+    std::cout << i << "-th predecessor " << pre_product.get_size(mgr,XX) << std::endl;
+    newbasin = pre_product.get_grid_bdd(mgr) & XX & (!(C.ExistAbstract(U*E)));
+    std::cout << i << "-th new states " << pre_product.get_size(mgr,newbasin) << std::endl << std::endl;
     XX = XX.ExistAbstract(U*E);
-    C = C | N;
+    C = C | newbasin;
   }
   tt.toc();
 
   /* Print final reach set */
   if (false){
     std::ofstream file;
-    file.open("consensus_reachable.txt");
+    file.open("better_consensus_reachable.txt");
     auto a = pre_product.bdd_to_grid_points(mgr, XX);
     for(size_t j = 0; j < a.size(); j++){
       // if (j % (state_dim *N) == 0){
@@ -338,9 +336,64 @@ int main() {
     file.close();
   }
 
-  std::cout << "\nWrite controller to controller.scs \n";
-  if(write_to_file(mgr, controller, C.ExistAbstract(E),"consensus_controller"))
+  std::cout << "\nWrite controller to better_consensus_controller.scs \n";
+  if(write_to_file(mgr, controller, C.ExistAbstract(E),"better_consensus_controller"))
     std::cout << "Done. \n";
 
-}
+  /* Dynamics for monolithic system */
+  auto prod_dynamics = [K](prod_state_type &x,  prod_control_type u) {
+    double avg = 0, w;
+    for (int i = 0; i < N; i++){
+      avg += x[i];
+    }
+    avg = avg / N;
+    std::cout << "Average w: " << avg << std::endl;
+    for (int i = 0; i < N; i++){
+      w = x[i] - avg;
+      x[i] = logistic_curve(x[i] + u[i] + K*w, 0, 31);
+    }
+  };
+
+  /*
+  Simulate Dynamics with synthesized controller 
+
+  Two options:
+  - active_control == true: Use synthesized controller
+  - active_control == false: All inputs u are equal to zero 
+  */
+  prod_state_type x={14.6, 15.4, 15, 16.2, 17.1, 24.1};
+  int u_index;
+  bool active_control = true;
+
+  for(int i=0; i<30; i++) {
+    std::cout << "State: ";
+    for(int j = 0; j < N; j++){
+      std::cout << x[j] << " ";
+    }
+    std::cout<< std::endl;
+
+    if (active_control){
+      std::cout << "Getting Control Input" << std::endl;
+      auto u = controller.restriction<prod_state_type>(mgr,C,x);
+      if (u.size() == 0){
+        std::cout << "No valid control. Exiting" << std::endl;
+        break;
+      }
+      u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
+      std::cout << "Number of Permitted Actions: " << u.size() << std::endl;
+      std::cout << "Input Index: " << u_index << std::endl;
+      std::cout << "Input: ";
+      for(int j = 0; j < N; j++){
+        std::cout << u[u_index+j] << " ";
+      } 
+      
+      prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2],u[u_index+3],u[u_index+4],u[u_index+5]});
+      std::cout<< std::endl << std::endl;
+    }
+    else{ // passive control
+      prod_dynamics(x, {0,0,0,0,0,0});
+    }
+  } // close simulation for loop
+
+} // close main 
 

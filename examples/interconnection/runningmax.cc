@@ -38,7 +38,7 @@ const int exog_dim = 1;
 /* input space of system is a cartesian product*/
 const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
-const int N = 22;
+const int N = 10;
 
 const int inter_dim = N - 2; 
 
@@ -86,21 +86,6 @@ void max2(std::array<double,2> ll, std::array<double, 2> ur, std::array<double, 
   o_ur[0] = std::max(ur[0], ur[1]);
 }
 
-/* Computes AND of BDDs which are a vector of N identical BDDs. Assumes N is a power of 2.*/
-// TODO optimize so that the vector is passed by reference
-BDD pow2vectorAND(std::vector<BDD> bdds){
-  int N = bdds.size(); 
-  std::cout << N << std::endl;
-  for(int stride = 2; stride <= N; stride *= 2){
-    std::cout << "Merging groups of " << stride << std::endl;
-    for (int i = 0; i < N; i += stride){
-      std::cout << i << "-th group" << std::endl; 
-      bdds[i] &= bdds[i+stride/2];
-    }
-  }
-  return bdds[0];
-}
-
 int main() {
   /* to measure time */
   TicToc tt;
@@ -108,7 +93,6 @@ int main() {
   Cudd mgr;
   mgr.AutodynEnable(CUDD_REORDER_SIFT_CONVERGE);
   // mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
-  //mgr.SetMaxGrowth(2.5);
   mgr.EnableReorderingReporting();
   //mgr.AutodynDisable();
 
@@ -214,9 +198,6 @@ int main() {
   }
   tt.toc();
 
-  // TODO Existential abstract out the intermediate variables?
-  // Verify by calling the restrict method on a large number
-
   /* Declare dependencies for individual systems */
   std::vector<scots::FunctionDependency> sysdeps(N, scots::FunctionDependency());
   for (int i = 0; i < N; i++){
@@ -233,21 +214,14 @@ int main() {
     abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
     std::cout << "System " << i << " abstraction ";
     composed_systems &= abs_comp[i].compute_abstraction(mgr);
-    //abs_systems[i] = abs_comp[i].compute_abstraction(mgr);
     tt.toc();
   }
   tt.toc();
-  // mgr.AutodynDisable();
+
   std::cout << "Composing Systems" << std::endl;
   tt.tic();
   BDD monolithic = composed_systems & interconnection;
   tt.toc();
-
-  // std::cout << "Composing smaller systems " << std::endl;
-  // BDD interconnected_sys = mgr.bddOne();
-  // tt.tic();
-  // interconnected_sys = pow2vectorAND(abs_systems);
-  // tt.toc();
 
 }
 
