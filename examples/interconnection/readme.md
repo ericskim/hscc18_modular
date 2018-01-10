@@ -1,18 +1,14 @@
 
+[paper]: https://people.eecs.berkeley.edu/~eskim/papers/HSCC18_preprint.pdf
+
 About
 ============
 
-This tool is a modification of the SCOTS toolbox for controller synthesis. 
-
-Two examples contained in the HSCC18 modular control systems paper.
+Two examples contained in the [HSCC18 modular control systems paper][paper].
 
 - runningmax.cc: An example to test the scalability of the interconnection decomposition. 
 - better_conensus.cc: Multiple scalar systems are tasked with agreeing on a consensus location. The only global information available to each individual system is the average state amongst all systems. 
 
-References
-============
-1. HSCC18 
-2. SCOTS
 
 Installation Instructions 
 ============
@@ -28,10 +24,12 @@ brew info cudd
 to find the library location.
 
 2. Edit the Makefile 
+   
    - Set CC to a compiler that supports C++11, e.g.
   ```
   CC = clang++
   ```
+   
    - set CUDDPATH to the location of the CUDD library, e.g.
 ```
 CUDDPATH = /usr/local/Cellar/cudd/3.0.0

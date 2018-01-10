@@ -2,4 +2,13 @@
 *.bdd
 *.scs
 *.txt
+*.bbl
+*.aux
+*.bcf
+*.log
+*.out
+*.toc
+*.blg
+*.synctex.gz
+*.run.xml
 newdoc
