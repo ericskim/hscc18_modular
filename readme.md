@@ -9,7 +9,7 @@ Bug reports and feature requests can be submitted to <eskim@eecs.berkeley.edu>
 
 # Additional Functionality 
 
-Most of the functionality of the original version has been retained, but some features to take advantage of the modular approach to constructing control system abstractions can be found in the files 
+Most of the functionality of the original version has been retained, but features to take advantage of the modular approach to constructing control system abstractions can be found in the files 
 
 - [./src/FunctionAbstracter.hh](./src/FunctionAbstracter.hh)
 - [./src/EnfPre.hh](./src/EnfPre.hh)

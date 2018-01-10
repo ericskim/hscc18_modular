@@ -326,9 +326,6 @@ int main() {
     file.open("better_consensus_reachable.txt");
     auto a = pre_product.bdd_to_grid_points(mgr, XX);
     for(size_t j = 0; j < a.size(); j++){
-      // if (j % (state_dim *N) == 0){
-      //   file << i << " ";
-      // }
       file << a[j] << " ";
       if (j % (state_dim *N) == (state_dim *N)-1)
         file << "\n";
@@ -365,35 +362,44 @@ int main() {
   int u_index;
   bool active_control = true;
 
+  std::ofstream file;
+  if (active_control){
+    file.open("traj_active.txt");
+  }
+  else{
+    file.open("traj_passive.txt");
+  }
+
   for(int i=0; i<30; i++) {
-    std::cout << "State: ";
+    file << "State: ";
     for(int j = 0; j < N; j++){
-      std::cout << x[j] << " ";
+      file << x[j] << " ";
     }
-    std::cout<< std::endl;
+    file<< std::endl;
 
     if (active_control){
-      std::cout << "Getting Control Input" << std::endl;
+      file << "Getting Control Input" << std::endl;
       auto u = controller.restriction<prod_state_type>(mgr,C,x);
       if (u.size() == 0){
-        std::cout << "No valid control. Exiting" << std::endl;
+        file << "No valid control. Exiting" << std::endl;
         break;
       }
       u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
-      std::cout << "Number of Permitted Actions: " << u.size() << std::endl;
-      std::cout << "Input Index: " << u_index << std::endl;
-      std::cout << "Input: ";
+      file << "Number of Permitted Actions: " << u.size() << std::endl;
+      file << "Input Index: " << u_index << std::endl;
+      file << "Input: ";
       for(int j = 0; j < N; j++){
-        std::cout << u[u_index+j] << " ";
+        file << u[u_index+j] << " ";
       } 
       
       prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2],u[u_index+3],u[u_index+4],u[u_index+5]});
-      std::cout<< std::endl << std::endl;
+      file<< std::endl << std::endl;
     }
     else{ // passive control
       prod_dynamics(x, {0,0,0,0,0,0});
     }
   } // close simulation for loop
 
+  file.close();
 } // close main 
 
