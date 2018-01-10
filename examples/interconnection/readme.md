@@ -31,9 +31,9 @@ to find the library location.
   ```
    
    - set CUDDPATH to the location of the CUDD library, e.g.
-```
-CUDDPATH = /usr/local/Cellar/cudd/3.0.0
-```
+  ```
+  CUDDPATH = /usr/local/Cellar/cudd/3.0.0
+  ```
 
 3. Compile `runningmax.cc` and `better_consensus.cc` by running
   ```
