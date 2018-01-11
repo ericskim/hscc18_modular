@@ -179,7 +179,7 @@ public:
 
 /**
 @class FunctionAbstracter
-@brief 
+@brief Computes a discrete abstraction of a finite dimensional continuous function 
 **/
 template<class concreteInput, class concreteOutput>
 class FunctionAbstracter{
