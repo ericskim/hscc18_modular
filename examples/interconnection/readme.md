@@ -23,19 +23,24 @@ brew info cudd
 ```
 to find the library location.
 
-2. Edit the Makefile 
+2. Copy this repository
+
+3. Edit the Makefile 
    
    * Set CC to a compiler that supports C++11, e.g. `CC = clang++`
    
    * set CUDDPATH to the location of the CUDD library, e.g. `CUDDPATH = /usr/local/Cellar/cudd/3.0.0`
 
-3. Compile `runningmax.cc` and `consensus.cc` by running
+How to Run
+=============
+
+1. Compile `runningmax.cc` and `consensus.cc` by running
 
   ```
   $ make 
   ``` 
 
-4. Execute examples with
+2. Execute examples with
 
   ```
   $./runningmax.o
@@ -43,7 +48,7 @@ to find the library location.
   ```
 
 
-5. Visualize consensus example
+3. Visualize consensus example
   
   ```
   python visualize_consensus.py
