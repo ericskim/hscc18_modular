@@ -13,19 +13,10 @@ Two examples contained in the [HSCC18 modular control systems paper][paper].
 Installation Instructions 
 ============
 
-1. To run these examples, you need the [CUDD](http://vlsi.colorado.edu/~fabio/CUDD/) library installed. On MacOS and using [Homebrew](https://brew.sh/) you can run 
-```
-brew install cudd 
-```
-in a terminal then
-```
-brew info cudd
-```
-to find the library location.
+1. To run these examples, you need the [CUDD](http://vlsi.colorado.edu/~fabio/CUDD/) library installed. On MacOS and using [Homebrew](https://brew.sh/) you can run `brew install cudd`
+in a terminal then `brew info cudd` to find the library location.
 
-2. Copy this repository
-
-3. Edit the Makefile 
+2. Edit the Makefile 
    
    * Set CC to a compiler that supports C++11, e.g. `CC = clang++`
    
