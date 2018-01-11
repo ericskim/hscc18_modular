@@ -21,10 +21,7 @@ For implementation details please have a look in the C++ [documentation](./doc/h
 * The basic implementation of **SCOTS** is inlined and header only. Hence, only a working C++ compiler
   with C++11 support is needed.
 
-* The best way to find out about **SCOTS** is to clone the repository and run the examples
-
-  - [./examples/dcdc_bdd/](./examples/dcdc_bdd/)
-  - [./examples/vehicle_bdd/](./examples/vehicle_bdd)
+* The best way to find out about **SCOTS** is to clone the repository and run the examples in [./examples/dcdc_bdd/](./examples/dcdc_bdd/) and [./examples/vehicle_bdd/](./examples/vehicle_bdd)
 
 * Two additional examples from the [paper][paper] and instructions on how to run them can be found in the  [./examples/interconnection/](./examples/interconnection/) directory.
 
