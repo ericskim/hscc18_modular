@@ -23,8 +23,8 @@ For implementation details please have a look in the C++ [documentation](./doc/h
 
 * The best way to find out about **SCOTS** is to clone the repository and run the examples
 
-  * [./examples/dcdc_bdd/](./examples/dcdc_bdd/)
-  * [./examples/vehicle_bdd/](./examples/vehicle_bdd)
+  - [./examples/dcdc_bdd/](./examples/dcdc_bdd/)
+  - [./examples/vehicle_bdd/](./examples/vehicle_bdd)
 
 * Two additional examples from the [paper][paper] and instructions on how to run them can be found in the  [./examples/interconnection/](./examples/interconnection/) directory.
 
