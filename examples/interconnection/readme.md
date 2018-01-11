@@ -7,7 +7,7 @@ About
 Two examples contained in the [HSCC18 modular control systems paper][paper].
 
 - runningmax.cc: An example to test the scalability of the interconnection decomposition. 
-- better_conensus.cc: Multiple scalar systems are tasked with agreeing on a consensus location. The only global information available to each individual system is the average state amongst all systems. 
+- consensus.cc: Multiple scalar systems are tasked with agreeing on a consensus location. The only global information available to each individual system is the average state amongst all systems. 
 
 
 Installation Instructions 
@@ -25,24 +25,26 @@ to find the library location.
 
 2. Edit the Makefile 
    
-   - Set CC to a compiler that supports C++11, e.g.
-  ```
-  CC = clang++
-  ```
+   * Set CC to a compiler that supports C++11, e.g. `CC = clang++`
    
-   - set CUDDPATH to the location of the CUDD library, e.g.
-  ```
-  CUDDPATH = /usr/local/Cellar/cudd/3.0.0
-  ```
+   * set CUDDPATH to the location of the CUDD library, e.g. `CUDDPATH = /usr/local/Cellar/cudd/3.0.0`
 
-3. Compile `runningmax.cc` and `better_consensus.cc` by running
+3. Compile `runningmax.cc` and `consensus.cc` by running
+
   ```
   $ make 
   ``` 
 
 4. Execute examples with
+
   ```
   $./runningmax.o
-  $./better_consensus.o
+  $./consensus.o
   ```
 
+
+5. Visualize consensus example
+  
+  ```
+  python visualize_consensus.py
+  ```
