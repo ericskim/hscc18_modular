@@ -1,5 +1,5 @@
 /*
- * SymbolicModel.hh
+ * FunctionAbstracter.hh
  *
  *  created: Sep 2017
  *   author: Eric S. Kim
@@ -17,13 +17,13 @@
 #include <map>
 
 #include "SymbolicSet.hh"
-//#include "Dependency.hh"
 
 /** @namespace scots **/ 
 namespace scots {
 
 /**
-@brief Keeps track of the dependencies between input/output variables of a given function.
+@class FunctionDependency
+@brief Keeps track of the dependencies between input/output SymbolicSets of a given function.
 **/
 class FunctionDependency{
 protected:
@@ -40,7 +40,6 @@ protected:
 private: 
 
   /*@brief Maps a output space set and coordinate to an index in pre_deps*/
-  //std::map<IntegerInterval<abs_type>, size_t> interval_to_index;
   std::vector<std::pair<IntegerInterval<abs_type>, int> > i_interval_to_index;
   std::vector<std::pair<IntegerInterval<abs_type>, int> > o_interval_to_index;
 
@@ -55,12 +54,17 @@ private:
   }
 
 public:
+
+  /**
+  @brief FunctionDependency constructor.
+  **/
+  FunctionDependency(){};
+
   /**
   @brief FunctionDependency constructor.
   @param [in] isets - The function's input set is a cartesian product of symbolic sets in isets
   @param [in] osets - The function's output set is a cartesian product of symbolic sets in osets
   **/
-  FunctionDependency(){};
   FunctionDependency(std::vector<SymbolicSet> isets, std::vector<SymbolicSet> osets): 
                   i_spaces(isets), o_spaces(osets){
     i_dims.resize(i_spaces.size());
@@ -111,9 +115,11 @@ public:
   ~FunctionDependency(){};
 
  /** @brief Set function dependency
-  @param [in] oslice - Output interval. A "slice" of the output set
-  @param [in] pre_deps - Vector of dependencies for the pre interval. 
+
   If a dependency has already been set for the specific output then it will be cleared if written.
+  
+  @param [in] oslice - Function output interval.
+  @param [in] pre_deps - Input intervals that oslice depends on. 
  **/
   void set_dependency(IntegerInterval<abs_type>& oslice, 
                       std::vector<IntegerInterval<abs_type> > pre_deps){
@@ -268,7 +274,22 @@ private:
 public:
   ~FunctionAbstracter() {};
   FunctionAbstracter() {};
-  /**@brief Constructor that remembers function dependencies **/
+  /**
+  * @brief Constructor for Function Abstracter object that remembers dependencies
+  * 
+  * The function abstracter's purpose is to compute an overapproximation of the set of input-output pairs 
+  * (_x_, _f_(_x_)) of some function _f_. 
+  * 
+  * The input and output spaces are partitioned into a grid of hyperrectangles.
+  * After fixing an input hyperrectangle [x], the set of output hyperrectangles intersecting the image
+  * {f(x): x in [x]} is computed and stored. 
+  *
+  * Providing access to input-output dependencies speeds up this procedure. 
+  * 
+  * @param[in] d - FunctionDependency of the overapproximation function 
+  * @param[in] oa - Overapproximation of the function that takes two corners of an input 
+  *                 hyperrectangle and outputs two corners of an overapproximating hyperrectangle
+  **/
   FunctionAbstracter(const FunctionDependency d,
                       const std::function<void(const concreteInput&, const concreteInput&, concreteOutput &, concreteOutput &)> oa): dep(d) {
       m_outSpace = dep.get_output_product();

@@ -11,4 +11,5 @@
 *.blg
 *.synctex.gz
 *.run.xml
+*.pdf
 newdoc

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['tictoc',['TicToc',['../class_tic_toc.html',1,'']]],
-  ['transitionfunction',['TransitionFunction',['../classscots_1_1_transition_function.html',1,'scots']]]
+  ['functionabstracter',['FunctionAbstracter',['../classscots_1_1_function_abstracter.html',1,'scots']]],
+  ['functiondependency',['FunctionDependency',['../classscots_1_1_function_dependency.html',1,'scots']]]
 ];

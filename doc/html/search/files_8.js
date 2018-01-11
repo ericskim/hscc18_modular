@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['winningdomain_2ehh',['WinningDomain.hh',['../_winning_domain_8hh.html',1,'']]]
+  ['transitionfunction_2ehh',['TransitionFunction.hh',['../_transition_function_8hh.html',1,'']]]
 ];
