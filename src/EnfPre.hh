@@ -3,6 +3,8 @@
  *
  *  created: Jan 2017
  *   author: Matthias Rungger
+ *  modified: Sep 2017
+ *   author: Eric S. Kim   
  */
 
 /** @file **/
@@ -136,6 +138,7 @@ public:
    *                              computed with SymbolicModel::compute_gb
    * @param  model - SymbolicModel containing the SymbolicSet for the state and input alphabet 
    **/
+
   EnfPre(const Cudd& manager, 
          const BDD& transition_relation,
          const SymbolicSet& pre_set,
@@ -157,6 +160,17 @@ public:
     /* non blocking states-input pairs */
     m_tr_nopost=m_tr.ExistAbstract(m_cube_post);
   }
+
+  template<class state_type, class input_type>
+  EnfPre(const Cudd& manager,
+        const BDD& transition_relation,
+        const SymbolicModel<state_type,input_type>& mdl): EnfPre(manager, 
+                                          transition_relation, 
+                                          mdl.get_sym_set_pre(), 
+                                          mdl.get_sym_set_input(),
+                                          mdl.get_sym_set_post()) {
+  }
+
   /** @brief computes the enforcable predecessor of the BDD Z **/
   BDD operator()(BDD Z) const {
     /* project onto state alphabet */
@@ -315,6 +329,18 @@ public:
     return exists_over_conjunction(mgr, pre_elim_vars, relation_conjunction);
   } 
 };
+
+/** @brief: small function to output progess of an iteration to the terminal **/
+inline void print_progress(int i) {
+  std::cout << ".";
+  std::flush(std::cout);
+  if(!(i%40)) {
+    std::cout << "\r";
+    std::cout << "                                        ";
+    std::cout << "\r";
+  }
+}
+
 
 //inline 
 //BDD solve_invariance_game(const Cudd& manager, const EnfPre& enf_pre, const BDD& S, bool verbose=true)  {

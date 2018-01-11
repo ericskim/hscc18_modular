@@ -11,8 +11,8 @@ Bug reports and feature requests can be submitted to <eskim@eecs.berkeley.edu>
 
 Most of the functionality of the original version has been retained, but features to take advantage of the modular approach to constructing control system abstractions can be found in the files 
 
-- [./src/FunctionAbstracter.hh](./src/FunctionAbstracter.hh)
-- [./src/EnfPre.hh](./src/EnfPre.hh)
+- [./src/FunctionAbstracter.hh](./src/FunctionAbstracter.hh) for abstracting both control systems and interconnection maps. 
+- [./src/EnfPre.hh](./src/EnfPre.hh) for using computing controllable predecessors. Predecessors are used in controller synthesis via fixed point computations. 
 
 Two examples from the paper and instructions to run them can be found in the  [./examples/interconnection/](./examples/interconnection/) directory.
 
