@@ -25,22 +25,8 @@ in a terminal then `brew info cudd` to find the library location.
 How to Run
 =============
 
-1. Compile `runningmax.cc` and `consensus.cc` by running
+1. Compile `runningmax.cc` and `consensus.cc` by running `$ make`
 
-  ```
-  $ make 
-  ``` 
+2. Execute examples with `$./runningmax.o` and `$./consensus.o`
 
-2. Execute examples with
-
-  ```
-  $./runningmax.o
-  $./consensus.o
-  ```
-
-
-3. Visualize consensus example
-  
-  ```
-  python visualize_consensus.py
-  ```
+3. Visualize consensus example `python visualize_consensus.py`
