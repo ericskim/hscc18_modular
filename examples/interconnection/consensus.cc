@@ -344,7 +344,7 @@ int main() {
       avg += x[i];
     }
     avg = avg / N;
-    std::cout << "Average w: " << avg << std::endl;
+    //std::cout << "Average w: " << avg << std::endl;
     for (int i = 0; i < N; i++){
       w = x[i] - avg;
       x[i] = logistic_curve(x[i] + u[i] + K*w, 0, 31);
@@ -360,15 +360,9 @@ int main() {
   */
   prod_state_type x={14.6, 15.4, 15, 16.2, 17.1, 24.1};
   int u_index;
-  bool active_control = true;
 
   std::ofstream file;
-  if (active_control){
-    file.open("traj_active.txt");
-  }
-  else{
-    file.open("traj_passive.txt");
-  }
+  file.open("traj_active.txt");
 
   for(int i=0; i<30; i++) {
     file << "State: ";
@@ -377,29 +371,40 @@ int main() {
     }
     file<< std::endl;
 
-    if (active_control){
-      file << "Getting Control Input" << std::endl;
-      auto u = controller.restriction<prod_state_type>(mgr,C,x);
-      if (u.size() == 0){
-        file << "No valid control. Exiting" << std::endl;
-        break;
-      }
-      u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
-      file << "Number of Permitted Actions: " << u.size() << std::endl;
-      file << "Input Index: " << u_index << std::endl;
-      file << "Input: ";
-      for(int j = 0; j < N; j++){
-        file << u[u_index+j] << " ";
-      } 
-      
-      prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2],u[u_index+3],u[u_index+4],u[u_index+5]});
-      file<< std::endl << std::endl;
+    file << "Getting Control Input" << std::endl;
+    auto u = controller.restriction<prod_state_type>(mgr,C,x);
+    if (u.size() == 0){
+      file << "No valid control. Exiting" << std::endl;
+      break;
     }
-    else{ // passive control
-      prod_dynamics(x, {0,0,0,0,0,0});
-    }
-  } // close simulation for loop
+    u_index = u.size() - (rand() % (u.size()/N))*N;//rand() % (u.size()/control_dim);
+    file << "Number of Permitted Actions: " << u.size() << std::endl;
+    file << "Input Index: " << u_index << std::endl;
+    file << "Input: ";
+    for(int j = 0; j < N; j++){
+      file << u[u_index+j] << " ";
+    } 
+    
+    prod_dynamics(x,{u[u_index],u[u_index+1],u[u_index+2],u[u_index+3],u[u_index+4],u[u_index+5]});
+    file<< std::endl << std::endl;
 
+  } // close simulation for loop
   file.close();
+
+  /* Passive Control */
+  x={14.6, 15.4, 15, 16.2, 17.1, 24.1};
+  file.open("traj_passive.txt");
+  for(int i=0; i<30; i++) {
+    file << "State: ";
+    for(int j = 0; j < N; j++){
+      file << x[j] << " ";
+    }
+    file<< std::endl;
+    prod_dynamics(x, {0,0,0,0,0,0});
+  }
+  file.close();
+
+
+
 } // close main 
 
