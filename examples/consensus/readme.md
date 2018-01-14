@@ -4,9 +4,8 @@
 About
 ============
 
-Two examples contained in the [HSCC18 modular control systems paper][paper].
+Consensus example contained in the [HSCC18 modular control systems paper][paper].
 
-* runningmax.cc: An example to test the scalability of the interconnection decomposition. 
 * consensus.cc: Multiple scalar systems are tasked with agreeing on a consensus location. The only global information available to each individual system is the average state amongst all systems. 
 
 
@@ -25,8 +24,8 @@ in a terminal then `brew info cudd` to find the library location.
 How to Run
 =============
 
-1. Compile `runningmax.cc` and `consensus.cc` by running `$ make`
+1. Compile `consensus.cc` by running `$ make`
 
-2. Execute examples with `$./runningmax.o` and `$./consensus.o`
+2. Execute examples with `$./consensus.o`
 
-3. Visualize consensus example `python visualize_consensus.py`
+3. To recreate Figure 7, run `python visualize_consensus.py`. This requires the python graphical plotting library matplotlib.

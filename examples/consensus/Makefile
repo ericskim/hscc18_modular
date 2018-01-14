@@ -19,17 +19,14 @@ CUDDINC 		= -I$(CUDDPATH)/include
 CUDD		    =  $(CUDDINC) -L$(CUDDPATH)/lib -lcudd
 
 
-.PHONY: consensus runningmax
+.PHONY: consensus
 
-TARGET = consensus runningmax
+TARGET = consensus
 
 all: $(TARGET)
 
 consensus:
 	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) consensus.cc -o consensus.o
 
-runningmax: 
-	$(CC) $(CXXFLAGS) $(SCOTSINC) $(CUDD) runningmax.cc -o runningmax.o
-
 clean:
-	rm consensus runningmax
+	rm consensus

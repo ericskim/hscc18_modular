@@ -358,6 +358,7 @@ int main() {
   - active_control == true: Use synthesized controller
   - active_control == false: All inputs u are equal to zero 
   */
+  std::cout << "Simulating Active Controller" << std::endl;
   prod_state_type x={14.6, 15.4, 15, 16.2, 17.1, 24.1};
   int u_index;
 
@@ -390,8 +391,10 @@ int main() {
 
   } // close simulation for loop
   file.close();
+  std::cout << "Trajectory written to traj_active.txt" << std::endl;
 
   /* Passive Control */
+  std::cout << "Simulating Passive Controller" << std::endl;
   x={14.6, 15.4, 15, 16.2, 17.1, 24.1};
   file.open("traj_passive.txt");
   for(int i=0; i<30; i++) {
@@ -403,6 +406,7 @@ int main() {
     prod_dynamics(x, {0,0,0,0,0,0});
   }
   file.close();
+  std::cout << "Trajectory written to traj_passive.txt" << std::endl;
 
 
 

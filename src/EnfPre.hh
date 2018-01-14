@@ -257,7 +257,7 @@ protected:
   /* stores the permutation array used to swap pre with post variables */
   std::unique_ptr<int[]> m_permute;
 
-  const std::vector<BDD> relation_conjunction;
+  const std::vector<BDD> relation_conj;
   std::vector<BDD> m_cubes_input;
   std::vector<BDD> m_cubes_latent;
   std::vector<BDD> m_cubes_post;
@@ -265,18 +265,18 @@ protected:
   Cudd mgr;
 public:
   /**
-* @brief Decomposed predecessor constructor 
-* @param pre_sets[in] -  predecessor state sets
-* @param control_sets[in] - controllable input sets
-* @param post_sets[in] - post state sets
-* @param latent_sets[in] - latent variable for sparsity or 
-**/
+  * @brief Decomposed predecessor constructor 
+  * @param pre_sets[in] -  predecessor state sets
+  * @param control_sets[in] - controllable input sets
+  * @param post_sets[in] - post state sets
+  * @param latent_sets[in] - latent variable for sparsity or 
+  **/
   DecomposedPredecessor(const Cudd& manager,
                         const std::vector<BDD>& relations,
                         const std::vector<SymbolicSet>& pre_sets,
                         const std::vector<SymbolicSet>& control_sets,
                         const std::vector<SymbolicSet>& post_sets,
-                        const std::vector<SymbolicSet>& latent_sets): relation_conjunction(relations){
+                        const std::vector<SymbolicSet>& latent_sets): relation_conj(relations){
     mgr = manager; 
     std::cout << "Permutation Array" << std::endl;
     /* Permutation array used to swap pre and post states */
@@ -317,16 +317,23 @@ public:
       ensure the post_state is within Z
   **/
   BDD operator() (BDD Z ) const {
+
     /* Change Z from a formula over predecessor states to one over post states */
     Z=Z.Permute(m_permute.get());
-    std::vector<BDD> conj_formulas(relation_conjunction);
+    
+    /* Compute the formula \forall (pre_elim_vars). ( /\ (relation_conj) => Z )*/
+    std::vector<BDD> conj_formulas(relation_conj);
     conj_formulas.push_back(!Z);
     return !exists_over_conjunction(mgr, pre_elim_vars, conj_formulas);
   }
 
-  /** @brief Compute non-blocking state-input pairs **/
+  /** 
+  @brief Compute non-blocking state-input pairs 
+  
+  Computes the formula \exists (pre_elim_vars). ( /\ (relation_conj) )
+  **/
   BDD nonblocking() const{
-    return exists_over_conjunction(mgr, pre_elim_vars, relation_conjunction);
+    return exists_over_conjunction(mgr, pre_elim_vars, relation_conj);
   } 
 };
 

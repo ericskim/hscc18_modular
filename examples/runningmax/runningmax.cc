@@ -38,7 +38,7 @@ const int exog_dim = 1;
 /* input space of system is a cartesian product*/
 const int input_dim = state_dim + control_dim + exog_dim; 
 /* Create N identical systems */
-const int N = 10;
+const int N = NUMSYS;
 
 const int inter_dim = N - 2; 
 
@@ -93,7 +93,7 @@ int main() {
   Cudd mgr;
   mgr.AutodynEnable(CUDD_REORDER_SIFT_CONVERGE);
   // mgr.AutodynEnable(CUDD_REORDER_RANDOM_PIVOT);
-  mgr.EnableReorderingReporting();
+  // mgr.EnableReorderingReporting();
   //mgr.AutodynDisable();
 
   /* Dynamics for individual subsystem */ 
@@ -167,10 +167,11 @@ int main() {
   std::vector<scots::FunctionDependency>inter_deps;
   inter_deps.resize(N-1); 
 
+  std::cout << "\n\nInterconnection Abstraction" << std::endl;
   BDD interconnection = mgr.bddOne();
   tt.tic();
   for (int i = 0; i < N-1; i++){
-    std::cout << i << std::endl;
+    std::cout << "Layer " << i << std::endl;
     std::array<double, 1> inter_lb, inter_ub, inter_eta;
     inter_lb[0] = 0;
     inter_ub[0] = 31;
@@ -209,16 +210,16 @@ int main() {
   std::vector<scots::FunctionAbstracter<input_type, state_type> > abs_comp(N, scots::FunctionAbstracter<input_type, state_type>());
   std::vector<BDD> abs_systems(N, mgr.bddOne());
   BDD composed_systems = mgr.bddOne();
+  std::cout << "\n\nSystem Abstractions" << std::endl;
   tt.tic();
   for (int i = 0; i < N; i++){
     abs_comp[i] = scots::FunctionAbstracter<input_type, state_type>(sysdeps[i], sys_overapprox);
-    std::cout << "System " << i << " abstraction ";
+    std::cout << "System " << i << " abstraction \n";
     composed_systems &= abs_comp[i].compute_abstraction(mgr);
-    tt.toc();
   }
   tt.toc();
 
-  std::cout << "Composing Systems" << std::endl;
+  std::cout << "\n\nComposing Systems" << std::endl;
   tt.tic();
   BDD monolithic = composed_systems & interconnection;
   tt.toc();
